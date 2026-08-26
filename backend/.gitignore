@@ -1,0 +1,98 @@
+# =========================
+# Build outputs
+# =========================
+bin/
+obj/
+out/
+publish/
+
+# =========================
+# User-specific files
+# =========================
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =========================
+# Visual Studio / IDE
+# =========================
+.vs/
+.vscode/
+.idea/
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# ASP.NET Core config secrets
+# =========================
+appsettings.*.Development.json
+appsettings.*.Local.json
+
+# Secret manager (user secrets)
+secrets.json
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# .NET tool cache
+# =========================
+.dotnet/
+.nuget/
+packages/
+
+# =========================
+# NuGet
+# =========================
+*.nupkg
+*.snupkg
+project.lock.json
+
+# =========================
+# Test results
+# =========================
+TestResults/
+*.trx
+
+# =========================
+# IIS / publish artifacts
+# =========================
+*.Publish.xml
+
+# =========================
+# Rider
+# =========================
+.idea/
+*.sln.iml
+
+# =========================
+# Local HTTPS certs (optional but common)
+# =========================
+https/
+*.pfx
+*.key
+
+# =========================
+# Azure / deployment
+# =========================
+azure-pipelines.yml.cache
+
+# =========================
+# Node (if frontend included)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+
+*.vbs
+.env*

@@ -1,0 +1,5 @@
+*.vbs
+*.py
+**/.env*
+**/appsettings*.json
+*.zip
