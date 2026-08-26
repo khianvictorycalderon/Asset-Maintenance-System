@@ -26,7 +26,7 @@
         },
         "AllowedHosts": "*",
         "ConnectionStrings": {
-            "DefaultConnection": "..."
+            "DefaultConnection": "Host=localhost;Port=[PORT];Database=[DB NAME];Username=[USERNAME];Password=[PASSWORD]"
         },
         "Cors": {
             "AllowedOrigins": [
@@ -39,13 +39,13 @@
         }
     }
     ```
-    **NOTE**: *Update all the `"..."` into actual credentials*
+    **NOTE**: *Replace with your actual credentials and configuration*
 2. Run this if you haven't installed entity framework before:
     ```cmd
     dotnet tool install --global dotnet-ef --version 8.0.0
     ```
     *NOTE: Latest version is unstable with the current setup so I use 8.0.0*
-3. Run the following CMD comamnds:
+3. Run the following CMD commands:
     *To actually create tables in the database:*
     ```
     dotnet ef database update
