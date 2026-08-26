@@ -1,4 +1,4 @@
-# Asset Maintenance and Monitoring SystemASFSAF
+# Asset Maintenance and Monitoring System
 
 ## Members:
 - Calderon, Khian Victory D. *(Backend Developer + Database Designer & Engineer)*
