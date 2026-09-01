@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-200 px-6">
+    <div className="min-h-screen w-full flex items-center justify-center bg-orange-50 dark:bg-zinc-950 text-orange-950 dark:text-orange-100 px-4 sm:px-6 transition-colors duration-300">
       <div className="w-full max-w-3xl text-center space-y-8">
 
         {/* Hero Title */}
@@ -18,19 +18,52 @@ export default function LandingPage() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+
+          {/* Sign-In */}
           <Link
             to="/login"
-            className="px-6 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-medium transition shadow-sm"
+            className="
+              w-full sm:w-auto
+              px-6 py-3
+              rounded-xl
+              bg-orange-500
+              hover:bg-orange-600
+              dark:bg-orange-700
+              dark:hover:bg-orange-600
+              text-white
+              font-medium
+              transition-colors
+              duration-200
+              shadow-sm
+            "
           >
             Sign-In
           </Link>
 
+          {/* Create Account */}
           <Link
             to="/register"
-            className="px-6 py-3 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-800 dark:text-zinc-200 font-medium transition"
+            className="
+              w-full sm:w-auto
+              px-6 py-3
+              rounded-xl
+              border
+              border-orange-300
+              dark:border-orange-800
+              bg-white
+              dark:bg-orange-950
+              hover:bg-orange-100
+              dark:hover:bg-orange-900
+              text-orange-950
+              dark:text-orange-100
+              font-medium
+              transition-colors
+              duration-200
+            "
           >
             Create Account
           </Link>
+
         </div>
 
       </div>
