@@ -3,7 +3,7 @@ import { FOOTER_BUTTONS } from "../config";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-orange-300 dark:border-orange-900 bg-orange-500 dark:bg-orange-900 text-black dark:text-orange-100">
+    <footer className="border-t border-orange-300 dark:border-orange-900 bg-orange-500 dark:bg-orange-900 text-white">
 
       <div className="max-w-6xl mx-auto px-6 py-12">
 
@@ -14,7 +14,7 @@ export default function Footer() {
             <div key={section} className="space-y-3">
 
               {/* Section title */}
-              <h3 className="text-sm font-semibold text-black dark:text-orange-100">
+              <h3 className="text-sm font-semibold text-white">
                 {section}
               </h3>
 
@@ -24,7 +24,7 @@ export default function Footer() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm text-black/80 dark:text-orange-100/80 hover:text-black dark:hover:text-white transition"
+                      className="text-sm text-white/80 hover:text-white transition"
                     >
                       {link.label}
                     </a>
@@ -44,17 +44,17 @@ export default function Footer() {
             © {new Date().getFullYear()} Asset Maintenance and Monitoring System. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-4 text-sm text-black/70 dark:text-orange-100/70">
+          <div className="flex items-center gap-4 text-sm text-white/70">
             <Link
               to="/privacy-policy"
-              className="hover:text-black dark:hover:text-white transition"
+              className="hover:text-white transition"
             >
               Privacy Policy
             </Link>
 
             <Link
               to="/terms-and-conditions"
-              className="hover:text-black dark:hover:text-white transition"
+              className="hover:text-white transition"
             >
               Terms & Conditions
             </Link>
