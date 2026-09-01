@@ -23,7 +23,7 @@ const PUBLIC_PAGES = [
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/terms-and-conditions", element: <TermsConditions /> },
   { path: "/guide", element: <>This is guide</> },
-  { path: "/blog", element: <>This is blo</> },
+  { path: "/blog", element: <>This is blog</> },
 ];
 
 const PUBLIC_PAGES_REDIRECT = [
