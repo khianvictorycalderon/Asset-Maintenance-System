@@ -20,13 +20,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 w-full z-50 border-b border-orange-300 dark:border-orange-900 bg-orange-500/90 dark:bg-orange-900/90 backdrop-blur-md">
 
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Brand */}
         <span
-          className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-100"
+          className="text-lg font-bold tracking-tight text-white dark:text-zinc-100"
         >
           {NAVBAR_HEADER}
         </span>
@@ -38,7 +38,7 @@ export default function Navbar() {
             <Link
               key={btn.path}
               to={btn.path}
-              className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition"
+              className="text-sm text-white/90 dark:text-orange-100/90 hover:text-black dark:hover:text-white transition"
             >
               {btn.label}
             </Link>
