@@ -15,8 +15,6 @@ import SlideToTop from "./components/SlideToTop";
 import PrivacyPolicy from "./public_pages/PrivacyPolicy";
 import TermsConditions from "./public_pages/TermsConditions";
 import PublicLayoutRedirect from "./layouts/PublicLayoutRedirect";
-import Guide from "./public_pages/Guide";
-import Blog from "./public_pages/Blog";
 
 const PUBLIC_PAGES = [
   { path: "/", element: <LandingPage /> },
@@ -24,8 +22,8 @@ const PUBLIC_PAGES = [
   { path: "/changelogs", element: <Changelogs /> },
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/terms-and-conditions", element: <TermsConditions /> },
-  { path: "/guide", element: <Guide /> },
-  { path: "/blog", element: <Blog /> },
+  { path: "/guide", element: <>This is guide</> },
+  { path: "/blog", element: <>This is blog</> },
 ];
 
 const PUBLIC_PAGES_REDIRECT = [
