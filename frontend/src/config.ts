@@ -197,8 +197,8 @@ export const FOOTER_BUTTONS: Record<
 
   References: [
     { label: "GitHub Source Code", href: "https://github.com/khianvictorycalderon/Asset-Maintenance-System" },
-    { label: "Blogs", href: "/#" },
-    { label: "Guide", href: "/#" },
+    { label: "Blogs", href: "#" },
+    { label: "Guide", href: "#" },
   ],
 };
 
