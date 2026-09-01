@@ -40,8 +40,8 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-orange-300 dark:border-orange-900 flex flex-col md:flex-row items-center justify-between gap-4">
 
-          <p className="text-sm text-white/70">
-            © {new Date().getFullYear()} All rights reserved.
+          <p className="text-sm text-zinc-500 dark:text-zinc-500">
+            © {new Date().getFullYear()} Asset Maintenance and Monitoring System. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/70">

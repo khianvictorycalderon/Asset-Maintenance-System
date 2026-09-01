@@ -22,6 +22,8 @@ const PUBLIC_PAGES = [
   { path: "/changelogs", element: <Changelogs /> },
   { path: "/privacy-policy", element: <PrivacyPolicy /> },
   { path: "/terms-and-conditions", element: <TermsConditions /> },
+  { path: "/guide", element: <>This is guide</> },
+  { path: "/blog", element: <>This is blog</> },
 ];
 
 const PUBLIC_PAGES_REDIRECT = [

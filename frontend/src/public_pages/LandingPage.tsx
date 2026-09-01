@@ -6,22 +6,14 @@ export default function LandingPage() {
       <div className="w-full max-w-3xl text-center space-y-8">
 
         {/* Hero Title */}
-        <div className="space-y-3">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-orange-950 dark:text-orange-50">
-            Build something
-            <span className="text-orange-500 dark:text-orange-600">
-              {" "}simple.
-            </span>
-          </h1>
-
-          {/* Orange accent */}
-          <div className="mx-auto h-1 w-16 rounded-full bg-orange-500 dark:bg-orange-700" />
-        </div>
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+          Manage your assets
+          <span className="text-zinc-500 dark:text-zinc-400"> with Confidence.</span>
+        </h1>
 
         {/* Subtitle */}
-        <p className="text-orange-800/80 dark:text-orange-200/70 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-          A modern, minimal application template built with clean design,
-          scalable structure, and orange styling.
+        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
+          A web-based system for an automotive manufacturing company to manage assets, monitor maintenance, and support reliable operations.
         </p>
 
         {/* CTA Buttons */}
