@@ -7,14 +7,13 @@ export default function LandingPage() {
 
         {/* Hero Title */}
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Build something
-          <span className="text-zinc-500 dark:text-zinc-400"> simple.</span>
+          Manage your assets
+          <span className="text-zinc-500 dark:text-zinc-400"> with Confidence.</span>
         </h1>
 
         {/* Subtitle */}
         <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-          A modern, minimal application template built with clean design,
-          scalable structure, and neutral styling.
+          A web-based system for an automotive manufacturing company to manage assets, monitor maintenance, and support reliable operations.
         </p>
 
         {/* CTA Buttons */}

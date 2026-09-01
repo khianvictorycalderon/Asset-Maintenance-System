@@ -41,7 +41,7 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-4">
 
           <p className="text-sm text-zinc-500 dark:text-zinc-500">
-            © {new Date().getFullYear()} All rights reserved.
+            © {new Date().getFullYear()} Asset Maintenance and Monitoring System. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-500">

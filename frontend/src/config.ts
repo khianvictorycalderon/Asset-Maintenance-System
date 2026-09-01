@@ -100,7 +100,7 @@ export const NAVBAR_BUTTONS: { label: string; path: string }[] = [
     }
 ];
 
-export const NAVBAR_HEADER = "Asset Maintenance System";
+export const NAVBAR_HEADER = "Asset Maintenance and Monitoring System";
 
 import type React from "react";
 // ---------------------------------------------------
@@ -187,31 +187,18 @@ export const REGISTER_FIELDS: RegisterFieldsProps[] = [
 // ---------------------------------------------------
 export const FOOTER_BUTTONS: Record<
   string,
-  { label: string; href: string }[]
+  { label: string; href?: string }[]
 > = {
-  Product: [
-    { label: "Features", href: "/features" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "Documentation", href: "/docs" },
-    { label: "Updates", href: "/changelogs" },
+   "Capstone Project By": [
+    { label: "Khian Victory D. Calderon" },
+    { label: "Dishiela Ingrid M. Camunag" },
+    { label: "Rafael L. Metran" },
   ],
 
-  Company: [
-    { label: "About", href: "/about" },
-    { label: "Careers", href: "/careers" },
-    { label: "Contact", href: "/contact" },
-  ],
-
-  Resources: [
-    { label: "Blog", href: "/blog" },
-    { label: "Help Center", href: "/help" },
-    { label: "Community", href: "/community" },
-  ],
-
-  Legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Cookie Policy", href: "/cookies" },
+  References: [
+    { label: "GitHub Source Code", href: "https://github.com/khianvictorycalderon/Asset-Maintenance-System" },
+    { label: "Blogs", href: "/blog" },
+    { label: "Guide", href: "/guide" },
   ],
 };
 
@@ -220,15 +207,19 @@ export const PRIVATE_FOOTER_LABEL = "Asset Maintenance and Monitoring System";
 // ---------------------------------------------------
 // About Page
 // ---------------------------------------------------
-export const ABOUT_DESCRIPTION: string = "A simple overview of this application";
+export const ABOUT_DESCRIPTION: string = "An asset maintenance and monitoring system designed to help automotive manufacturing companies manage, monitor, and maintain their operational assets.";
 export const ABOUT: { title: string; desc: string }[] = [
     {
-        title: "What is this?",
-        desc: "This is <strong>blah blah blah</strong> with <em>HTML support</em>.",
+        title: "What is this system?",
+        desc: "The <strong>Asset Maintenance and Monitoring System</strong> is a centralized platform designed to help an automotive manufacturing company manage its assets and maintenance activities more efficiently.",
     },
     {
-        title: "How did it come to this?",
-        desc: "It went through like this <br/> blah blah <u>blah</u>",
+        title: "What does it do?",
+        desc: "The system helps authorized personnel <strong>monitor assets, manage maintenance activities, and keep track of asset-related information</strong> through a centralized web application.",
+    },
+    {
+        title: "Who is it for?",
+        desc: "The system is intended for authorized <strong>administrators, employees, supervisors, and personnel</strong> involved in asset management and maintenance operations."
     },
 ];
 
@@ -239,47 +230,119 @@ export const CHANGELOGS: { release: string; changes: string[] }[] = [
     {
         release: "1.0.1",
         changes: [
-            "Added feature X",
-            "Added feature Y"
+            "Updated public pages with system information and documentation.",
+            "Improved navigation and user-facing content."
         ]
     },
     {
         release: "1.0.0",
         changes: [
-            "Initial Release", 
-            "Built with blah blah blah"
+            "Initial release of the Asset Maintenance and Monitoring System.", 
+            "Implemented role-based access for system users.",
+            "Added account and authentication functionality.",
         ]
     },
   ];
 
+
+// ---------------------------------------------------
+// Guide Page
+// ---------------------------------------------------
+export const GUIDE_DESCRIPTION: string =
+    "A practical guide to using the Asset Maintenance and Monitoring System.";
+
+export const GUIDE: { title: string; desc: string }[] = [
+    {
+        title: "Getting Started",
+        desc: "blah blah",
+    },
+];
+
+// ---------------------------------------------------
+// Blog Page
+// ---------------------------------------------------
+export const BLOG_DESCRIPTION: string =
+    "Articles and insights about asset maintenance and monitoring in automotive manufacturing.";
+
+export const BLOG: { title: string; desc: string }[] = [
+    {
+        title: "Why Asset Maintenance Matters in Automotive Manufacturing",
+        desc: "blah blah",
+    },
+];
+  
 // ---------------------------------------------------
 // Terms and Conditions
 // ---------------------------------------------------
-export const TERMS_LAST_UPDATED_DATE: string = "May 3, 2026 @ 8:00 PM";
+export const TERMS_LAST_UPDATED_DATE: string = "September 1, 2026";
 export const TERMS_CONDITIONS: { title: string; desc: string }[] = [
     {
-        title: "Usage",
-        desc: "Blah blah blah"
+        title: "Authorized Use",
+        desc: "This system is intended for authorized users involved in asset management and maintenance operations within the organization. Users are expected to use the system only for legitimate work-related purposes."
     },
     {
-        title: "Legal Framework",
-        desc: "Blah blah blah"
-    }
+        title: "Account Responsibility",
+        desc: "Users are responsible for maintaining the confidentiality of their account credentials and for all activities performed through their account. Users should report suspected unauthorized access to the appropriate administrator."
+    },
+    {
+        title: "Access and Permissions",
+        desc: "Access to system features and information is determined by the user's assigned role and permissions. Users must only access information and functionality necessary for their assigned responsibilities and must not attempt to bypass or modify access restrictions."
+    },
+    {
+        title: "System Information",
+        desc: "Users should provide accurate and appropriate information when recording or updating asset and maintenance-related data. Information entered into the system may be used to support maintenance operations and monitoring."
+    },
+    {
+        title: "Acceptable Use",
+        desc: "Users must not intentionally misuse, disrupt, damage, or attempt to gain unauthorized access to the system or its data."
+    },
+    {
+        title: "System Availability",
+        desc: "The system may occasionally be unavailable due to maintenance, updates, technical issues, network conditions, or other operational circumstances. Reasonable efforts may be made to maintain system availability, but uninterrupted access cannot be guaranteed."
+    },
+        {
+        title: "Account Suspension or Termination",
+        desc: "User access may be suspended, restricted, or terminated when authorization is revoked, an account is no longer required, or there is a suspected violation of system policies or security requirements."
+    },
+    {
+        title: "Changes to These Terms",
+        desc: "These Terms and Conditions may be updated from time to time to reflect changes to the system, organizational practices, operational requirements, or applicable policies. The latest version and its effective date will be made available through the system."
+    },
 ];
 
 // ---------------------------------------------------
 // Privacy Policy
 // ---------------------------------------------------
-export const PRIVACY_LAST_UPDATED_DATE: string = "May 3, 2026 @ 8:00 PM";
+export const PRIVACY_LAST_UPDATED_DATE: string = "September 1, 2026";
 export const PRIVACY_POLICY: { title: string; desc: string }[] = [
     {
-      title: "Data",
-      desc: "Blah blah blah"
+      title: "Information We Collect",
+      desc: "The system may collect information necessary for account management and system operations, such as user names, email addresses, account information, and asset or maintenance records entered into the system."
     },
     {
-      title: "Third Party",
-      desc: "Blah blah blah"
-    }
+      title: "Use of Information",
+      desc: "Information collected through the system is used to support asset management, maintenance monitoring, user authentication, and other legitimate system operations."
+    },
+        {
+        title: "Data Access",
+        desc: "Access to system information is restricted according to the user's assigned role and permissions. Users should only access information necessary for their responsibilities."
+    },
+    {
+        title: "Data Security",
+        desc: "Reasonable security measures are implemented to help protect account information and system data from unauthorized access or misuse."
+    },
+    {
+        title: "Data Retention",
+        desc: "Information may be retained for as long as reasonably necessary to support legitimate operational, administrative, security, record-keeping, and organizational requirements. Retention periods may vary depending on the type and purpose of the information."
+    },
+    {
+        title: "Privacy Requests and Concerns",
+        desc: "Users with questions, concerns, or requests regarding their personal information or its use within the system should contact the appropriate organizational administrator or designated privacy contact. Requests may be handled in accordance with applicable organizational policies and requirements."
+    },
+    {
+        title: "Changes to This Privacy Policy",
+        desc: "This Privacy Policy may be updated from time to time to reflect changes to the system, information-handling practices, organizational requirements, or applicable policies. The latest version and its effective date will be made available through the system."
+    },
 ];
 
 // ---------------------------------------------------
