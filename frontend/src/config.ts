@@ -190,9 +190,9 @@ export const FOOTER_BUTTONS: Record<
   { label: string; href?: string }[]
 > = {
    "Capstone Project By": [
-    { label: "Khian Victory D. Calderon" },
-    { label: "Dishiela Ingrid M. Camunag" },
-    { label: "Rafael L. Metran" },
+    { label: "Khian Victory D. Calderon", href: "https://github.com/khianvictorycalderon" },
+    { label: "Dishiela Ingrid M. Camunag", href: "https://github.com/Dishiela12" },
+    { label: "Rafael L. Metran", href: "https://github.com/Raaafael" },
   ],
 
   References: [
