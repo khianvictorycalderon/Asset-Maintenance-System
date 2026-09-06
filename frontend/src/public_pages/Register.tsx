@@ -31,7 +31,7 @@ export default function Register() {
     const [success, setSuccess] = useState(false);
 
     const [params] = useSearchParams();
-    const role = params.get("role") ?? "Personnel";
+    const role = params.get("role") ?? "Admin";
 
     // Track visibility per password field id
     const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
