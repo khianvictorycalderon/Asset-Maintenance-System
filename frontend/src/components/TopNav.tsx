@@ -85,7 +85,7 @@ export default function TopNav({ onMenuClick }: Props) {
     }, [profileOpen]);
 
     return (
-        <nav className="h-14 flex items-center px-4 border-b border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800">
+        <nav className="h-14 flex items-center px-4 border-b border-orange-200 dark:border-orange-800 bg-orange-500 dark:bg-orange-950">
 
             {/* Left: Hamburger */}
             <button
@@ -109,7 +109,7 @@ export default function TopNav({ onMenuClick }: Props) {
             </button>
 
             {/* Title */}
-            <div className="ml-2 font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+            <div className="ml-2 font-semibold text-white dark:text-orange-100 truncate">
                 {TOPNAV_HEADER}
             </div>
 
@@ -124,13 +124,13 @@ export default function TopNav({ onMenuClick }: Props) {
                             setThemeOpen(false);
                         }
                     }}
-                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-neutral-200 dark:hover:bg-neutral-700 transition"
+                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-600 dark:hover:bg-orange-900 transition"
                 >
-                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs font-semibold">
+                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-white text-orange-600 dark:bg-orange-100 dark:text-orange-950 text-xs font-semibold">
                         {initials}
                     </span>
 
-                    <span className="hidden sm:block max-w-[10rem] truncate text-sm font-medium text-neutral-800 dark:text-neutral-200">
+                    <span className="hidden sm:block max-w-[10rem] truncate text-sm font-medium text-white dark:text-orange-100">
                         {fullName}
                     </span>
 

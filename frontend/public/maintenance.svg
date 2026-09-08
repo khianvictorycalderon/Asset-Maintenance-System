@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <circle cx="50" cy="50" r="46" fill="#FFF3E0"></circle>
+
+  <!-- Gear -->
+  <path d="M50 29
+           L55 25L62 29L68 27L72 34L78 37
+           L76 44L80 50L76 56L78 63
+           L72 66L68 73L62 71L55 75
+           L50 71L45 75L38 71L32 73
+           L28 66L22 63L24 56L20 50
+           L24 44L22 37L28 34L32 27
+           L38 29L45 25Z" fill="#FDBA74" stroke="#9A3412" stroke-width="3" stroke-linejoin="round"></path>
+
+  <circle cx="50" cy="50" r="10" fill="#FFF7ED" stroke="#9A3412" stroke-width="3"></circle>
+
+  <!-- Wrench -->
+  <path d="M65 31
+           C71 27 78 29 82 34
+           L73 39L69 35L65 31Z" fill="#F97316"></path>
+
+  <path d="M69 36L40 65" stroke="#7C2D12" stroke-width="8" stroke-linecap="round"></path>
+
+  <circle cx="35" cy="70" r="7" fill="#F97316" stroke="#7C2D12" stroke-width="3"></circle>
+
+  <!-- Screwdriver -->
+  <path d="M28 32L38 42" stroke="#7C2D12" stroke-width="7" stroke-linecap="round"></path>
+
+  <path d="M24 28L32 36" stroke="#F97316" stroke-width="9" stroke-linecap="round"></path>
+
+  <path d="M39 43L73 77" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"></path>
+</svg>
