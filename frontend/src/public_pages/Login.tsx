@@ -64,7 +64,7 @@ export default function Login() {
   return (
     <div className="
       min-h-screen w-full flex items-center justify-center px-6
-      bg-cover bg-center relative
+      bg-cover bg-center relative bg-fixed
       "
       style={{ backgroundImage: `url(${loginBg})` }}
     >
