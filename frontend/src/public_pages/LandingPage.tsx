@@ -2,17 +2,41 @@ import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-orange-50 dark:bg-zinc-950 text-orange-950 dark:text-orange-100 px-4 sm:px-6 transition-colors duration-300">
-      <div className="w-full max-w-3xl text-center space-y-8">
+    <div className="min-h-screen w-full flex items-center justify-center text-orange-950 dark:text-orange-100 px-4 sm:px-6 transition-colors duration-300 relative overflow-hidden">
+
+  {/* Background Image */}
+  <div
+    className="
+      absolute inset-0
+      bg-cover bg-center
+      opacity-90
+      dark:opacity-60
+    "
+    style={{
+      backgroundImage: "url('/NEM_mechanical.jpg')",
+    }}
+  />
+
+  {/* Orange Theme Overlay */}
+  <div
+    className="
+      absolute inset-0
+      bg-orange-100/60
+      dark:bg-orange-950/70
+    "
+  />
+
+  {/* Content */}
+  <div className="relative z-10 w-full max-w-3xl text-center space-y-8">
 
         {/* Hero Title */}
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
           Manage your assets
-          <span className="text-zinc-500 dark:text-zinc-400"> with Confidence.</span>
+          <span className="text-orange-800 dark:text-orange-100 drop-shadow-md"> {" "} with Confidence.</span>
         </h1>
 
         {/* Subtitle */}
-        <p className="text-zinc-600 dark:text-zinc-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
+        <p className="text-orange-950/90 dark:text-orange-50/90 text-base md:text-lg font-semibold leading-relaxed max-w-xl mx-auto drop-shadow-md">
           A web-based system for an automotive manufacturing company to manage assets, monitor maintenance, and support reliable operations.
         </p>
 
@@ -68,5 +92,6 @@ export default function LandingPage() {
 
       </div>
     </div>
+    
   );
 }

@@ -48,7 +48,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeOpen((v) => !v)}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-xs text-zinc-800 dark:text-zinc-200"
+              className="px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-950 bg-orange-300 dark:bg-orange-950 text-xs text-orange-950 dark:text-orange-100"
             >
               Theme: {theme} ▾
             </button>
@@ -76,7 +76,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeOpen((v) => !v)}
-              className="px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-900 text-xs text-zinc-800 dark:text-zinc-200"
+              className="px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-950 bg-orange-300 dark:bg-orange-950 text-xs text-orange-950 dark:text-orange-100"
             >
               {theme}
             </button>
