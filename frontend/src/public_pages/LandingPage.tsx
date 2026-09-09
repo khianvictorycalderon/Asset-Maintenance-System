@@ -11,6 +11,7 @@ export default function LandingPage() {
       bg-cover bg-center
       opacity-90
       dark:opacity-60
+      bg-fixed
     "
     style={{
       backgroundImage: "url('/NEM_mechanical.jpg')",

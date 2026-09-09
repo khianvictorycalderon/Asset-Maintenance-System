@@ -122,6 +122,7 @@ export default function Register() {
           min-h-screen w-full flex items-center justify-center px-6
           bg-orange-100
           relative overflow-hidden
+          bg-fixed
           "
           style={{ backgroundImage: `
           linear-gradient(
