@@ -24,6 +24,28 @@ const EyeIcon = ({ open }: { open: boolean }) =>
     </svg>
   );
 
+   const ROLES = [
+  {
+    id: "Office Employees",
+    label: "Office Employees",
+    icon: "/office.svg",
+    background: "/register-office.jpg",
+  },
+  {
+    id: "Maintenance Supervisor",
+    label: "Maintenance Supervisor",
+    icon: "/maintenance.svg",
+    background: "/register-maintenance.jpg",
+  },
+  {
+    id: "On-Site Personnel",
+    label: "On-Site Personnel",
+    icon: "/onsite.svg",
+    background: "/register-onsite.jpg",
+  },
+];
+
+
 export default function Register() {
     const [form, setForm] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
@@ -31,7 +53,14 @@ export default function Register() {
     const [success, setSuccess] = useState(false);
 
     const [params] = useSearchParams();
-    const role = params.get("role") ?? "Admin";
+    const initialRole = params.get("role");
+
+    const [role, setRole] = useState(
+       initialRole &&
+    ["Office Employees", "Maintenance Supervisor", "On-Site Personnel"].includes(initialRole)
+    ? initialRole
+    : "Office Employees"
+    );
 
     // Track visibility per password field id
     const [showPassword, setShowPassword] = useState<Record<string, boolean>>({});
@@ -65,8 +94,10 @@ export default function Register() {
         await axios.post(BUILT_IN_API_URLS.register, { ...form, role });
         setSuccess(true);
         setForm({});
-      } catch (err: any) {
-        setError(err?.response?.data?.message || "Registration failed");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+        setError(err?.message || "Registration failed");
+        }
       } finally {
         setLoading(false);
       }
@@ -74,12 +105,13 @@ export default function Register() {
 
     const baseInputClass = `
       w-full px-3 py-2 rounded-md
-      border border-zinc-300/70 dark:border-zinc-700/60
+      border border-orange-200
       bg-white/70 dark:bg-zinc-800/50
       text-zinc-900 dark:text-zinc-100
       placeholder:text-zinc-400 dark:placeholder:text-zinc-500
       focus:outline-none
-      focus:ring-2 focus:ring-zinc-400/30 dark:focus:ring-zinc-600/40
+      focus:ring-2 focus:ring-orange-500/30
+      focus:border-orange-500
       transition
     `;
 
@@ -87,38 +119,94 @@ export default function Register() {
 
     return (
       <div className="
-        min-h-screen w-full flex items-center justify-center px-6
-        bg-linear-to-br
-        from-zinc-200 via-zinc-100 to-white
-        dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950
-      ">
+          min-h-screen w-full flex items-center justify-center px-6
+          bg-orange-100
+          relative overflow-hidden
+          bg-fixed
+          "
+          style={{ backgroundImage: `
+          linear-gradient(
+          rgba(67, 32, 8, 0.60),
+          rgba(120, 53, 15, 0.68)
+            ),
+          url('${ROLES.find((item) => item.id === role)?.background}')
+            `,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+       }}>
 
         {/* Card */}
         <div className="
+          relative z-10
           w-full max-w-2xl space-y-6
-          bg-white/80 dark:bg-zinc-900/80
+          bg-white/95
           backdrop-blur-xl
-          border border-zinc-200/70 dark:border-zinc-800/60
-          rounded-2xl p-8 shadow-xl
+          border border-orange-200
+          rounded-3xl p-8
+          shadow-2xl shadow-black/30
         ">
 
           {/* Back */}
           <Link
             to="/"
-            className="text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition"
+            className="text-sm text-orange-700 dark:text-orange-300 hover:text-orange-500 dark:hover:text-orange-200 transition"
           >
             ← Back to Home
           </Link>
 
           {/* Header */}
           <div className="text-center space-y-1">
-            <h1 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-3xl font-semibold text-orange-600">
               Create account
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-orange-950 dark:text-orange-100">
               Fill in your details
             </p>
           </div>
+
+          {/* Role Selection */}
+          <div className="space-y-3">
+          <label className="text-sm font-medium text-orange-950 dark:text-orange-100">
+             Select your role
+          </label>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {ROLES.map((item) => (
+          <button
+          key={item.id}
+          type="button"
+          onClick={() => setRole(item.id)}
+          className={`
+          flex items-center gap-3
+          px-4 py-3
+          rounded-xl
+          border
+          text-left
+          cursor-pointer
+          transition-all duration-200
+
+          ${
+            role === item.id
+              ? "bg-orange-500 dark:bg-orange-600 text-white border-orange-500 dark:border-orange-600 shadow-lg shadow-orange-500/25"
+              : "bg-orange-50 dark:bg-orange-950/40 text-orange-950 dark:text-orange-100 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/60"
+          }
+        `}
+      >
+            {/* Icon - LEFT */}
+            <img
+                src={item.icon}
+                alt=""
+                className="w-12 h-12 shrink-0 object-contain"
+            />
+
+            {/* Text - RIGHT */}
+            <span className="text-sm font-semibold">
+              {item.label}
+            </span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -127,7 +215,7 @@ export default function Register() {
               {REGISTER_FIELDS.map((field) => (
                 <div key={field.id} className="space-y-1">
 
-                  <label className="text-sm text-zinc-600 dark:text-zinc-400">
+                  <label className="text-sm font-medium text-orange-900 dark:text-orange-200">
                     {field.label}
                   </label>
 
@@ -167,7 +255,7 @@ export default function Register() {
                   )}
 
                   {field.id === "password" && (
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    <p className="text-xs text-orange-900 dark:text-orange-200">
                       Min 8 chars, uppercase, lowercase, number, special character.
                     </p>
                   )}
@@ -211,9 +299,10 @@ export default function Register() {
               className="
                 cursor-pointer
                 w-full py-2 rounded-md
-                bg-zinc-900 dark:bg-zinc-100
-                text-white dark:text-zinc-900
-                hover:bg-zinc-800 dark:hover:bg-zinc-200
+                bg-orange-500 dark:bg-orange-600
+                text-white
+                hover:bg-orange-600 dark:hover:bg-orange-500
+                shadow-lg shadow-orange-500/25
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition
               "
@@ -225,7 +314,7 @@ export default function Register() {
           {/* Footer */}
           <p className="text-sm text-center text-zinc-500 dark:text-zinc-400">
             Already have an account?{" "}
-            <Link to="/login" className="text-zinc-800 dark:text-zinc-200 hover:underline">
+            <Link to="/login" className="text-orange-600 hover:text-orange-700 hover:underline">
               Login
             </Link>
           </p>

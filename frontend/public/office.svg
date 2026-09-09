@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <circle cx="50" cy="50" r="46" fill="#FFF3E0"></circle>
+
+  <!-- Building -->
+  <path d="M25 78V27L50 18L75 27V78H25Z" fill="#F97316" stroke="#7C2D12" stroke-width="3" stroke-linejoin="round"></path>
+
+  <!-- Windows -->
+  <rect x="33" y="34" width="10" height="10" rx="2" fill="#FFF7ED"></rect>
+  <rect x="57" y="34" width="10" height="10" rx="2" fill="#FFF7ED"></rect>
+
+  <rect x="33" y="49" width="10" height="10" rx="2" fill="#FFF7ED"></rect>
+  <rect x="57" y="49" width="10" height="10" rx="2" fill="#FFF7ED"></rect>
+
+  <!-- Door -->
+  <path d="M43 78V63C43 60.8 44.8 59 47 59H53C55.2 59 57 60.8 57 63V78" fill="#7C2D12"></path>
+
+  <!-- Roof -->
+  <path d="M20 29L50 14L80 29" stroke="#7C2D12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+
+  <!-- Ground -->
+  <path d="M18 82H82" stroke="#7C2D12" stroke-width="4" stroke-linecap="round"></path>
+</svg>

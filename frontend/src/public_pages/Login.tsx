@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { BUILT_IN_API_URLS, PRIVATE_ROUTE_FIRST_PATH } from "../config";
+import loginBg from "../assets/NEM_mechanical.jpg";
 
 const EyeIcon = ({ open }: { open: boolean }) =>
   open ? (
@@ -18,13 +19,14 @@ const EyeIcon = ({ open }: { open: boolean }) =>
   );
 
 const inputClass = `
-  w-full px-3 py-2 rounded-md
+  w-full px-4 py-3 rounded-xl
   border border-zinc-300/70 dark:border-zinc-700/60
-  bg-white/70 dark:bg-zinc-800/50
+  bg-white/80 dark:bg-zinc-800/60
   text-zinc-900 dark:text-zinc-100
   placeholder:text-zinc-400 dark:placeholder:text-zinc-500
   focus:outline-none
-  focus:ring-2 focus:ring-zinc-400/30 dark:focus:ring-zinc-600/40
+  focus:border-orange-500
+  focus:ring-2 focus:ring-orange-500/30
   transition
 `;
 
@@ -62,20 +64,20 @@ export default function Login() {
   return (
     <div className="
       min-h-screen w-full flex items-center justify-center px-6
-      bg-linear-to-br
-      from-zinc-200 via-zinc-100 to-white
-      dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950
-    ">
-
+      bg-cover bg-center relative bg-fixed
+      "
+      style={{ backgroundImage: `url(${loginBg})` }}
+    >
+  <div className="absolute inset-0 bg-orange-950/60 backdrop-blur-[2px]" />
       {/* Card */}
       <div className="
+        relative z-10
         w-full max-w-md space-y-6
-        rounded-2xl p-8
-        border
-        border-zinc-200/70 dark:border-zinc-800/60
-        bg-white/80 dark:bg-zinc-900/70
+        rounded-3xl p-8
+        border border-white/30
+        bg-white/90 dark:bg-zinc-950/85
         backdrop-blur-xl
-        shadow-lg shadow-zinc-200/40 dark:shadow-black/30
+        shadow-2xl shadow-orange-950/30
       ">
 
         {/* Back */}
@@ -83,8 +85,8 @@ export default function Login() {
           to="/"
           className="
             text-sm inline-flex items-center gap-1
-            text-zinc-500 dark:text-zinc-400
-            hover:text-zinc-900 dark:hover:text-zinc-100
+            text-orange-700 dark:text-orange-300
+            hover:text-orange-900 dark:hover:text-orange-100
             transition
           "
         >
@@ -93,10 +95,10 @@ export default function Login() {
 
         {/* Header */}
         <div className="text-center space-y-1">
-          <h1 className="text-3xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-3xl font-bold text-orange-950 dark:text-orange-50">
             Welcome back
           </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-orange-950 dark:text-orange-50">
             Login to your account
           </p>
         </div>
@@ -106,7 +108,7 @@ export default function Login() {
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="text-sm text-zinc-600 dark:text-zinc-400">
+            <label className="text-sm text-orange-950 dark:text-orange-50">
               Email / Username
             </label>
             <input
@@ -121,7 +123,7 @@ export default function Login() {
 
           {/* Password */}
           <div className="space-y-1">
-            <label className="text-sm text-zinc-600 dark:text-zinc-400">
+            <label className="text-sm text-orange-950 dark:text-orange-50">
               Password
             </label>
             <div className="relative">
@@ -163,12 +165,15 @@ export default function Login() {
             disabled={loading}
             className="
               cursor-pointer
-              w-full py-2 rounded-md
-              bg-zinc-900 dark:bg-zinc-100
-              text-white dark:text-zinc-900
-              hover:bg-zinc-800 dark:hover:bg-zinc-200
+              w-full py-3 rounded-xl
+              bg-orange-600
+              text-white
+              font-semibold
+              shadow-lg shadow-orange-600/25
+              hover:bg-orange-700
+              hover:shadow-orange-600/40
               disabled:opacity-50 disabled:cursor-not-allowed
-              transition
+              transition-all duration-200
             "
           >
             {loading ? "Logging in..." : "Login"}
@@ -180,7 +185,7 @@ export default function Login() {
           Don't have an account?{" "}
           <Link
             to="/register"
-            className="text-zinc-800 dark:text-zinc-200 hover:underline transition"
+            className="font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:underline transition"
           >
             Register
           </Link>
