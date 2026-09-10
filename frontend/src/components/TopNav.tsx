@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { BUILT_IN_API_URLS, TOPNAV_HEADER } from "../config";
+import { BUILT_IN_API_URLS, NAVBAR_HEADER } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
 import { clearUser } from "../slices/userSlice";
 import type { RootState } from "../config/store";
@@ -109,8 +109,8 @@ export default function TopNav({ onMenuClick }: Props) {
             </button>
 
             {/* Title */}
-            <div className="ml-2 font-semibold text-white dark:text-orange-100 truncate">
-                {TOPNAV_HEADER}
+            <div className="ml-2 font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+                {NAVBAR_HEADER}
             </div>
 
             {/* Right side */}

@@ -24,26 +24,34 @@ const EyeIcon = ({ open }: { open: boolean }) =>
     </svg>
   );
 
-   const ROLES = [
+const ROLES = [
   {
     id: "Office Employees",
     label: "Office Employees",
+    value: "Employee",
     icon: "/office.svg",
     background: "/register-office.jpg",
   },
   {
     id: "Maintenance Supervisor",
     label: "Maintenance Supervisor",
+    value: "Supervisor",
     icon: "/maintenance.svg",
     background: "/register-maintenance.jpg",
   },
   {
     id: "On-Site Personnel",
     label: "On-Site Personnel",
+    value: "Personnel",
     icon: "/onsite.svg",
     background: "/register-onsite.jpg",
   },
 ];
+
+const ROLE_MAP = ROLES.map((role) => ({
+  label: role.id,
+  value: role.value,
+}));
 
 
 export default function Register() {
@@ -91,7 +99,14 @@ export default function Register() {
       setSuccess(false);
 
       try {
-        await axios.post(BUILT_IN_API_URLS.register, { ...form, role });
+        const backendRole = ROLE_MAP.find(
+          (item) => item.label === role
+        )?.value;
+
+        await axios.post(BUILT_IN_API_URLS.register, {
+          ...form,
+          role: backendRole,
+        });        
         setSuccess(true);
         setForm({});
       } catch (err: unknown) {
