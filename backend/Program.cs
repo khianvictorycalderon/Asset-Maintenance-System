@@ -1,6 +1,8 @@
+using backend.Data;
 using backend.Extensions;
 using backend.Hubs;
 using backend.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,15 @@ builder.Services.AddSignalR();
 // App pipeline
 // ----------------------------------------------------------------
 var app = builder.Build();
+
+// Db Seeder (auto creates the admin account if it doesn't exist)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await db.Database.MigrateAsync();
+    await DbSeeder.SeedAsync(db, config);
+}
 
 app.UseCorsPolicy();
 app.UseSessionAuth();
