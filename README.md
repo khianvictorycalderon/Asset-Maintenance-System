@@ -36,10 +36,25 @@
         },
         "Session": {
             "DurationHours": 6
+        },
+        "Roles": [
+            "Admin",
+            "Employee",
+            "Supervisor",
+            "Personnel"
+        ],
+
+        "Default": {
+            "Credentials": {
+                "Admin": {
+                    "Username": "...",
+                    "Password": "..."
+                }
+            }
         }
     }
     ```
-    **NOTE**: *Replace with your actual credentials and configuration*
+    **NOTE**: *Replace with your actual credentials and configuration. Also put actual values for default admin username and password (auto creates on start of the backend application)*
 2. Run this if you haven't installed entity framework before:
     ```cmd
     dotnet tool install --global dotnet-ef --version 8.0.4

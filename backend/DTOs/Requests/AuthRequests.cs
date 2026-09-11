@@ -51,5 +51,5 @@ public class RegisterRequest
     public string ConfirmPassword { get; set; } = string.Empty;
 
     [JsonPropertyName("role")]
-    public string Role { get; set; } = "Employee";
+    public string Role { get; set; } = "Personnel";
 }

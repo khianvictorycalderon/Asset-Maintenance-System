@@ -13,6 +13,9 @@ public class AuthService(AppDbContext db, IConfiguration configuration, IHubCont
     private readonly int _sessionDurationHours =
         configuration.GetValue<int>("Session:DurationHours", 6);
 
+    private readonly string[] _strictRoles = 
+        configuration.GetSection("Roles").Get<string[]>() ?? [];
+
     private readonly IHubContext<SyncHub> _hub = hub;
 
     // ----------------------------------------------------------------
@@ -75,6 +78,15 @@ public class AuthService(AppDbContext db, IConfiguration configuration, IHubCont
         var exists = await db.Users.AnyAsync(u => u.Email == request.Email);
         if (exists)
             return (null, "Email already exists", StatusCodes.Status409Conflict);
+
+        // Strict role validation
+        var isRoleExists = _strictRoles.Contains(request.Role);
+        if (!isRoleExists)
+            return (null, "Invalid role", StatusCodes.Status400BadRequest);
+
+        // Admin validation, Admins must be auto created during seeding
+        if (request.Role == "Admin")
+            return (null, "You cannot register admin", StatusCodes.Status401Unauthorized);
 
         var hashed = BCrypt.Net.BCrypt.HashPassword(request.Password, workFactor: 10);
 
