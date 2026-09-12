@@ -105,8 +105,8 @@ export default function Register() {
 
     const baseInputClass = `
       w-full px-3 py-2 rounded-md
-      border border-orange-200
-      bg-white/70 dark:bg-zinc-800/50
+      border border-orange-200 dark:border-orange-800
+      bg-white/70 dark:bg-zinc-900/80
       text-zinc-900 dark:text-zinc-100
       placeholder:text-zinc-400 dark:placeholder:text-zinc-500
       focus:outline-none
@@ -119,7 +119,8 @@ export default function Register() {
 
     return (
       <div className="
-          min-h-screen w-full flex items-center justify-center px-6
+          min-h-screen w-full flex items-center justify-center 
+          px-6 py-8
           bg-orange-100
           relative overflow-hidden
           "
@@ -138,9 +139,9 @@ export default function Register() {
         <div className="
           relative z-10
           w-full max-w-2xl space-y-6
-          bg-white/95
+          bg-white/95 dark:bg-zinc-950/95
           backdrop-blur-xl
-          border border-orange-200
+          border border-orange-200 dark:border-orange-900
           rounded-3xl p-8
           shadow-2xl shadow-black/30
         ">
@@ -158,7 +159,7 @@ export default function Register() {
             <h1 className="text-3xl font-semibold text-orange-600">
               Create account
             </h1>
-            <p className="text-sm text-orange-950 dark:text-orange-100">
+            <p className="text-sm text-orange-700 dark:text-orange-300">
               Fill in your details
             </p>
           </div>
@@ -186,8 +187,8 @@ export default function Register() {
 
           ${
             role === item.id
-              ? "bg-orange-500 dark:bg-orange-600 text-white border-orange-500 dark:border-orange-600 shadow-lg shadow-orange-500/25"
-              : "bg-orange-50 dark:bg-orange-950/40 text-orange-950 dark:text-orange-100 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-900/60"
+              ? "bg-orange-600 dark:bg-orange-700 text-white border-orange-600 dark:border-orange-600 shadow-lg shadow-orange-900/30"
+              : "bg-orange-100 dark:bg-zinc-900 text-orange-950 dark:text-orange-100 border-orange-300 dark:border-orange-700 hover:bg-orange-400 dark:hover:bg-orange-600"
           }
         `}
       >
@@ -254,7 +255,7 @@ export default function Register() {
                   )}
 
                   {field.id === "password" && (
-                    <p className="text-xs text-orange-900 dark:text-orange-200">
+                    <p className="text-xs text-orange-700 dark:text-orange-300">
                       Min 8 chars, uppercase, lowercase, number, special character.
                     </p>
                   )}
@@ -298,10 +299,10 @@ export default function Register() {
               className="
                 cursor-pointer
                 w-full py-2 rounded-md
-                bg-orange-500 dark:bg-orange-600
+                bg-orange-600 dark:bg-orange-800
                 text-white
-                hover:bg-orange-600 dark:hover:bg-orange-500
-                shadow-lg shadow-orange-500/25
+                hover:bg-orange-700 dark:hover:bg-orange-700
+                shadow-lg shadow-orange-900/30
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition
               "

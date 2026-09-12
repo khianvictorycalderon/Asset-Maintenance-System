@@ -40,16 +40,16 @@ export default function Sidebar({ open, setOpen, collapsed, setCollapsed }: Prop
                 className={`
                     fixed md:static z-50
                     top-0 left-0 h-screen ${sidebarWidthClass}
-                    bg-orange-50 dark:bg-orange-950
+                    bg-orange-50 dark:bg-orange-900
                     flex flex-col
                     overflow-y-auto
                     transform transition-all duration-200
-                    border-r border-orange-200 dark:border-orange-900
+                    border-r border-orange-200 dark:border-orange-800
                     ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
                 `}
             >
                 {/* HEADER */}
-                <div className="relative p-4 pb-8 font-semibold text-neutral-900 dark:text-neutral-100 border-b border-orange-200 dark:border-orange-900">
+                <div className="relative p-4 pb-8 font-semibold text-neutral-900 dark:text-neutral-100 border-b border-orange-200 dark:border-orange-800">
                     <button
                         onClick={() => setOpen(false)}
                         className="md:hidden absolute right-3 top-3 p-1 rounded hover:bg-neutral-200 dark:hover:bg-neutral-700 cursor-pointer"
@@ -111,7 +111,7 @@ export default function Sidebar({ open, setOpen, collapsed, setCollapsed }: Prop
                                 ${
                                     isActive(item.path)
                                         ? "bg-orange-600 text-white shadow-md shadow-orange-600/20"
-                                        : "text-orange-900 dark:text-orange-100 hover:bg-orange-100 dark:hover:bg-orange-900/70"
+                                        : "text-orange-900 dark:text-orange-100 hover:bg-orange-100 dark:hover:bg-orange-800/60"
                                 }
                             `}
                         >
