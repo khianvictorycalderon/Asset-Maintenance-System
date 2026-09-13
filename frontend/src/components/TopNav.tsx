@@ -85,16 +85,16 @@ export default function TopNav({ onMenuClick }: Props) {
     }, [profileOpen]);
 
     return (
-        <nav className="h-14 flex items-center px-4 border-b border-orange-600 dark:border-orange-800 bg-orange-500 dark:bg-orange-950">
+        <nav className="h-14 flex items-center px-4 dark:border-b dark:border-zinc-800 bg-orange-600 dark:bg-zinc-900">
 
             {/* Left: Hamburger */}
             <button
                 onClick={onMenuClick}
-                className="md:hidden p-2 rounded hover:bg-orange-400 dark:hover:bg-orange-900 cursor-pointer"
+                className="md:hidden p-2 rounded hover:bg-orange-500 dark:hover:bg-zinc-800 cursor-pointer"
                 aria-label="Open sidebar"
             >
                 <svg
-                    className="w-6 h-6 text-neutral-900 dark:text-neutral-100"
+                    className="w-6 h-6 text-white dark:text-neutral-100"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -109,7 +109,7 @@ export default function TopNav({ onMenuClick }: Props) {
             </button>
 
             {/* Title */}
-            <div className="ml-2 font-semibold text-neutral-900 dark:text-neutral-100 truncate">
+            <div className="ml-2 font-semibold text-white dark:text-neutral-100 truncate">
                 {NAVBAR_HEADER}
             </div>
 
@@ -124,13 +124,13 @@ export default function TopNav({ onMenuClick }: Props) {
                             setThemeOpen(false);
                         }
                     }}
-                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-600 dark:hover:bg-orange-800 transition"
+                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-500 dark:hover:bg-zinc-800 transition"
                 >
-                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-white text-orange-600 dark:bg-orange-100 dark:text-orange-900 text-xs font-semibold">
+                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-white text-orange-600 dark:bg-orange-500 dark:text-white text-xs font-semibold">
                         {initials}
                     </span>
 
-                    <span className="hidden sm:block max-w-[10rem] truncate text-sm font-medium text-white dark:text-orange-100">
+                    <span className="hidden sm:block max-w-[10rem] truncate text-sm font-medium text-white dark:text-neutral-100">
                         {fullName}
                     </span>
 
@@ -140,7 +140,7 @@ export default function TopNav({ onMenuClick }: Props) {
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
-                        className="hidden sm:block w-4 h-4 text-neutral-500 dark:text-neutral-400"
+                        className="hidden sm:block w-4 h-4 text-orange-100 dark:text-neutral-400"
                     >
                         <path
                             strokeLinecap="round"
@@ -152,13 +152,13 @@ export default function TopNav({ onMenuClick }: Props) {
 
                 {/* Profile menu */}
                 {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-lg border border-orange-200 dark:border-orange-800 bg-white dark:bg-orange-950 shadow-lg shadow-orange-950/30 overflow-hidden z-50">
+                    <div className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden z-50">
 
                         {/* Account */}
                         <Link
                             to="/account"
                             onClick={closeProfileMenu}
-                            className="block px-3 py-2 text-sm text-orange-900 dark:text-orange-100 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
+                            className="block px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-zinc-800 transition"
                         >
                             Account
                         </Link>
@@ -166,22 +166,22 @@ export default function TopNav({ onMenuClick }: Props) {
                         {/* Theme */}
                         <button
                             onClick={() => setThemeOpen((v) => !v)}
-                            className="cursor-pointer w-full flex items-center justify-between px-3 py-2 text-sm text-orange-900 dark:text-orange-100 hover:bg-neutral-100 dark:hover:bg-orange-900 transition"
+                            className="cursor-pointer w-full flex items-center justify-between px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-zinc-800 transition"
                         >
                             <span>Theme</span>
-                            <span className="text-xs text-orange-600 dark:text-orange-300">
+                            <span className="text-xs text-orange-600 dark:text-orange-400">
                                 {theme} ▾
                             </span>
                         </button>
 
                         {/* Theme submenu */}
                         {themeOpen && (
-                            <div className="border-t border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/60">
+                            <div className="border-t border-neutral-200 dark:border-zinc-800 bg-neutral-50 dark:bg-zinc-950">
                                 {THEMES.map((t) => (
                                     <button
                                         key={t}
                                         onClick={() => changeTheme(t)}
-                                        className="cursor-pointer w-full text-left pl-6 pr-3 py-2 text-sm text-orange-900 dark:text-orange-100 hover:bg-orange-100 dark:hover:bg-orange-900 transition"
+                                        className="cursor-pointer w-full text-left pl-6 pr-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-zinc-800 transition"
                                     >
                                         {t}
                                     </button>
@@ -195,7 +195,7 @@ export default function TopNav({ onMenuClick }: Props) {
                                 closeProfileMenu();
                                 handleLogout();
                             }}
-                            className="cursor-pointer w-full text-left px-3 py-2 text-sm text-red-500 border-t border-orange-200 dark:border-orange-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition"
+                            className="cursor-pointer w-full text-left px-3 py-2 text-sm text-red-500 dark:text-red-400 border-t border-neutral-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
                         >
                             Logout
                         </button>
