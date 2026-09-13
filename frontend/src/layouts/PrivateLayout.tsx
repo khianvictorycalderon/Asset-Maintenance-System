@@ -46,16 +46,15 @@ export default function PrivateLayout() {
           withCredentials: true,
         }
       );
-      setIsAuth(res.data.authenticated);
+
+      return res.data.authenticated;
     } catch {
-      setIsAuth(false);
-    } finally {
-      setLoading(false);
-    }
+      return(false);
+    } 
   };
 
   // User state management
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
   const loadUserData = async () => {
     try {
       const res = await axios.get(
@@ -64,21 +63,39 @@ export default function PrivateLayout() {
           withCredentials: true
         }
       );
-      dispath(updateUser(res.data.user));
-    } catch (e: unknown) {
-      dispath(clearUser());
+      dispatch(updateUser(res.data.user));
+    } catch {
+      dispatch(clearUser());
     }
-  }
+  };
 
   useEffect(() => {
-    checkAuth();
-    loadUserData();
-  }, [location.pathname]);
+    const initialize = async () => {
+      setLoading(true);
+
+      const authenticated = await checkAuth();
+
+      if (!authenticated) {
+        setIsAuth(false);
+        setLoading(false);
+        return;
+      }
+
+      setIsAuth(true);
+
+      await loadUserData();
+
+      setLoading(false);
+    };
+
+    initialize();
+  }, []);
 
   useSignalREvent(
     "LoggedOut",
-    () => {
-      checkAuth();
+    async () => {
+      const authenticated = await checkAuth();
+      setIsAuth(authenticated);
     }
   );
 
