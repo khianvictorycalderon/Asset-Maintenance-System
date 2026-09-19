@@ -37,7 +37,7 @@ export default function Navbar() {
         />
 
         <span
-          className="text-lg font-bold tracking-tight text-white dark:text-zinc-100"
+          className="text-sm md:text-md lg:text-lg font-bold tracking-tight text-white dark:text-zinc-100 truncate max-w-[70%] md:max-w-[85%] lg:max-w-full"
         >
           {NAVBAR_HEADER}
         </span>
