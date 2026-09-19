@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { NAVBAR_BUTTONS, NAVBAR_HEADER } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
+import assetMaintenanceLogo from "/public/asset-maintenance-logo.png";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -25,11 +26,22 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Brand */}
+        <Link
+           to="/"
+           className="flex items-center gap-3"
+>
+       <img
+          src={assetMaintenanceLogo}
+          alt="Asset Maintenance System Logo"
+          className="h-15 w-15 object-contain"
+        />
+
         <span
           className="text-lg font-bold tracking-tight text-white dark:text-zinc-100"
         >
           {NAVBAR_HEADER}
         </span>
+        </Link>
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-6">
