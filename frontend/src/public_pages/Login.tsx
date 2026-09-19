@@ -2,7 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { BUILT_IN_API_URLS, PRIVATE_ROUTE_FIRST_PATH } from "../config";
-import loginBg from "../assets/NEM_mechanical.jpg";
 
 const EyeIcon = ({ open }: { open: boolean }) =>
   open ? (
@@ -66,7 +65,7 @@ export default function Login() {
       min-h-screen w-full flex items-center justify-center px-6
       bg-cover bg-center relative bg-fixed
       "
-      style={{ backgroundImage: `url(${loginBg})` }}
+      style={{ backgroundImage: `url("/NEM_mechanical.jpg")` }}
     >
   <div className="absolute inset-0 bg-orange-950/60 backdrop-blur-[2px]" />
       {/* Card */}
