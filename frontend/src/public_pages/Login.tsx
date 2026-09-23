@@ -94,10 +94,10 @@ export default function Login() {
 
         {/* Header */}
         <div className="text-center space-y-1">
-          <h1 className="text-3xl font-bold text-orange-950 dark:text-orange-50">
+          <h1 className="text-3xl font-bold text-zinc-900 dark:text-orange-50">
             Welcome back
           </h1>
-          <p className="text-sm text-orange-950 dark:text-orange-50">
+          <p className="text-sm text-zinc-500 dark:text-orange-50/80">
             Login to your account
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function Login() {
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="text-sm text-orange-950 dark:text-orange-50">
+            <label className="text-sm text-zinc-700 dark:text-orange-50">
               Email / Username
             </label>
             <input
@@ -122,7 +122,7 @@ export default function Login() {
 
           {/* Password */}
           <div className="space-y-1">
-            <label className="text-sm text-orange-950 dark:text-orange-50">
+            <label className="text-sm text-zinc-700 dark:text-orange-50">
               Password
             </label>
             <div className="relative">

@@ -21,7 +21,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 border-b border-orange-300 dark:border-orange-900 bg-orange-500/90 dark:bg-orange-900/90 backdrop-blur-md">
+    <nav className="fixed top-0 left-0 w-full z-50 border-b border-orange-400/30 dark:border-b-2 dark:border-orange-500/80 bg-orange-600/95 dark:bg-zinc-950/90 backdrop-blur-md shadow-sm shadow-orange-900/10 dark:shadow-black/40">
 
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
@@ -50,7 +50,7 @@ export default function Navbar() {
             <Link
               key={btn.path}
               to={btn.path}
-              className="text-sm text-white/90 dark:text-orange-100/90 hover:text-black dark:hover:text-white transition"
+              className="text-sm text-white/90 dark:text-zinc-300 hover:text-white dark:hover:text-orange-400 transition"
             >
               {btn.label}
             </Link>
@@ -60,7 +60,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeOpen((v) => !v)}
-              className="px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-950 bg-orange-300 dark:bg-orange-950 text-xs text-orange-950 dark:text-orange-100"
+              className="cursor-pointer px-3 py-1.5 rounded-lg border border-white/25 dark:border-zinc-700 bg-white/15 dark:bg-zinc-900 text-xs text-white dark:text-orange-300 hover:bg-white/25 dark:hover:bg-zinc-800 transition"
             >
               Theme: {theme} ▾
             </button>
@@ -71,7 +71,7 @@ export default function Navbar() {
                   <button
                     key={t}
                     onClick={() => changeTheme(t)}
-                    className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+                    className="cursor-pointer w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
                   >
                     {t}
                   </button>
@@ -88,7 +88,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeOpen((v) => !v)}
-              className="px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-950 bg-orange-300 dark:bg-orange-950 text-xs text-orange-950 dark:text-orange-100"
+              className="px-3 py-1.5 rounded-lg border border-white/25 dark:border-zinc-700 bg-white/15 dark:bg-zinc-900 text-xs text-white dark:text-orange-300 hover:bg-white/25 dark:hover:bg-zinc-800 transition"
             >
               {theme}
             </button>
@@ -99,7 +99,7 @@ export default function Navbar() {
                   <button
                     key={t}
                     onClick={() => changeTheme(t)}
-                    className="w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
+                    className="cursor-pointer w-full text-left px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
                   >
                     {t}
                   </button>
@@ -133,7 +133,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-6 py-4 space-y-3">
+        <div className="text-center md:hidden border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-6 py-4 space-y-3">
 
           {NAVBAR_BUTTONS.map((btn) => (
             <Link

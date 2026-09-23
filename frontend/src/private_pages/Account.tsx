@@ -451,7 +451,7 @@ export default function Account() {
             <button
               onClick={handleUpdateInfo}
               disabled={isSavingInfo}
-              className={`px-5 py-2 rounded-lg transition bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 ${isSavingInfo ? "opacity-50 cursor-not-allowed" : "hover:opacity-90 cursor-pointer"}`}
+              className={`px-5 py-2 rounded-lg transition bg-orange-600 text-white ${isSavingInfo ? "opacity-50 cursor-not-allowed" : "hover:brightness-125 cursor-pointer"}`}
             >
               {isSavingInfo ? "Saving..." : "Save Changes"}
             </button>
@@ -496,7 +496,7 @@ export default function Account() {
             <button
               onClick={handleUpdatePassword}
               disabled={isSavingPassword}
-              className={`px-5 py-2 rounded-lg transition bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 ${isSavingPassword ? "opacity-50 cursor-not-allowed" : "hover:opacity-90 cursor-pointer"}`}
+              className={`px-5 py-2 rounded-lg transition bg-orange-600 text-white ${isSavingPassword ? "opacity-50 cursor-not-allowed" : "hover:brightness-125 cursor-pointer"}`}
             >
               {isSavingPassword ? "Saving..." : "Update Password"}
             </button>
