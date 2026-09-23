@@ -120,7 +120,7 @@ export default function Register() {
 
     const baseInputClass = `
       w-full px-3 py-2 rounded-md
-      border border-orange-200 dark:border-orange-800
+      border border-zinc-300/70 dark:border-zinc-700/60
       bg-white/70 dark:bg-zinc-900/80
       text-zinc-900 dark:text-zinc-100
       placeholder:text-zinc-400 dark:placeholder:text-zinc-500
@@ -157,7 +157,7 @@ export default function Register() {
           w-full max-w-2xl space-y-6
           bg-white/95 dark:bg-zinc-950/95
           backdrop-blur-xl
-          border border-orange-200 dark:border-orange-900
+          border border-white/30
           rounded-3xl p-8
           shadow-2xl shadow-black/30
         ">
@@ -172,17 +172,17 @@ export default function Register() {
 
           {/* Header */}
           <div className="text-center space-y-1">
-            <h1 className="text-3xl font-semibold text-orange-600">
+            <h1 className="text-3xl font-bold text-zinc-900 dark:text-orange-50">
               Create account
             </h1>
-            <p className="text-sm text-orange-700 dark:text-orange-300">
+            <p className="text-sm text-zinc-500 dark:text-orange-50/80">
               Fill in your details
             </p>
           </div>
 
           {/* Role Selection */}
           <div className="space-y-3">
-          <label className="text-sm font-medium text-orange-950 dark:text-orange-100">
+          <label className="text-sm font-medium text-zinc-700 dark:text-orange-100">
              Select your role
           </label>
 
@@ -204,7 +204,7 @@ export default function Register() {
           ${
             role === item.id
               ? "bg-orange-600 dark:bg-orange-700 text-white border-orange-600 dark:border-orange-600 shadow-lg shadow-orange-900/30"
-              : "bg-orange-100 dark:bg-zinc-900 text-orange-950 dark:text-orange-100 border-orange-300 dark:border-orange-700 hover:bg-orange-400 dark:hover:bg-orange-600"
+              : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-orange-100 border-zinc-200 dark:border-zinc-700 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-zinc-800"
           }
         `}
       >
@@ -231,7 +231,7 @@ export default function Register() {
               {REGISTER_FIELDS.map((field) => (
                 <div key={field.id} className="space-y-1">
 
-                  <label className="text-sm font-medium text-orange-900 dark:text-orange-200">
+                  <label className="text-sm font-medium text-zinc-700 dark:text-orange-200">
                     {field.label}
                   </label>
 
@@ -271,7 +271,7 @@ export default function Register() {
                   )}
 
                   {field.id === "password" && (
-                    <p className="text-xs text-orange-700 dark:text-orange-300">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Min 8 chars, uppercase, lowercase, number, special character.
                     </p>
                   )}
@@ -315,10 +315,10 @@ export default function Register() {
               className="
                 cursor-pointer
                 w-full py-2 rounded-md
-                bg-orange-600 dark:bg-orange-800
+                bg-orange-600
                 text-white
-                hover:bg-orange-700 dark:hover:bg-orange-700
-                shadow-lg shadow-orange-900/30
+                hover:bg-orange-700
+                shadow-lg shadow-orange-600/25
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition
               "
