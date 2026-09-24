@@ -6,7 +6,7 @@ import { BUILT_IN_API_URLS, NAVBAR_HEADER } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
 import { clearUser } from "../slices/userSlice";
 import type { RootState } from "../config/store";
-import assetMaintenanceLogo from "/public/asset-maintenance-logo.png";
+import assetMaintenanceLogo from "/public/images/asset-maintenance-logo.png";
 
 type Props = {
     onMenuClick: () => void;

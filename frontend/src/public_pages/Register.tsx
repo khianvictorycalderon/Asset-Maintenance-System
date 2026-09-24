@@ -30,21 +30,21 @@ const ROLES = [
     label: "Office Employees",
     value: "Employee",
     icon: "/office.svg",
-    background: "/register-office.jpg",
+    background: "/images/register-office.jpg",
   },
   {
     id: "Maintenance Supervisor",
     label: "Maintenance Supervisor",
     value: "Supervisor",
-    icon: "/maintenance.svg",
-    background: "/register-maintenance.jpg",
+    icon: "/icons/maintenance.svg",
+    background: "/images/register-maintenance.jpg",
   },
   {
     id: "On-Site Personnel",
     label: "On-Site Personnel",
     value: "Personnel",
-    icon: "/onsite.svg",
-    background: "/register-onsite.jpg",
+    icon: "/icons/onsite.svg",
+    background: "/images/register-onsite.jpg",
   },
 ];
 
