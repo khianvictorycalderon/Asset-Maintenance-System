@@ -29,7 +29,7 @@ const ROLES = [
     id: "Office Employees",
     label: "Office Employees",
     value: "Employee",
-    icon: "/office.svg",
+    icon: "/icons/office.svg",
     background: "/images/register-office.jpg",
   },
   {
