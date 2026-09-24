@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { NAVBAR_BUTTONS, NAVBAR_HEADER } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
-import assetMaintenanceLogo from "/public/asset-maintenance-logo.png";
+import assetMaintenanceLogo from "/public/images/asset-maintenance-logo.png";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);

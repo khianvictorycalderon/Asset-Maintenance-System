@@ -13,7 +13,7 @@ export default function LandingPage() {
       bg-fixed
     "
     style={{
-      backgroundImage: "url('/NEM_mechanical.jpg')",
+      backgroundImage: "url('/images/NEM_mechanical.jpg')",
     }}
   />
 

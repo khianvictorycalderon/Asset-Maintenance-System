@@ -65,7 +65,7 @@ export default function Login() {
       min-h-screen w-full flex items-center justify-center px-6
       bg-cover bg-center relative bg-fixed
       "
-      style={{ backgroundImage: `url("/NEM_mechanical.jpg")` }}
+      style={{ backgroundImage: `url("/images/NEM_mechanical.jpg")` }}
     >
   <div className="absolute inset-0 bg-orange-950/60 backdrop-blur-[2px]" />
       {/* Card */}
