@@ -25,6 +25,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
                   entity.Property(u => u.UpdatedAt)
                         .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(u => u.RevocationStatus)
+                        .HasDefaultValue("Active");
             });
 
             // Session

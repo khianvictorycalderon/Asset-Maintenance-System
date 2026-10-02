@@ -48,6 +48,10 @@ public class User
     [Column("updated_at")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    // 2 status only: Active and Revoke (Like Banned Unbanned user)
+    [Column("revocation_status")]
+    public string RevocationStatus { get; set; } = "Active";
+
     // Navigation
     public ICollection<Session> Sessions { get; set; } = [];
 }

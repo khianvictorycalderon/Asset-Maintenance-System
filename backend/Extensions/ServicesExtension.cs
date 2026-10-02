@@ -10,6 +10,9 @@ public static class ServicesExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISessionService, SessionService>();
 
+        // Role-based services
+        services.AddScoped<IAdminService, AdminService>();
+
         return services;
     }
 }
