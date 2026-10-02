@@ -19,7 +19,12 @@ builder.Services.AddControllers()
             System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(o =>
+        o.PayloadSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.SnakeCaseLower);
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<backend.Exceptions.GlobalExceptionHandler>();
 
 // ----------------------------------------------------------------
 // App pipeline
@@ -36,6 +41,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseCorsPolicy();
+app.UseAudit();            // must wrap the exception handler to see the final status code
+app.UseExceptionHandler();
 app.UseSessionAuth();
 
 app.MapControllers();

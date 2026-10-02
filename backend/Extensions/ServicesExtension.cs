@@ -1,3 +1,4 @@
+using backend.Auditing;
 using backend.Services;
 
 namespace backend.Extensions;
@@ -9,6 +10,10 @@ public static class ServicesExtension
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISessionService, SessionService>();
+
+        // Auditing
+        services.AddScoped<AuditContext>();
+        services.AddScoped<IActivityLogService, ActivityLogService>();
 
         // Role-based services
         services.AddScoped<IAdminService, AdminService>();

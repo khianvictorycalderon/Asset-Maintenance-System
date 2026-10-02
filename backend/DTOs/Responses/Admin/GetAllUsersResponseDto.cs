@@ -4,7 +4,10 @@ public class GetAllUserResponseDto
 {
     public string Message { get; set; } = "";
     public List<AllUsersDto> Users { get; set; } = [];
-    public int UserCount { get; set; } = 0;
+    public int TotalUsers { get; set; }
+    public int CurrentPage { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
 }
 
 public class AllUsersDto
@@ -16,4 +19,5 @@ public class AllUsersDto
     public required string Email { get; set; }
     public required string Role { get; set; }
     public required string RevocationStatus { get; set; }
+    public bool IsUserBanned { get; set; }
 }

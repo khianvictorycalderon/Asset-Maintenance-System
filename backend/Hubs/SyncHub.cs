@@ -1,8 +1,12 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 namespace backend.Hubs;
 
 public class SyncHub : Hub
 {
+    // Admins join this group so activity-log events only reach admins
+    public const string AdminGroup = "Role_Admin";
+
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine("SignalR connected");
@@ -32,6 +36,11 @@ public class SyncHub : Hub
                 Context.ConnectionId,
                 $"Session_{sessionId}"
             );
+        }
+
+        if (Context.User?.FindFirst(ClaimTypes.Role)?.Value == "Admin")
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, AdminGroup);
         }
 
         await base.OnConnectedAsync();
