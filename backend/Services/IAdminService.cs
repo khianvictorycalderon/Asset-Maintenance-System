@@ -4,4 +4,6 @@ public interface IAdminService
 {
     Task<GetAllUserResponseDto> 
         GetAllUser(int page, int pageSize, string sortBy, string sortOrder);
+
+    Task<UpdateRevocationAccessResponseDto> UpdateRevocationStatus(Guid userId);
 }

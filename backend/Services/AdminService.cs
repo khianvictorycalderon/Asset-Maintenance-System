@@ -1,12 +1,14 @@
 using backend.Data;
 using backend.DTOs;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 public class AdminService(AppDbContext db) : IAdminService
 {
     private readonly AppDbContext _db = db;
     
-    public async Task<GetAllUserResponseDto> GetAllUser(
+    public async Task<GetAllUserResponseDto> GetAllUser
+    (
         int page = 1,
         int pageSize = 10,
         string sortBy = "lastname",
@@ -59,6 +61,38 @@ public class AdminService(AppDbContext db) : IAdminService
             Message = "User retrieved successfully.",
             Users = users,
             UserCount = totalUsers
+        };
+    }
+
+    public async Task<UpdateRevocationAccessResponseDto> UpdateRevocationStatus
+    (
+        Guid userId
+    )
+    {
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException("User not found.");
+        }
+
+        var isUserBanned = user.RevocationStatus != "Revoked";
+
+        user.RevocationStatus = isUserBanned
+            ? "Revoked"
+            : "Active";
+
+        await _db.SaveChangesAsync();
+
+        // TODO: Record the action in the System Activity Logs.
+
+        return new UpdateRevocationAccessResponseDto
+        {
+            IsUserBanned = isUserBanned,
+            Message = isUserBanned
+                ? "User access revoked successfully."
+                : "User access restored successfully."
         };
     }
 }
