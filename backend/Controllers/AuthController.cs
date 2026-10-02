@@ -1,5 +1,4 @@
 using backend.DTOs.Requests;
-using backend.DTOs.Responses;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 

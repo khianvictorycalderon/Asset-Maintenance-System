@@ -17,7 +17,8 @@ public class SessionAuthMiddleware(RequestDelegate next)
 
             var result = await db.Sessions
                 .AsNoTracking()
-                .Where(s => s.Id == sessionId && s.ExpiresAt > now)
+                .Where(s => s.Id == sessionId && s.ExpiresAt > now
+                            && s.User.RevocationStatus != "Revoked")
                 .Select(s => new
                 {
                     s.UserId,

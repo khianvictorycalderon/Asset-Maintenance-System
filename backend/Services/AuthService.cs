@@ -33,6 +33,9 @@ public class AuthService(AppDbContext db, IConfiguration configuration, IHubCont
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             return (null, null, null, "Invalid username or password", StatusCodes.Status401Unauthorized);
 
+        if (user.RevocationStatus == "Revoked")
+            return (null, null, null, "Your access has been revoked. Please contact an administrator.", StatusCodes.Status403Forbidden);
+
         var expiresAt = DateTime.UtcNow.AddHours(_sessionDurationHours);
 
         var session = new Session

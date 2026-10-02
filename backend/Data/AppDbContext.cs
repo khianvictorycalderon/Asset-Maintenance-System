@@ -7,6 +7,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Session> Sessions => Set<Session>();
+    public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
 
       protected override void OnModelCreating(ModelBuilder modelBuilder)
       {
@@ -25,6 +26,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
                   entity.Property(u => u.UpdatedAt)
                         .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(u => u.RevocationStatus)
+                        .HasDefaultValue("Active");
             });
 
             // Session
@@ -40,6 +44,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
                   entity.Property(s => s.LastSeen)
                         .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+            });
+
+            // Activity Log
+            modelBuilder.Entity<ActivityLog>(entity =>
+            {
+                  entity.HasOne(log => log.PerformedBy)
+                        .WithMany()
+                        .HasForeignKey(log => log.PerformedById)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                  entity.HasOne(log => log.TargetUser)
+                        .WithMany()
+                        .HasForeignKey(log => log.TargetUserId)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                  entity.HasIndex(log => log.Timestamp);
+
+                  entity.Property(log => log.Timestamp)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(log => log.DatePerformed)
+                        .HasDefaultValueSql("CURRENT_DATE");
             });
       }
 

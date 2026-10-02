@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261002043457_AddRevocationStatusDefault")]
+    partial class AddRevocationStatusDefault
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,66 +24,6 @@ namespace backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("backend.Models.ActivityLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Activity")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("activity");
-
-                    b.Property<DateOnly>("DatePerformed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("date")
-                        .HasColumnName("date_performed")
-                        .HasDefaultValueSql("CURRENT_DATE");
-
-                    b.Property<string>("Details")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("details");
-
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(45)
-                        .HasColumnType("character varying(45)")
-                        .HasColumnName("ip_address");
-
-                    b.Property<Guid?>("PerformedById")
-                        .HasColumnType("uuid")
-                        .HasColumnName("performed_by");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("result");
-
-                    b.Property<Guid?>("TargetUserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("target_user_id");
-
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("timestamp")
-                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PerformedById");
-
-                    b.HasIndex("TargetUserId");
-
-                    b.HasIndex("Timestamp");
-
-                    b.ToTable("activity_logs");
-                });
 
             modelBuilder.Entity("backend.Models.Session", b =>
                 {
@@ -212,23 +155,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("users");
-                });
-
-            modelBuilder.Entity("backend.Models.ActivityLog", b =>
-                {
-                    b.HasOne("backend.Models.User", "PerformedBy")
-                        .WithMany()
-                        .HasForeignKey("PerformedById")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("backend.Models.User", "TargetUser")
-                        .WithMany()
-                        .HasForeignKey("TargetUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("PerformedBy");
-
-                    b.Navigation("TargetUser");
                 });
 
             modelBuilder.Entity("backend.Models.Session", b =>
