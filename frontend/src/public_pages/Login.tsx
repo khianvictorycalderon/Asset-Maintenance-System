@@ -108,14 +108,14 @@ export default function Login() {
           {/* Email */}
           <div className="space-y-1">
             <label className="text-sm text-zinc-700 dark:text-orange-50">
-              Email / Username
+              Email
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className={inputClass}
+              className={`${inputClass} mt-2`}
               placeholder="you@example.com"
             />
           </div>
@@ -131,13 +131,13 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`${inputClass} pr-10`}
+                className={`${inputClass} pr-10 mt-2`}
                 placeholder="••••••••"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer transition"
+                className="mt-1 absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer transition"
                 tabIndex={-1}
               >
                 <EyeIcon open={showPassword} />
