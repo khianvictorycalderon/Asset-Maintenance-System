@@ -53,7 +53,7 @@ export default function Login() {
 
       navigate(PRIVATE_ROUTE_FIRST_PATH, { replace: true });
 
-    } catch (err: any) {
+    } catch (err: any) { // Paltan itong any, avoid using any as data type, use unknown instead.
       setError(err?.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
