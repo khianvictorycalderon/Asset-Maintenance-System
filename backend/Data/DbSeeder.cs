@@ -9,7 +9,7 @@ public static class DbSeeder
         IConfiguration configuration
     ){
 
-        var adminDefaultEmail = configuration.GetSection("Default:Credentials:Admin:Username").Get<string>();
+        var adminDefaultEmail = configuration.GetSection("Default:Credentials:Admin:Email").Get<string>();
         var adminDefaultPassword = configuration.GetSection("Default:Credentials:Admin:Password").Get<string>();
         
         if (string.IsNullOrWhiteSpace(adminDefaultEmail) || string.IsNullOrWhiteSpace(adminDefaultPassword))
