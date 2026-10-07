@@ -47,14 +47,17 @@
         "Default": {
             "Credentials": {
                 "Admin": {
-                    "Username": "...",
+                    "Email": "...",
                     "Password": "..."
                 }
             }
         }
     }
     ```
-    **NOTE**: *Replace with your actual credentials and configuration. Also put actual values for default admin username and password (auto creates on start of the backend application)*
+    **NOTES**: 
+    - *Replace with your actual credentials and configuration. Also put actual values for default admin username and password (auto creates on start of the backend application)*
+    - *Admin default email should be a valid email.*
+    - *Admin password must be strong enough just like in register page.*
 2. Run this if you haven't installed entity framework before:
     ```cmd
     dotnet tool install --global dotnet-ef --version 8.0.4
