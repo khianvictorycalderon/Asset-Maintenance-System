@@ -1,10 +1,13 @@
-import { useState } from "react";
-import Modal from "../components/Modal";
-import Pagination from "../components/Pagination";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Modal from "../Modal";
+import Pagination from "../Pagination";
 import LoadingState from "../components/LoadingState";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import Toast from "../components/Toast";
+import { ROLE_BASED_API_URLS as API_URLS } from "../config";
+import { useNavigate } from "react-router-dom";
 
 type UserRole =
   | "Employee"
@@ -15,7 +18,7 @@ type UserRole =
 type AccessStatus = "Active" | "Revoked";
 
 interface User {
-  id: number;
+  id: string;
   firstName: string;
   middleName: string;
   lastName: string;
@@ -24,58 +27,46 @@ interface User {
   status: AccessStatus;
 }
 
+interface UsersResponse {
+  message: string;
+  users: {
+    user_id: string;
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    email: string;
+    role: UserRole;
+    revocation_status: AccessStatus;
+    is_user_banned: boolean;
+  }[];
+  total_users: number;
+  current_page: number;
+  page_size: number;
+  total_pages: number;
+}
+
 const AdminUsersRoles = () => {
+  
+  const navigate = useNavigate();
 
   // =========================
   // USERS
   // =========================
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      firstName: "Shino",
-      middleName: "",
-      lastName: "Amano",
-      email: "shino.amano@example.com",
-      role: "Admin",
-      status: "Active",
-    },
-    {
-      id: 2,
-      firstName: "Juan",
-      middleName: "Dela",
-      lastName: "Cruz",
-      email: "juan.delacruz@example.com",
-      role: "Employee",
-      status: "Active",
-    },
-    {
-      id: 3,
-      firstName: "Maria",
-      middleName: "",
-      lastName: "Santos",
-      email: "maria.santos@example.com",
-      role: "Supervisor",
-      status: "Active",
-    },
-    {
-      id: 4,
-      firstName: "Pedro",
-      middleName: "Garcia",
-      lastName: "Reyes",
-      email: "pedro.reyes@example.com",
-      role: "Personnel",
-      status: "Revoked",
-    },
-  ]);
+  const [users, setUsers] = useState<User[]>([]);
 
   // =========================
   // PAGE LOADING / ERROR
   // =========================
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [errorMessage, setErrorMessage] =
-    useState("");
+  // =========================
+  // PAGINATION
+  // =========================
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
   // =========================
   // TOAST
@@ -89,17 +80,7 @@ const AdminUsersRoles = () => {
   // REVOKE LOADING
   // =========================
   const [loadingId, setLoadingId] =
-    useState<number | null>(null);
-
-  // =========================
-  // PAGINATION
-  // =========================
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-  const totalItems = 93;
-  const itemsPerPage = 10;
-  const totalPages = 10;
+    useState<string | null>(null);
 
   // =========================
   // ROLE MODAL
@@ -143,6 +124,58 @@ const AdminUsersRoles = () => {
     useState("");
 
   // =========================
+  // FETCH USERS
+  // =========================
+  const fetchUsers = async (page: number) => {
+    setIsLoading(true);
+    setErrorMessage("");
+
+    try {
+      const response = await axios.get<UsersResponse>(
+        `${API_URLS.Admin}/users?page=${page}&pageSize=${itemsPerPage}`,
+        { withCredentials: true }
+      );
+
+      const data = response.data;
+
+      setUsers(
+        data.users.map((user) => ({
+          id: user.user_id,
+          firstName: user.first_name,
+          middleName: user.middle_name,
+          lastName: user.last_name,
+          email: user.email,
+          role: user.role,
+          status: user.revocation_status,
+        }))
+      );
+
+      setTotalItems(data.total_users);
+      setItemsPerPage(data.page_size);
+      setTotalPages(data.total_pages);
+      setCurrentPage(data.current_page);
+    } catch (error: unknown) {
+      setErrorMessage(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message ??
+              error.response?.data?.detail ??
+              error.response?.data?.title ??
+              (error.response
+                ? "Something went wrong."
+                : "Can't reach the server.")
+          : "Something went wrong."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // =========================
   // ROLE LABELS
   // =========================
   const roleLabels: Record<
@@ -159,148 +192,168 @@ const AdminUsersRoles = () => {
   // RETRY USERS
   // =========================
   const handleRetry = () => {
-    setErrorMessage("");
-    setIsLoading(true);
+    fetchUsers(currentPage);
+  };
 
-    // Temporary loading simulation.
-    // Replace this with the backend request later.
-    setTimeout(() => {
-      setIsLoading(false);
+  // =========================
+  // ERROR HELPER (shared by all PATCH calls)
+  // =========================
+  const getErrorInfo = (error: unknown) => {
+    if (!axios.isAxiosError(error)) {
+      return { message: "Something went wrong.", status: undefined };
+    }
 
-      setToast({
-        type: "success",
-        message: "Users loaded successfully.",
-      });
-    }, 800);
+    if (!error.response) {
+      return { message: "Can't reach the server.", status: undefined };
+    }
+
+    const status = error.response.status;
+    const data = error.response.data;
+
+    // Session expired, or this admin's access was revoked
+    if (status === 401) {
+      navigate("/login", { replace: true });
+      return { message: "Your session has expired.", status };
+    }
+
+    if (status === 403) {
+      return {
+        message: "You don't have permission to perform this action.",
+        status,
+      };
+    }
+
+    if (status >= 500) {
+      return { message: "Server error. Please try again.", status };
+    }
+
+    return {
+      message:
+        data?.message ??
+        data?.detail ??
+        data?.title ??
+        "Something went wrong.",
+      status,
+    };
   };
 
   // =========================
   // REVOKE / UNDO REVOKE
   // =========================
-  const handleRevoke = (user: User) => {
+  const handleRevoke = async (user: User) => {
 
-    // Admin accounts cannot be revoked
-    if (user.role === "Admin") return;
+    // Admin accounts cannot be revoked, and block double clicks
+    if (user.role === "Admin" || loadingId) return;
 
     setLoadingId(user.id);
 
-    // Temporary loading simulation
-    setTimeout(() => {
+    try {
+      const response = await axios.patch<{
+        is_user_banned: boolean;
+        message: string;
+      }>(
+        `${API_URLS.Admin}/users/${user.id}/access-revocation`,
+        null,
+        { withCredentials: true }
+      );
 
+      const { is_user_banned, message } = response.data;
+
+      // Status comes from the response, never guessed locally
       setUsers((currentUsers) =>
         currentUsers.map((item) =>
           item.id === user.id
             ? {
                 ...item,
-                status:
-                  item.status === "Active"
-                    ? "Revoked"
-                    : "Active",
+                status: is_user_banned ? "Revoked" : "Active",
               }
             : item
         )
       );
 
+      setToast({ type: "success", message });
+
+    } catch (error: unknown) {
+      const { message, status } = getErrorInfo(error);
+
+      setToast({ type: "error", message });
+
+      // User gone or record changed by someone else: refresh the list
+      if (status === 404 || status === 409) {
+        fetchUsers(currentPage);
+      }
+
+    } finally {
       setLoadingId(null);
-
-      setToast({
-        type: "success",
-        message:
-          user.status === "Active"
-            ? "User access revoked successfully."
-            : "User access restored successfully.",
-      });
-
-    }, 800);
+    }
   };
 
   // =========================
   // OPEN UPDATE ROLE MODAL
   // =========================
+
   const openRoleModal = (user: User) => {
 
     // Admin accounts cannot have their role changed
     if (user.role === "Admin") return;
 
     setSelectedUser(user);
-
-    setSelectedRole(
-      user.role === "Employee" ||
-        user.role === "Supervisor" ||
-        user.role === "Personnel"
-        ? user.role
-        : "Employee"
-    );
-
+    setSelectedRole(user.role as Exclude<UserRole, "Admin">);
     setModalError("");
     setRoleModalOpen(true);
-  };
+  };  
 
   // =========================
   // UPDATE ROLE
   // =========================
+
+  // True when the selected role equals the current role (backend returns 400 for this)
+  const roleUnchanged =
+    selectedUser !== null && selectedUser.role === selectedRole;
+
   const handleUpdateRole = async () => {
 
-    if (!selectedUser) return;
+    if (!selectedUser || modalLoading || roleUnchanged) return;
 
     setModalLoading(true);
     setModalError("");
 
     try {
-
-      // Temporary backend simulation
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1000)
+      const response = await axios.patch<{
+        role: UserRole;
+        message: string;
+      }>(
+        `${API_URLS.Admin}/users/${selectedUser.id}/role-update`,
+        { role: selectedRole },
+        { withCredentials: true }
       );
 
-      // Example backend validation
-      if (selectedRole === selectedUser.role) {
-        throw new Error(
-          "User already has the selected role."
-        );
-      }
+      const { role, message } = response.data;
 
-      // Update user role
       setUsers((currentUsers) =>
         currentUsers.map((user) =>
           user.id === selectedUser.id
-            ? {
-                ...user,
-                role: selectedRole,
-              }
+            ? { ...user, role }
             : user
         )
       );
 
-      // Success toast
-      setToast({
-        type: "success",
-        message:
-          "User role updated successfully.",
-      });
-
-      // Close modal
+      setToast({ type: "success", message });
       setRoleModalOpen(false);
       setSelectedUser(null);
 
-    } catch (error) {
-
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Unable to update user role.";
+    } catch (error: unknown) {
+      const { message, status } = getErrorInfo(error);
 
       setModalError(message);
+      setToast({ type: "error", message });
 
-      setToast({
-        type: "error",
-        message,
-      });
+      if (status === 404 || status === 409) {
+        fetchUsers(currentPage);
+      }
 
     } finally {
-
       setModalLoading(false);
-
     }
   };
 
@@ -330,90 +383,65 @@ const AdminUsersRoles = () => {
   // =========================
   const handleChangePassword = async () => {
 
+    if (!selectedUser || modalLoading) return;
+
     setModalError("");
 
-    // Empty new password
     if (!newPassword) {
-
-      setModalError(
-        "New password is required."
-      );
-
+      setModalError("New password is required.");
       return;
     }
 
-    // Empty confirmation
     if (!confirmPassword) {
-
-      setModalError(
-        "Please confirm the new password."
-      );
-
+      setModalError("Please confirm the new password.");
       return;
     }
 
-    // Password too short
-    if (newPassword.length < 8) {
-
-      setModalError(
-        "Password must be at least 8 characters."
-      );
-
-      return;
-    }
-
-    // Passwords don't match
     if (newPassword !== confirmPassword) {
+      setModalError("Passwords do not match.");
+      return;
+    }
 
-      setModalError(
-        "Passwords do not match."
-      );
+    if (newPassword.length < 8) {
+      setModalError("Password must be at least 8 characters.");
+      return;
+    }
 
+    if (new TextEncoder().encode(newPassword).length > 72) {
+      setModalError("Password is too long (maximum 72 bytes).");
       return;
     }
 
     setModalLoading(true);
 
     try {
-
-      // Temporary backend simulation
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1000)
+      // Only new_password is sent. confirm_password never leaves the browser.
+      const response = await axios.patch<{ message: string }>(
+        `${API_URLS.Admin}/users/${selectedUser.id}/password-change`,
+        { new_password: newPassword },
+        { withCredentials: true }
       );
 
-      // Success toast
-      setToast({
-        type: "success",
-        message:
-          "Password changed successfully.",
-      });
+      setToast({ type: "success", message: response.data.message });
 
-      // Close modal
+      // Close modal and clear the passwords
       setPasswordModalOpen(false);
-
-      // Reset fields
       setNewPassword("");
       setConfirmPassword("");
       setSelectedUser(null);
 
-    } catch (error) {
-
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Unable to change password.";
+    } catch (error: unknown) {
+      const { message, status } = getErrorInfo(error);
 
       setModalError(message);
+      setToast({ type: "error", message });
 
-      setToast({
-        type: "error",
-        message,
-      });
+      if (status === 404 || status === 409) {
+        fetchUsers(currentPage);
+      }
 
     } finally {
-
       setModalLoading(false);
-
     }
   };
 
@@ -722,7 +750,7 @@ const AdminUsersRoles = () => {
               totalPages={totalPages}
               totalItems={totalItems}
               itemsPerPage={itemsPerPage}
-              onPageChange={setCurrentPage}
+              onPageChange={(page) => fetchUsers(page)}
             />
           )}
 
@@ -968,7 +996,7 @@ const AdminUsersRoles = () => {
 
               <button
                 type="button"
-                disabled={modalLoading}
+                disabled={modalLoading || roleUnchanged}
                 onClick={handleUpdateRole}
                 className="
                   flex items-center
