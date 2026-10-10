@@ -23,7 +23,7 @@ import MaintenanceContracts from "./private_pages/Admin/MaintenanceContracts";
 import MaintenanceRecords from "./private_pages/Admin/MaintenanceRecords";
 import MaintenanceVendors from "./private_pages/Admin/MaintenanceVendors";
 import AdminReports from "./private_pages/Admin/Reports";
-import SystemActivityLogs from "./private_pages/AdminActivityLogs";
+import SystemActivityLogs from "./private_pages/Admin/SystemActivityLogs";
 import UsersRoles from "./private_pages/AdminUserRoles";
 
 // Employee pages

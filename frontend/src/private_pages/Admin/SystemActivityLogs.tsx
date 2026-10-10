@@ -1,9 +1,15 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
+import { useSignalREvent } from "../../utils/useSignalREvent";
+
+const PAGE_SIZE = 10;
 
 type ActivityResult = "Success" | "Failed" | "Rejected";
 
 type ActivityLog = {
-  id: number;
+  id: string;
   activity: string;
   performedBy?: string;
   ipAddress?: string;
@@ -15,73 +21,49 @@ type ActivityLog = {
   isNew?: boolean;
 };
 
-const initialLogs: ActivityLog[] = [
-  {
-    id: 1,
-    activity: "Update user role",
-    performedBy: "Admin User",
-    result: "Success",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "14:25:31",
-    targetUser: "Jane Doe",
-    details:
-      "Changed role of Jane Doe from Employee to Supervisor.",
-    isNew: true,
-  },
-  {
-    id: 2,
-    activity: "Fetch all users",
-    performedBy: "Admin User",
-    result: "Success",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "14:21:08",
-    details:
-      "Retrieved the complete list of registered users.",
-  },
-  {
-    id: 3,
-    activity: "Change user password",
-    performedBy: "Admin User",
-    result: "Success",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "14:15:42",
-    targetUser: "John Smith",
-    details:
-      "Password was successfully changed for the selected user.",
-  },
-  {
-    id: 4,
-    activity: "Revoke user access",
-    performedBy: "Admin User",
-    result: "Failed",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "14:08:17",
-    targetUser: "System Administrator",
-    details:
-      "The request was rejected because administrator accounts cannot be revoked.",
-  },
-  {
-    id: 5,
-    activity: "Update user role",
-    performedBy: "Admin User",
-    result: "Rejected",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "13:57:02",
-    targetUser: "System Administrator",
-    details:
-      "Administrator accounts cannot have their role changed.",
-  },
-  {
-    id: 6,
-    activity: "Login attempt",
-    ipAddress: "192.168.1.25",
-    result: "Failed",
-    datePerformed: "Oct 7, 2026",
-    timestamp: "13:45:19",
-    details:
-      "Login attempt failed because the supplied credentials were invalid.",
-  },
-];
+// Shape returned by the backend
+type ApiLog = {
+  id: string;
+  activity: string;
+  performed_by: string | null;
+  performed_by_user_id: string | null;
+  target_user: string | null;
+  result: ActivityResult;
+  date_performed: string;
+  timestamp: string; // UTC, ends in Z
+  ip_address: string | null;
+  details: string | null;
+};
+
+type LogsResponse = {
+  message: string;
+  logs: ApiLog[];
+  total_logs: number;
+  current_page: number;
+  page_size: number;
+  total_pages: number;
+};
+
+// Map the API log to the UI shape. Date and time are shown in the viewer's local time.
+const toLog = (log: ApiLog): ActivityLog => {
+  const date = new Date(log.timestamp);
+
+  return {
+    id: log.id,
+    activity: log.activity,
+    performedBy: log.performed_by ?? undefined,
+    ipAddress: log.ip_address ?? undefined,
+    result: log.result,
+    datePerformed: date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    }),
+    timestamp: date.toLocaleTimeString(undefined, { hour12: false }),
+    targetUser: log.target_user ?? undefined,
+    details: log.details ?? undefined,
+  };
+};
 
 function ResultBadge({
   result,
@@ -140,20 +122,28 @@ function Pagination({
   page,
   totalPages,
   totalItems,
+  pageSize,
+  onPageChange,
 }: {
   page: number;
   totalPages: number;
   totalItems: number;
+  pageSize: number;
+  onPageChange: (page: number) => void;
 }) {
+  const start = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, totalItems);
+
   return (
     <div className="flex flex-col gap-3 border-t border-neutral-200 px-4 py-4 text-sm dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-neutral-500 dark:text-neutral-400">
-        Showing 1–{Math.min(10, totalItems)} of {totalItems}
+        Showing {start}–{end} of {totalItems}
       </p>
 
       <div className="flex items-center gap-2">
         <button
           disabled={page === 1}
+          onClick={() => onPageChange(page - 1)}
           className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
         >
           Previous
@@ -165,6 +155,7 @@ function Pagination({
 
         <button
           disabled={page === totalPages}
+          onClick={() => onPageChange(page + 1)}
           className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
         >
           Next
@@ -268,26 +259,103 @@ function ErrorState({
 }
 
 export default function SystemActivityLogs() {
+  const navigate = useNavigate();
+
   const [logs, setLogs] = useState<ActivityLog[]>([]);
-    useState<ActivityLog[]>(initialLogs);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  const [expandedId, setExpandedId] =
-    useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [newActivityCount, setNewActivityCount] = useState(0);
 
-  const [error, setError] =
-    useState(false);
+  const pageRef = useRef(1);
+  const pageSizeRef = useRef(PAGE_SIZE);
+  const totalRef = useRef(0);
+  const seenIds = useRef<Set<string>>(new Set());
+  const timers = useRef<number[]>([]);
 
-  const retry = () => {
-    setError(false);
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach((t) => window.clearTimeout(t));
+  }, []);
+
+  const fetchLogs = async (target: number) => {
     setLoading(true);
+    setError(false);
 
-    setTimeout(() => {
+    try {
+      const response = await axios.get<LogsResponse>(
+        `${API_URLS.Admin}/activity-logs?page=${target}&pageSize=${PAGE_SIZE}`,
+        { withCredentials: true }
+      );
+
+      const data = response.data;
+
+      // Backend returns newest first. Do not reorder.
+      setLogs(data.logs.map(toLog));
+      setTotalItems(data.total_logs);
+      setPageSize(data.page_size);
+      setTotalPages(Math.max(1, data.total_pages));
+      setPage(data.current_page);
+      setNewActivityCount(0);
+      pageRef.current = data.current_page;
+      pageSizeRef.current = data.page_size;
+      totalRef.current = data.total_logs;
+      seenIds.current = new Set(data.logs.map((l) => l.id));
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      setError(true);
+    } finally {
       setLoading(false);
-    }, 700);
+    }
   };
+
+  useEffect(() => {
+    fetchLogs(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const retry = () => fetchLogs(page);
+
+    // Live updates: listen only, never send
+  useSignalREvent<[ApiLog]>("ActivityLogCreated", (apiLog) => {
+    // Ignore duplicates
+    if (seenIds.current.has(apiLog.id)) return;
+    seenIds.current.add(apiLog.id);
+
+    totalRef.current += 1;
+    setTotalItems(totalRef.current);
+    setTotalPages(
+      Math.max(1, Math.ceil(totalRef.current / pageSizeRef.current))
+    );
+
+    // Other pages: update the totals and show a notice only
+    if (pageRef.current !== 1) {
+      setNewActivityCount((count) => count + 1);
+      return;
+    }
+
+    // Page 1: prepend, keep the page size, highlight the new row
+    const log = { ...toLog(apiLog), isNew: true };
+
+    setLogs((current) => [log, ...current].slice(0, pageSizeRef.current));
+
+    const timer = window.setTimeout(() => {
+      setLogs((current) =>
+        current.map((l) => (l.id === log.id ? { ...l, isNew: false } : l))
+      );
+    }, 4000);
+
+    timers.current.push(timer);
+  });
 
   return (
     <div className="space-y-6">
@@ -302,6 +370,19 @@ export default function SystemActivityLogs() {
           Monitor actions and events performed within the system.
         </p>
       </div>
+      
+      {newActivityCount > 0 && page !== 1 && (
+        <div className="flex items-center justify-between rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 text-sm text-orange-800 dark:border-orange-900 dark:bg-orange-950/30 dark:text-orange-300">
+          <span>New activity ({newActivityCount}) is available on page 1.</span>
+
+          <button
+            onClick={() => fetchLogs(1)}
+            className="rounded-md bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700"
+          >
+            Go to page 1
+          </button>
+        </div>
+      )}
 
       {/* Activity table */}
       <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
@@ -452,11 +533,12 @@ export default function SystemActivityLogs() {
 
               </table>
             </div>
-
             <Pagination
-              page={1}
-              totalPages={10}
-              totalItems={93}
+              page={page}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={(p) => fetchLogs(p)}
             />
           </>
         )}
