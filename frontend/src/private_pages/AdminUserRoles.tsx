@@ -155,16 +155,7 @@ const AdminUsersRoles = () => {
       setTotalPages(data.total_pages);
       setCurrentPage(data.current_page);
     } catch (error: unknown) {
-      setErrorMessage(
-        axios.isAxiosError(error)
-          ? error.response?.data?.message ??
-              error.response?.data?.detail ??
-              error.response?.data?.title ??
-              (error.response
-                ? "Something went wrong."
-                : "Can't reach the server.")
-          : "Something went wrong."
-      );
+      setErrorMessage(getErrorInfo(error).message);
     } finally {
       setIsLoading(false);
     }
@@ -1043,6 +1034,8 @@ const AdminUsersRoles = () => {
 
             setPasswordModalOpen(false);
             setModalError("");
+            setNewPassword("");
+            setConfirmPassword("");
 
           }
 
@@ -1229,6 +1222,8 @@ const AdminUsersRoles = () => {
 
                   setPasswordModalOpen(false);
                   setModalError("");
+                  setNewPassword("");
+                  setConfirmPassword("");
 
                 }}
                 className="
