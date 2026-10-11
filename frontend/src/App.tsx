@@ -24,7 +24,7 @@ import MaintenanceRecords from "./private_pages/Admin/MaintenanceRecords";
 import MaintenanceVendors from "./private_pages/Admin/MaintenanceVendors";
 import AdminReports from "./private_pages/Admin/Reports";
 import SystemActivityLogs from "./private_pages/Admin/SystemActivityLogs";
-import UsersRoles from "./private_pages/Admin/UsersRoles";
+import UsersRoles from "./private_pages/AdminUserRoles";
 
 // Employee pages
 import AssignedAssets from "./private_pages/Employee/AssignedAssets";

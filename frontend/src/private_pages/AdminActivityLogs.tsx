@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Pagination from "../components/Pagination";
+import Pagination from "../Pagination";
 import LoadingState from "../components/LoadingState";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
