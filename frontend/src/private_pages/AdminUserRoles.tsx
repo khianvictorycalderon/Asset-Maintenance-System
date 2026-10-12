@@ -437,18 +437,18 @@ const AdminUsersRoles = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1d1d1d] p-6 text-white">
+    <div className="text-neutral-900 dark:text-white">
 
       {/* =========================
           PAGE HEADER
       ========================= */}
       <div className="mb-6">
 
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">
           Users & Roles
         </h1>
 
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-neutral-500 dark:text-gray-400">
           Manage system users, roles, and access status.
         </p>
 
@@ -457,175 +457,133 @@ const AdminUsersRoles = () => {
       {/* =========================
           USERS TABLE
       ========================= */}
-      <div className="overflow-hidden rounded-xl border border-gray-700 bg-[#242424]">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
 
         <div className="overflow-x-auto">
 
-          <table className="min-w-[1100px] w-full">
+          <table className="min-w-[1100px] w-full text-left">
 
             {/* TABLE HEADER */}
-            <thead className="border-b border-gray-700 bg-[#191919]">
+            <thead className="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
 
               <tr>
-
-                <th className="px-5 py-4 text-left text-sm font-semibold">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   First Name / Middle Name / Last Name
                 </th>
 
-                <th className="px-5 py-4 text-left text-sm font-semibold">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   Email
                 </th>
 
-                <th className="px-5 py-4 text-left text-sm font-semibold">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   Role
                 </th>
 
-                <th className="px-5 py-4 text-left text-sm font-semibold">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   Access Status
                 </th>
 
-                <th className="px-5 py-4 text-left text-sm font-semibold">
+                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   Actions
                 </th>
-
               </tr>
 
             </thead>
 
-            {/* =========================
-                TABLE BODY
-            ========================= */}
-            <tbody className="divide-y divide-gray-700">
+            {/* TABLE BODY */}
+            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
 
-              {/* LOADING */}
               {isLoading ? (
 
                 <tr>
-
                   <td colSpan={5}>
-
                     <LoadingState />
-
                   </td>
-
                 </tr>
 
               ) : errorMessage ? (
 
-                /* ERROR */
                 <tr>
-
                   <td colSpan={5}>
-
                     <ErrorState
                       message={errorMessage}
                       onRetry={handleRetry}
                     />
-
                   </td>
-
                 </tr>
 
               ) : users.length === 0 ? (
 
-                /* EMPTY */
                 <tr>
-
                   <td colSpan={5}>
-
-                    <EmptyState
-                      message="No users found."
-                    />
-
+                    <EmptyState message="No users found." />
                   </td>
-
                 </tr>
 
               ) : (
 
-                /* USERS */
                 users.map((user) => {
 
-                  const isAdmin =
-                    user.role === "Admin";
-
-                  const isLoading =
-                    loadingId === user.id;
+                  const isAdmin = user.role === "Admin";
+                  const isRowLoading = loadingId === user.id;
 
                   return (
                     <tr
                       key={user.id}
-                      className="transition hover:bg-[#2b2b2b]"
+                      className="transition hover:bg-orange-50/50 dark:hover:bg-orange-950/20"
                     >
 
                       {/* NAME */}
-                      <td className="px-5 py-4 text-sm">
-
+                      <td className="px-4 py-4 text-sm font-medium text-neutral-900 dark:text-white">
                         {user.firstName}{" "}
-
                         {user.middleName || "—"}{" "}
-
                         {user.lastName}
-
                       </td>
 
                       {/* EMAIL */}
-                      <td className="max-w-[250px] px-5 py-4 text-sm">
-
+                      <td className="max-w-[250px] px-4 py-4">
                         <span
                           title={user.email}
-                          className="block truncate text-gray-300"
+                          className="block truncate text-sm text-neutral-600 dark:text-neutral-300"
                         >
                           {user.email}
                         </span>
-
                       </td>
 
                       {/* ROLE */}
-                      <td className="px-5 py-4">
-
+                      <td className="px-4 py-4">
                         <span
-                          className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+                          className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
                             isAdmin
-                              ? "bg-blue-500/15 text-blue-400"
-                              : "bg-gray-700 text-gray-200"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
+                              : "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300"
                           }`}
                         >
                           {roleLabels[user.role]}
                         </span>
-
                       </td>
 
                       {/* ACCESS STATUS */}
-                      <td className="px-5 py-4">
-
+                      <td className="px-4 py-4">
                         {user.status === "Active" ? (
-
-                          <span className="rounded-md bg-green-500/15 px-2.5 py-1 text-xs font-medium text-green-400">
+                          <span className="inline-flex rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700 dark:bg-green-950 dark:text-green-300">
                             Active
                           </span>
-
                         ) : (
-
-                          <span className="rounded-md bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-400">
+                          <span className="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
                             Revoked
                           </span>
-
                         )}
-
                       </td>
 
                       {/* ACTIONS */}
-                      <td className="px-5 py-4">
-
-                        <div className="flex gap-2">
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2">
 
                           {/* REVOKE / UNDO REVOKE */}
                           <button
                             type="button"
-                            disabled={
-                              isAdmin || isLoading
-                            }
+                            disabled={isAdmin || isRowLoading}
                             title={
                               isAdmin
                                 ? "Admin accounts can't be modified"
@@ -633,39 +591,22 @@ const AdminUsersRoles = () => {
                                 ? "Revoke access"
                                 : "Restore access"
                             }
-                            onClick={() =>
-                              handleRevoke(user)
-                            }
-                            className={`
-                              flex items-center gap-2
-                              rounded-md
-                              px-3 py-2
-                              text-xs font-medium
-                              transition
-
-                              ${
-                                isAdmin
-                                  ? "cursor-not-allowed bg-gray-700 text-gray-500"
-                                  : user.status === "Active"
-                                  ? "bg-red-600 text-white hover:bg-red-700"
-                                  : "border border-red-500 text-red-400 hover:bg-red-500/10"
-                              }
-
-                              disabled:cursor-not-allowed
-                              disabled:opacity-60
-                            `}
+                            onClick={() => handleRevoke(user)}
+                            className={`flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${
+                              user.status === "Active"
+                                ? "bg-red-600 text-white hover:bg-red-700"
+                                : "border border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-950"
+                            }`}
                           >
-
-                            {isLoading && (
-                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                            {isRowLoading && (
+                              <span className="h-3 w-3 animate-spin rounded-full border-2 border-current/30 border-t-current" />
                             )}
 
-                            {isLoading
+                            {isRowLoading
                               ? "Loading..."
                               : user.status === "Active"
                               ? "Revoke"
                               : "Undo Revoke"}
-
                           </button>
 
                           {/* UPDATE ROLE */}
@@ -677,21 +618,8 @@ const AdminUsersRoles = () => {
                                 ? "Admin accounts can't be modified"
                                 : "Update user role"
                             }
-                            onClick={() =>
-                              openRoleModal(user)
-                            }
-                            className="
-                              rounded-md
-                              bg-green-600
-                              px-3 py-2
-                              text-xs font-medium
-                              text-white
-                              transition
-                              hover:bg-green-700
-                              disabled:cursor-not-allowed
-                              disabled:bg-gray-700
-                              disabled:text-gray-500
-                            "
+                            onClick={() => openRoleModal(user)}
+                            className="cursor-pointer rounded-lg bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
                           >
                             Update Role
                           </button>
@@ -699,25 +627,13 @@ const AdminUsersRoles = () => {
                           {/* CHANGE PASSWORD */}
                           <button
                             type="button"
-                            onClick={() =>
-                              openPasswordModal(user)
-                            }
-                            className="
-                              rounded-md
-                              border border-gray-600
-                              bg-gray-700
-                              px-3 py-2
-                              text-xs font-medium
-                              text-gray-200
-                              transition
-                              hover:bg-gray-600
-                            "
+                            onClick={() => openPasswordModal(user)}
+                            className="cursor-pointer rounded-lg bg-neutral-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-neutral-700 dark:bg-neutral-700 dark:hover:bg-neutral-600"
                           >
                             Change Password
                           </button>
 
                         </div>
-
                       </td>
 
                     </tr>
@@ -752,15 +668,15 @@ const AdminUsersRoles = () => {
       ========================= */}
       <div className="mt-8">
 
-        <h2 className="mb-4 text-lg font-semibold">
+        <h2 className="mb-4 text-lg font-semibold text-neutral-900 dark:text-white">
           Role Labels
         </h2>
 
-        <div className="overflow-hidden rounded-xl border border-gray-700 bg-[#242424]">
+        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
 
           <table className="w-full">
 
-            <thead className="border-b border-gray-700 bg-[#191919]">
+            <thead className="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
 
               <tr>
 
@@ -776,13 +692,13 @@ const AdminUsersRoles = () => {
 
             </thead>
 
-            <tbody className="divide-y divide-gray-700">
+            <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
 
               <tr>
 
                 <td className="px-5 py-3">
 
-                  <span className="rounded bg-gray-700 px-2 py-1 text-xs">
+                  <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
                     Employee
                   </span>
 
@@ -798,7 +714,7 @@ const AdminUsersRoles = () => {
 
                 <td className="px-5 py-3">
 
-                  <span className="rounded bg-gray-700 px-2 py-1 text-xs">
+                  <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
                     Supervisor
                   </span>
 
@@ -814,7 +730,7 @@ const AdminUsersRoles = () => {
 
                 <td className="px-5 py-3">
 
-                  <span className="rounded bg-gray-700 px-2 py-1 text-xs">
+                  <span className="rounded bg-neutral-100 px-2 py-1 text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200">
                     Personnel
                   </span>
 
@@ -830,7 +746,7 @@ const AdminUsersRoles = () => {
 
                 <td className="px-5 py-3">
 
-                  <span className="rounded bg-blue-500/15 px-2 py-1 text-xs text-blue-400">
+                  <span className="rounded bg-blue-100 px-2 py-1 text-xs text-blue-700 dark:bg-blue-950 dark:text-blue-300">
                     Admin
                   </span>
 
@@ -840,7 +756,7 @@ const AdminUsersRoles = () => {
 
                   Administrator{" "}
 
-                  <span className="italic text-gray-500">
+                  <span className="italic text-neutral-500">
                     (logged-in admin)
                   </span>
 
@@ -879,9 +795,9 @@ const AdminUsersRoles = () => {
           <div className="space-y-5">
 
             {/* USER INFORMATION */}
-            <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-3">
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
 
-              <p className="font-medium text-white">
+              <p className="font-medium text-neutral-900 dark:text-white">
 
                 {selectedUser.firstName}{" "}
 
@@ -893,7 +809,7 @@ const AdminUsersRoles = () => {
 
               </p>
 
-              <p className="mt-1 truncate text-sm text-gray-400">
+              <p className="mt-1 truncate text-sm text-neutral-500 dark:text-gray-400">
                 {selectedUser.email}
               </p>
 
@@ -904,7 +820,7 @@ const AdminUsersRoles = () => {
 
               <label
                 htmlFor="user-role"
-                className="mb-2 block text-sm font-medium text-gray-300"
+                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
               >
                 Role
               </label>
@@ -924,10 +840,10 @@ const AdminUsersRoles = () => {
                 className="
                   w-full
                   rounded-lg
-                  border border-gray-700
-                  bg-gray-800
+                  border border-neutral-300 dark:border-gray-700
+                  bg-white dark:bg-gray-800
                   px-3 py-2.5
-                  text-white
+                  text-neutral-900 dark:text-white
                   outline-none
                   focus:border-green-500
                 "
@@ -952,7 +868,7 @@ const AdminUsersRoles = () => {
             {/* ERROR MESSAGE */}
             {modalError && (
 
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
                 {modalError}
               </div>
 
@@ -971,13 +887,14 @@ const AdminUsersRoles = () => {
 
                 }}
                 className="
+                  cursor-pointer
                   rounded-lg
-                  border border-gray-700
+                  border border-neutral-300 dark:border-gray-700
                   px-4 py-2.5
                   text-sm font-medium
-                  text-gray-300
+                  text-neutral-700 dark:text-gray-300
                   transition
-                  hover:bg-gray-800
+                  hover:bg-neutral-100 dark:hover:bg-gray-800
                   disabled:cursor-not-allowed
                   disabled:opacity-50
                 "
@@ -990,7 +907,7 @@ const AdminUsersRoles = () => {
                 disabled={modalLoading || roleUnchanged}
                 onClick={handleUpdateRole}
                 className="
-                  flex items-center
+                  flex cursor-pointer items-center
                   justify-center gap-2
                   rounded-lg
                   bg-green-600
@@ -1047,9 +964,9 @@ const AdminUsersRoles = () => {
           <div className="space-y-5">
 
             {/* USER INFORMATION */}
-            <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-3">
+            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
 
-              <p className="font-medium text-white">
+              <p className="font-medium text-neutral-900 dark:text-white">
 
                 {selectedUser.firstName}{" "}
 
@@ -1061,7 +978,7 @@ const AdminUsersRoles = () => {
 
               </p>
 
-              <p className="mt-1 truncate text-sm text-gray-400">
+              <p className="mt-1 truncate text-sm text-neutral-500 dark:text-gray-400">
                 {selectedUser.email}
               </p>
 
@@ -1072,7 +989,7 @@ const AdminUsersRoles = () => {
 
               <label
                 htmlFor="new-password"
-                className="mb-2 block text-sm font-medium text-gray-300"
+                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
               >
                 New Password
               </label>
@@ -1095,11 +1012,11 @@ const AdminUsersRoles = () => {
                   className="
                     w-full
                     rounded-lg
-                    border border-gray-700
-                    bg-gray-800
+                    border border-neutral-300 dark:border-gray-700
+                    bg-white dark:bg-gray-800
                     px-3 py-2.5
                     pr-16
-                    text-white
+                    text-neutral-900 dark:text-white
                     outline-none
                     placeholder:text-gray-500
                     focus:border-green-500
@@ -1118,9 +1035,10 @@ const AdminUsersRoles = () => {
                     right-3
                     top-1/2
                     -translate-y-1/2
+                    cursor-pointer
                     text-xs
-                    text-gray-400
-                    hover:text-white
+                    text-neutral-500 dark:text-gray-400
+                    hover:text-neutral-900 dark:hover:text-white
                   "
                 >
                   {showNewPassword
@@ -1141,7 +1059,7 @@ const AdminUsersRoles = () => {
 
               <label
                 htmlFor="confirm-password"
-                className="mb-2 block text-sm font-medium text-gray-300"
+                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
               >
                 Confirm New Password
               </label>
@@ -1166,11 +1084,11 @@ const AdminUsersRoles = () => {
                   className="
                     w-full
                     rounded-lg
-                    border border-gray-700
-                    bg-gray-800
+                    border border-neutral-300 dark:border-gray-700
+                    bg-white dark:bg-gray-800
                     px-3 py-2.5
                     pr-16
-                    text-white
+                    text-neutral-900 dark:text-white
                     outline-none
                     placeholder:text-gray-500
                     focus:border-green-500
@@ -1189,9 +1107,10 @@ const AdminUsersRoles = () => {
                     right-3
                     top-1/2
                     -translate-y-1/2
+                    cursor-pointer
                     text-xs
-                    text-gray-400
-                    hover:text-white
+                    text-neutral-500 dark:text-gray-400
+                    hover:text-neutral-900 dark:hover:text-white
                   "
                 >
                   {showConfirmPassword
@@ -1206,7 +1125,7 @@ const AdminUsersRoles = () => {
             {/* ERROR MESSAGE */}
             {modalError && (
 
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
                 {modalError}
               </div>
 
@@ -1227,13 +1146,14 @@ const AdminUsersRoles = () => {
 
                 }}
                 className="
+                  cursor-pointer
                   rounded-lg
-                  border border-gray-700
+                  border border-neutral-300 dark:border-gray-700
                   px-4 py-2.5
                   text-sm font-medium
-                  text-gray-300
+                  text-neutral-700 dark:text-gray-300
                   transition
-                  hover:bg-gray-800
+                  hover:bg-neutral-100 dark:hover:bg-gray-800
                   disabled:cursor-not-allowed
                   disabled:opacity-50
                 "
@@ -1246,7 +1166,7 @@ const AdminUsersRoles = () => {
                 disabled={modalLoading}
                 onClick={handleChangePassword}
                 className="
-                  flex items-center
+                  flex cursor-pointer items-center
                   justify-center gap-2
                   rounded-lg
                   bg-green-600
