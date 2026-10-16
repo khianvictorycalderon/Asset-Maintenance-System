@@ -329,7 +329,7 @@ export default function AssetRegistryPage() {
   }
 
   return (
-    <main className="min-h-full bg-gray-100 p-3 text-gray-900 transition-colors dark:bg-zinc-950 dark:text-gray-100 sm:p-5">
+    <main className="min-h-full p-3 text-gray-900 transition-colors dark:text-gray-100 sm:p-5">
       <div className="mx-auto max-w-[1600px]">
         {/* Page Heading */}
         <div className="mb-5">
