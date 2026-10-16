@@ -12,11 +12,22 @@ public class AdminController(IAdminService _adminService) : ControllerBase
     private Guid CurrentUserId => (Guid)HttpContext.Items["UserId"]!;
     private Guid? CurrentSessionId => HttpContext.Items["SessionId"] as Guid?;
 
+
+    // ==================================================================================================================
+    // ==================================================================================================================
+    // Test api endpoint
+    // ==================================================================================================================
+    // ==================================================================================================================
     [HttpGet("api/admin/test")]
     [Audit("Test admin endpoint")]
     public IActionResult Test() =>
         Ok(new { message = "You are authorized for admin!" });
 
+    // ==================================================================================================================
+    // ==================================================================================================================
+    // Users and roles
+    // ==================================================================================================================
+    // ==================================================================================================================
     [HttpGet("api/admin/users")]
     [Audit("Fetch all users")]
     public async Task<IActionResult> GetAllUser(
@@ -44,6 +55,40 @@ public class AdminController(IAdminService _adminService) : ControllerBase
         return Ok(new MessageResponse(message));
     }
 
+    // ==================================================================================================================
+    // ==================================================================================================================
+    // Asset registry
+    // ==================================================================================================================
+    // ==================================================================================================================
+    [HttpGet("api/admin/assets")]
+    [Audit("Fetch assets")]
+    public async Task<IActionResult> GetAssets([FromQuery] GetAssetsQueryDto query)
+        => Ok(await _adminService.GetAssets(query));
+
+    [HttpPost("api/admin/assets")]
+    [Audit("Register asset")]
+    public async Task<IActionResult> CreateAsset([FromBody] SaveAssetRequestDto request)
+        => Ok(await _adminService.CreateAsset(request));
+
+    [HttpPut("api/admin/assets/{assetId}")]
+    [Audit("Update asset")]
+    public async Task<IActionResult> UpdateAsset(
+        [FromRoute] Guid assetId, [FromBody] SaveAssetRequestDto request)
+        => Ok(await _adminService.UpdateAsset(assetId, request));
+
+    [HttpDelete("api/admin/assets/{assetId}")]
+    [Audit("Delete asset")]
+    public async Task<IActionResult> DeleteAsset([FromRoute] Guid assetId)
+    {
+        var message = await _adminService.DeleteAsset(assetId);
+        return Ok(new MessageResponse(message));
+    }
+
+    // ==================================================================================================================
+    // ==================================================================================================================
+    // System activity logs
+    // ==================================================================================================================
+    // ==================================================================================================================
     [HttpGet("api/admin/activity-logs")]
     [Audit("Fetch activity logs")]
     public async Task<IActionResult> GetActivityLogs(

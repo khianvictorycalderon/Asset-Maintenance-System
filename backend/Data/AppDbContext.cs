@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users => Set<User>();
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
+    public DbSet<Assets> Assets => Set<Assets>();
 
       protected override void OnModelCreating(ModelBuilder modelBuilder)
       {
@@ -66,6 +67,32 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
                   entity.Property(log => log.DatePerformed)
                         .HasDefaultValueSql("CURRENT_DATE");
+            });
+
+            // Assets (asset registry)
+            modelBuilder.Entity<Assets>(entity =>
+            {
+                  // Backstop for the case-insensitive duplicate check done in AdminService
+                  entity.HasIndex(a => a.Tag).IsUnique();
+                  entity.HasIndex(a => a.DateAdded);
+
+                  entity.Property(a => a.Status)
+                        .HasDefaultValue("Active");
+
+                  entity.Property(a => a.Condition)
+                        .HasDefaultValue("Good");
+
+                  entity.Property(a => a.Criticality)
+                        .HasDefaultValue("Medium");
+
+                  entity.Property(a => a.DateAdded)
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                  entity.Property(a => a.CreatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(a => a.UpdatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
             });
       }
 

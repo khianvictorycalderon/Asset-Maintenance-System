@@ -11,5 +11,13 @@ public interface IAdminService
 
     Task<string> ChangePassword(Guid userId, ChangePasswordRequestDto request, Guid actorId, Guid? currentSessionId);
 
+    Task<GetAssetsResponseDto> GetAssets(GetAssetsQueryDto query);
+
+    Task<AssetResponseDto> CreateAsset(SaveAssetRequestDto request);
+
+    Task<AssetResponseDto> UpdateAsset(Guid assetId, SaveAssetRequestDto request);
+
+    Task<string> DeleteAsset(Guid assetId);
+
     Task<GetActivityLogsResponseDto> GetActivityLogs(int page, int pageSize);
 }
