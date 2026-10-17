@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -78,6 +77,18 @@ const emptyForm = {
   category: "",
   criticality: "Medium" as Criticality,
 };
+
+type AssetForm = typeof emptyForm;
+
+const toPayload = (form: AssetForm) => ({
+  name: form.name.trim(),
+  tag: form.tag.trim(),
+  description: form.description.trim(),
+  status: form.status,
+  condition: form.condition,
+  category: form.category,
+  criticality: form.criticality,
+});
 
 // One shared error mapper (401 is handled by the caller)
 const getErrorInfo = (error: unknown) => {
@@ -174,6 +185,140 @@ function formatDate(date: string, format: string) {
   }
 }
 
+// Shared by the register form and the edit popup
+function AssetFields({
+  form,
+  onChange,
+  idPrefix,
+  className,
+}: {
+  form: AssetForm;
+  onChange: (field: keyof AssetForm, value: string) => void;
+  idPrefix: string;
+  className: string;
+}) {
+  return (
+    <div className={className}>
+      <div>
+        <label htmlFor={`${idPrefix}-name`} className={labelClass}>
+          Asset Name *
+        </label>
+        <input
+          id={`${idPrefix}-name`}
+          className={fieldClass}
+          placeholder="Enter asset name"
+          value={form.name}
+          onChange={(e) => onChange("name", e.target.value)}
+          maxLength={100}
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor={`${idPrefix}-tag`} className={labelClass}>
+          Asset Tag *
+        </label>
+        <input
+          id={`${idPrefix}-tag`}
+          className={fieldClass}
+          placeholder="e.g. AST-126"
+          value={form.tag}
+          onChange={(e) => onChange("tag", e.target.value)}
+          maxLength={50}
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor={`${idPrefix}-status`} className={labelClass}>
+          Status
+        </label>
+        <select
+          id={`${idPrefix}-status`}
+          className={fieldClass}
+          value={form.status}
+          onChange={(e) => onChange("status", e.target.value)}
+        >
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+          <option value="Under Maintenance">Under Maintenance</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor={`${idPrefix}-condition`} className={labelClass}>
+          Condition
+        </label>
+        <select
+          id={`${idPrefix}-condition`}
+          className={fieldClass}
+          value={form.condition}
+          onChange={(e) => onChange("condition", e.target.value)}
+        >
+          <option value="Good">Good</option>
+          <option value="Fair">Fair</option>
+          <option value="Poor">Poor</option>
+          <option value="Damaged">Damaged</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor={`${idPrefix}-category`} className={labelClass}>
+          Category *
+        </label>
+        <select
+          id={`${idPrefix}-category`}
+          className={fieldClass}
+          value={form.category}
+          onChange={(e) => onChange("category", e.target.value)}
+          required
+        >
+          <option value="">Select category</option>
+          <option value="Workshop Equipment">Workshop Equipment</option>
+          <option value="Office Equipment">Office Equipment</option>
+          <option value="IT Equipment">IT Equipment</option>
+          <option value="Machinery">Machinery</option>
+          <option value="Vehicles">Vehicles</option>
+          <option value="Tools">Tools</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor={`${idPrefix}-criticality`} className={labelClass}>
+          Criticality
+        </label>
+        <select
+          id={`${idPrefix}-criticality`}
+          className={fieldClass}
+          value={form.criticality}
+          onChange={(e) => onChange("criticality", e.target.value)}
+        >
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+
+      <div className="md:col-span-2">
+        <label htmlFor={`${idPrefix}-description`} className={labelClass}>
+          Asset Description
+        </label>
+        <textarea
+          id={`${idPrefix}-description`}
+          className={`${fieldClass} min-h-[42px] resize-y`}
+          placeholder="Enter asset description"
+          value={form.description}
+          onChange={(e) => onChange("description", e.target.value)}
+          maxLength={500}
+          rows={2}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function AssetRegistryPage() {
   const navigate = useNavigate();
 
@@ -185,10 +330,16 @@ export default function AssetRegistryPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [listError, setListError] = useState("");
 
-  // Form
+  // Create form
   const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Edit popup
+  const [editForm, setEditForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editError, setEditError] = useState("");
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [message, setMessage] = useState<FormMessage | null>(null);
 
@@ -260,55 +411,66 @@ export default function AssetRegistryPage() {
     };
   }, [page, applied, reloadKey, navigate]);
 
-  function updateForm(field: keyof typeof emptyForm, value: string) {
+  // Edit popup: close on Escape and lock background scroll while open
+  const isModalOpen = editingId !== null;
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !isUpdating) closeEditModal();
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isModalOpen, isUpdating]);
+
+  function updateForm(field: keyof AssetForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateEditForm(field: keyof AssetForm, value: string) {
+    setEditForm((current) => ({ ...current, [field]: value }));
   }
 
   function resetForm() {
     setForm(emptyForm);
-    setEditingId(null);
     setMessage(null);
   }
 
+  function closeEditModal() {
+    setEditingId(null);
+    setEditForm(emptyForm);
+    setEditError("");
+  }
+
   // =========================
-  // CREATE / UPDATE
+  // CREATE
   // =========================
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleCreate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (isSaving) return;
 
     setIsSaving(true);
     setMessage(null);
 
-    const payload = {
-      name: form.name.trim(),
-      tag: form.tag.trim(),
-      description: form.description.trim(),
-      status: form.status,
-      condition: form.condition,
-      category: form.category,
-      criticality: form.criticality,
-    };
-
     try {
-      const response =
-        editingId !== null
-          ? await axios.put<AssetResponse>(
-              `${API_URLS.Admin}/assets/${editingId}`,
-              payload,
-              { withCredentials: true }
-            )
-          : await axios.post<AssetResponse>(
-              `${API_URLS.Admin}/assets`,
-              payload,
-              { withCredentials: true }
-            );
+      const response = await axios.post<AssetResponse>(
+        `${API_URLS.Admin}/assets`,
+        toPayload(form),
+        { withCredentials: true }
+      );
 
       setMessage({ type: "success", text: response.data.message });
       setForm(emptyForm);
-      setEditingId(null);
-
-      if (editingId === null) setPage(1);
+      setPage(1);
       setReloadKey((key) => key + 1);
     } catch (error: unknown) {
       const info = getErrorInfo(error);
@@ -319,20 +481,16 @@ export default function AssetRegistryPage() {
       }
 
       setMessage({ type: "error", text: info.message });
-
-      // Asset was deleted by someone else: leave edit mode and refresh
-      if (info.status === 404) {
-        setForm(emptyForm);
-        setEditingId(null);
-        setReloadKey((key) => key + 1);
-      }
     } finally {
       setIsSaving(false);
     }
   }
 
+  // =========================
+  // UPDATE (from popup)
+  // =========================
   function handleEdit(asset: Asset) {
-    setForm({
+    setEditForm({
       name: asset.name,
       tag: asset.tag,
       description: asset.description,
@@ -343,9 +501,47 @@ export default function AssetRegistryPage() {
     });
 
     setEditingId(asset.id);
+    setEditError("");
     setMessage(null);
+  }
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  async function handleUpdate(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (isUpdating || editingId === null) return;
+
+    setIsUpdating(true);
+    setEditError("");
+
+    try {
+      const response = await axios.put<AssetResponse>(
+        `${API_URLS.Admin}/assets/${editingId}`,
+        toPayload(editForm),
+        { withCredentials: true }
+      );
+
+      closeEditModal();
+      setMessage({ type: "success", text: response.data.message });
+      setReloadKey((key) => key + 1);
+    } catch (error: unknown) {
+      const info = getErrorInfo(error);
+
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      // Asset was deleted by someone else: close the popup and refresh
+      if (info.status === 404) {
+        closeEditModal();
+        setMessage({ type: "error", text: info.message });
+        setReloadKey((key) => key + 1);
+        return;
+      }
+
+      setEditError(info.message);
+    } finally {
+      setIsUpdating(false);
+    }
   }
 
   // =========================
@@ -369,11 +565,6 @@ export default function AssetRegistryPage() {
       );
 
       setMessage({ type: "success", text: response.data.message });
-
-      if (editingId === asset.id) {
-        setForm(emptyForm);
-        setEditingId(null);
-      }
 
       // Deleted the last row on this page: go back one page
       if (assets.length === 1 && page > 1) setPage(page - 1);
@@ -431,10 +622,10 @@ export default function AssetRegistryPage() {
   }
 
   return (
-    <main className="min-h-full p-3 text-gray-900 transition-colors dark:text-gray-100 sm:p-5">
-      <div className="mx-auto max-w-[1600px]">
+    <main className="min-h-full text-gray-900 transition-colors dark:text-gray-100">
+      <div className="mx-auto">
         {/* Page Heading */}
-        <div className="mb-5">
+        <div className="mb-2">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Asset Registry
           </h1>
@@ -443,151 +634,46 @@ export default function AssetRegistryPage() {
           </p>
         </div>
 
+        {/* Status message (create / update / delete / filters) */}
+        {message && (
+          <div
+            role="status"
+            className={`mb-5 flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
+              message.type === "error"
+                ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+                : "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+            }`}
+          >
+            <span>{message.text}</span>
+            <button
+              type="button"
+              onClick={() => setMessage(null)}
+              aria-label="Dismiss message"
+              className="cursor-pointer text-lg leading-none opacity-60 hover:opacity-100"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Registration Form */}
         <section className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
           <div className="mb-4 border-b border-gray-200 pb-3 dark:border-zinc-700">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-              {editingId !== null ? "Edit Asset" : "Register New Asset"}
+              Register New Asset
             </h2>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Enter the asset details below.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
-              <div>
-                <label className={labelClass}>Asset Name *</label>
-                <input
-                  className={fieldClass}
-                  placeholder="Enter asset name"
-                  value={form.name}
-                  onChange={(e) => updateForm("name", e.target.value)}
-                  maxLength={100}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Asset Tag *</label>
-                <input
-                  className={fieldClass}
-                  placeholder="e.g. AST-126"
-                  value={form.tag}
-                  onChange={(e) => updateForm("tag", e.target.value)}
-                  maxLength={50}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Status</label>
-                <select
-                  className={fieldClass}
-                  value={form.status}
-                  onChange={(e) => updateForm("status", e.target.value)}
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Under Maintenance">
-                    Under Maintenance
-                  </option>
-                </select>
-              </div>
-
-              <div>
-                <label className={labelClass}>Condition</label>
-                <select
-                  className={fieldClass}
-                  value={form.condition}
-                  onChange={(e) => updateForm("condition", e.target.value)}
-                >
-                  <option value="Good">Good</option>
-                  <option value="Fair">Fair</option>
-                  <option value="Poor">Poor</option>
-                  <option value="Damaged">Damaged</option>
-                </select>
-              </div>
-
-              <div>
-                <label className={labelClass}>Category *</label>
-                <select
-                  className={fieldClass}
-                  value={form.category}
-                  onChange={(e) => updateForm("category", e.target.value)}
-                  required
-                >
-                  <option value="">Select category</option>
-                  <option value="Workshop Equipment">
-                    Workshop Equipment
-                  </option>
-                  <option value="Office Equipment">
-                    Office Equipment
-                  </option>
-                  <option value="IT Equipment">IT Equipment</option>
-                  <option value="Machinery">Machinery</option>
-                  <option value="Vehicles">Vehicles</option>
-                  <option value="Tools">Tools</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div>
-                <label className={labelClass}>Criticality</label>
-                <select
-                  className={fieldClass}
-                  value={form.criticality}
-                  onChange={(e) =>
-                    updateForm("criticality", e.target.value)
-                  }
-                >
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                  <option value="Critical">Critical</option>
-                </select>
-              </div>
-
-              <div className="xl:col-span-2">
-                <label className={labelClass}>Asset Description</label>
-                <textarea
-                  className={`${fieldClass} min-h-[42px] resize-y`}
-                  placeholder="Enter asset description"
-                  value={form.description}
-                  onChange={(e) =>
-                    updateForm("description", e.target.value)
-                  }
-                  maxLength={500}
-                  rows={2}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Date Format</label>
-                <select
-                  className={fieldClass}
-                  value={dateFormat}
-                  onChange={(e) => setDateFormat(e.target.value)}
-                >
-                  <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                  <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                  <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                </select>
-              </div>
-            </div>
-
-            {message && (
-              <p
-                role="status"
-                className={`mt-4 text-sm ${
-                  message.type === "error"
-                    ? "text-red-600 dark:text-red-400"
-                    : "text-emerald-700 dark:text-emerald-400"
-                }`}
-              >
-                {message.text}
-              </p>
-            )}
+          <form onSubmit={handleCreate}>
+            <AssetFields
+              idPrefix="create"
+              form={form}
+              onChange={updateForm}
+              className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4"
+            />
 
             <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
               <button
@@ -604,11 +690,7 @@ export default function AssetRegistryPage() {
                 disabled={isSaving}
                 className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
               >
-                {isSaving
-                  ? "Saving..."
-                  : editingId !== null
-                  ? "Save Changes"
-                  : "+ Register Asset"}
+                {isSaving ? "Saving..." : "+ Register Asset"}
               </button>
             </div>
           </form>
@@ -716,6 +798,21 @@ export default function AssetRegistryPage() {
                 Clear
               </button>
             </div>
+          </div>
+        </section>
+
+        <section className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900">
+          <div>
+            <label className={labelClass}>Date Format</label>
+            <select
+              className={fieldClass}
+              value={dateFormat}
+              onChange={(e) => setDateFormat(e.target.value)}
+            >
+              <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+              <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+              <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+            </select>
           </div>
         </section>
 
@@ -883,6 +980,84 @@ export default function AssetRegistryPage() {
           </div>
         </section>
       </div>
+
+      {/* Edit Asset Popup */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget && !isUpdating) closeEditModal();
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-asset-title"
+            className="my-auto w-full max-w-3xl rounded-2xl border border-gray-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 sm:p-6"
+          >
+            <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-200 pb-3 dark:border-zinc-700">
+              <div>
+                <h2
+                  id="edit-asset-title"
+                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                >
+                  Edit Asset
+                </h2>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Update the asset details, then save your changes.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeEditModal}
+                disabled={isUpdating}
+                aria-label="Close"
+                className="cursor-pointer rounded-lg p-1.5 text-xl leading-none text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-zinc-800 dark:hover:text-gray-200"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdate}>
+              <AssetFields
+                idPrefix="edit"
+                form={editForm}
+                onChange={updateEditForm}
+                className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2"
+              />
+
+              {editError && (
+                <p
+                  role="alert"
+                  className="mt-4 text-sm text-red-600 dark:text-red-400"
+                >
+                  {editError}
+                </p>
+              )}
+
+              <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  disabled={isUpdating}
+                  className={`${buttonSecondary} cursor-pointer disabled:cursor-not-allowed disabled:opacity-60`}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
+                >
+                  {isUpdating ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

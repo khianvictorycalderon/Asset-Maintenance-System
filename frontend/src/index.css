@@ -1,4 +1,8 @@
 @import "tailwindcss";
 
+button, a, select, select option {
+    cursor: pointer;
+}
+
 /* Enables light and dark theme */
 @custom-variant dark (&:where(.dark, .dark *));
