@@ -16,7 +16,7 @@ public class AssetDto
     public DateOnly DateAdded { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    // Shared by the list query (translated to SQL) and the create/update responses
+    // Shared by employee asset listing and create/update responses.
     public static readonly Expression<Func<Assets, AssetDto>> Projection = a => new AssetDto
     {
         Id = a.Id,

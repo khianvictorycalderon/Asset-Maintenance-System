@@ -368,7 +368,7 @@ export default function AssetRegistryPage() {
 
       try {
         const response = await axios.get<AssetsResponse>(
-          `${API_URLS.Admin}/assets`,
+          `${API_URLS.Employee}/assets`,
           {
             withCredentials: true,
             params: {
@@ -463,7 +463,7 @@ export default function AssetRegistryPage() {
 
     try {
       const response = await axios.post<AssetResponse>(
-        `${API_URLS.Admin}/assets`,
+        `${API_URLS.Employee}/assets`,
         toPayload(form),
         { withCredentials: true }
       );
@@ -514,7 +514,7 @@ export default function AssetRegistryPage() {
 
     try {
       const response = await axios.put<AssetResponse>(
-        `${API_URLS.Admin}/assets/${editingId}`,
+        `${API_URLS.Employee}/assets/${editingId}`,
         toPayload(editForm),
         { withCredentials: true }
       );
@@ -560,7 +560,7 @@ export default function AssetRegistryPage() {
 
     try {
       const response = await axios.delete<{ message: string }>(
-        `${API_URLS.Admin}/assets/${asset.id}`,
+        `${API_URLS.Employee}/assets/${asset.id}`,
         { withCredentials: true }
       );
 

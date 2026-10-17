@@ -1,5 +1,7 @@
-export default function MaintenanceSchedulePage() {
-  return (
-    <>This is the maintenance schedule page</>
-  );
+export default function MaintenanceSchedule() {
+    return (
+        <>
+            <p className="text-black dark:text-white">Maintenance schedule page</p>  
+        </>
+    );
 }

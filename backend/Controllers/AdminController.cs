@@ -57,35 +57,6 @@ public class AdminController(IAdminService _adminService) : ControllerBase
 
     // ==================================================================================================================
     // ==================================================================================================================
-    // Asset registry
-    // ==================================================================================================================
-    // ==================================================================================================================
-    [HttpGet("api/admin/assets")]
-    [Audit("Fetch assets")]
-    public async Task<IActionResult> GetAssets([FromQuery] GetAssetsQueryDto query)
-        => Ok(await _adminService.GetAssets(query));
-
-    [HttpPost("api/admin/assets")]
-    [Audit("Register asset")]
-    public async Task<IActionResult> CreateAsset([FromBody] SaveAssetRequestDto request)
-        => Ok(await _adminService.CreateAsset(request));
-
-    [HttpPut("api/admin/assets/{assetId}")]
-    [Audit("Update asset")]
-    public async Task<IActionResult> UpdateAsset(
-        [FromRoute] Guid assetId, [FromBody] SaveAssetRequestDto request)
-        => Ok(await _adminService.UpdateAsset(assetId, request));
-
-    [HttpDelete("api/admin/assets/{assetId}")]
-    [Audit("Delete asset")]
-    public async Task<IActionResult> DeleteAsset([FromRoute] Guid assetId)
-    {
-        var message = await _adminService.DeleteAsset(assetId);
-        return Ok(new MessageResponse(message));
-    }
-
-    // ==================================================================================================================
-    // ==================================================================================================================
     // System activity logs
     // ==================================================================================================================
     // ==================================================================================================================
