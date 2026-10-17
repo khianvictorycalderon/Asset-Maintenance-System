@@ -1,12 +1,15 @@
 
-import { useMemo, useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
 
 type AssetStatus = "Active" | "Inactive" | "Under Maintenance";
 type AssetCondition = "Good" | "Fair" | "Poor" | "Damaged";
 type Criticality = "Low" | "Medium" | "High" | "Critical";
 
 type Asset = {
-  id: number;
+  id: string;
   name: string;
   tag: string;
   description: string;
@@ -17,41 +20,54 @@ type Asset = {
   dateAdded: string;
 };
 
-const initialAssets: Asset[] = [
-  {
-    id: 1,
-    name: "Laptop",
-    tag: "AST-123",
-    description: "Company laptop for development",
-    status: "Active",
-    condition: "Good",
-    category: "IT Equipment",
-    criticality: "High",
-    dateAdded: "2026-04-15",
-  },
-  {
-    id: 2,
-    name: "Robot",
-    tag: "AST-124",
-    description: "Cleaning robot",
-    status: "Active",
-    condition: "Good",
-    category: "Workshop Equipment",
-    criticality: "High",
-    dateAdded: "2026-04-15",
-  },
-  {
-    id: 3,
-    name: "Stove",
-    tag: "AST-125",
-    description: "Company appliance",
-    status: "Active",
-    condition: "Good",
-    category: "Workshop Equipment",
-    criticality: "Medium",
-    dateAdded: "2026-04-15",
-  },
-];
+type ApiAsset = {
+  id: string;
+  name: string;
+  tag: string;
+  description: string;
+  status: AssetStatus;
+  condition: AssetCondition;
+  category: string;
+  criticality: Criticality;
+  date_added: string;
+  updated_at: string;
+};
+
+type AssetsResponse = {
+  message: string;
+  assets: ApiAsset[];
+  total_assets: number;
+  current_page: number;
+  page_size: number;
+  total_pages: number;
+};
+
+type AssetResponse = { message: string; asset: ApiAsset };
+
+type FormMessage = { type: "success" | "error"; text: string };
+
+const PAGE_SIZE = 5;
+
+const toAsset = (a: ApiAsset): Asset => ({
+  id: a.id,
+  name: a.name,
+  tag: a.tag,
+  description: a.description,
+  status: a.status,
+  condition: a.condition,
+  category: a.category,
+  criticality: a.criticality,
+  dateAdded: a.date_added,
+});
+
+const emptyFilters = {
+  keyword: "",
+  searchField: "all",
+  startDate: "",
+  endDate: "",
+  sortField: "name",
+  sortOrder: "asc",
+};
 
 const emptyForm = {
   name: "",
@@ -61,6 +77,36 @@ const emptyForm = {
   condition: "Good" as AssetCondition,
   category: "",
   criticality: "Medium" as Criticality,
+};
+
+// One shared error mapper (401 is handled by the caller)
+const getErrorInfo = (error: unknown) => {
+  if (!axios.isAxiosError(error)) {
+    return { message: "Something went wrong.", status: undefined };
+  }
+  if (!error.response) {
+    return { message: "Can't reach the server.", status: undefined };
+  }
+
+  const status = error.response.status;
+  const data = error.response.data;
+
+  if (status === 401) return { message: "Your session has expired.", status };
+  if (status === 403) {
+    return {
+      message: "You don't have permission to perform this action.",
+      status,
+    };
+  }
+  if (status >= 500) {
+    return { message: "Server error. Please try again.", status };
+  }
+
+  return {
+    message:
+      data?.message ?? data?.detail ?? data?.title ?? "Something went wrong.",
+    status,
+  };
 };
 
 const fieldClass =
@@ -129,10 +175,24 @@ function formatDate(date: string, format: string) {
 }
 
 export default function AssetRegistryPage() {
-  const [assets, setAssets] = useState<Asset[]>(initialAssets);
-  const [form, setForm] = useState(emptyForm);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const navigate = useNavigate();
 
+  // Server data
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [listError, setListError] = useState("");
+
+  // Form
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [message, setMessage] = useState<FormMessage | null>(null);
+
+  // Filter inputs (draft values)
   const [keyword, setKeyword] = useState("");
   const [searchField, setSearchField] = useState("all");
   const [startDate, setStartDate] = useState("");
@@ -140,74 +200,65 @@ export default function AssetRegistryPage() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [sortField, setSortField] = useState("name");
   const [dateFormat, setDateFormat] = useState("MM/DD/YYYY");
-  const [page, setPage] = useState(1);
-  const [message, setMessage] = useState("");
 
-  const pageSize = 5;
+  // Filters actually sent to the server (set by "Apply Filters")
+  const [applied, setApplied] = useState(emptyFilters);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const filteredAssets = useMemo(() => {
-    const filtered = assets.filter((asset) => {
-      const fields: Record<string, string> = {
-        name: asset.name,
-        tag: asset.tag,
-        description: asset.description,
-        status: asset.status,
-        condition: asset.condition,
-        category: asset.category,
-        criticality: asset.criticality,
-      };
+  // =========================
+  // FETCH (page, applied filters, or reloadKey changes)
+  // =========================
+  useEffect(() => {
+    let cancelled = false;
 
-      const searchText = keyword.trim().toLowerCase();
+    const load = async () => {
+      setIsLoading(true);
+      setListError("");
 
-      const matchesKeyword =
-        !searchText ||
-        (searchField === "all"
-          ? Object.values(fields).some((value) =>
-              value.toLowerCase().includes(searchText)
-            )
-          : (fields[searchField] ?? "")
-              .toLowerCase()
-              .includes(searchText));
+      try {
+        const response = await axios.get<AssetsResponse>(
+          `${API_URLS.Admin}/assets`,
+          {
+            withCredentials: true,
+            params: {
+              keyword: applied.keyword.trim() || undefined,
+              searchField: applied.searchField,
+              startDate: applied.startDate || undefined,
+              endDate: applied.endDate || undefined,
+              sortField: applied.sortField,
+              sortOrder: applied.sortOrder,
+              page,
+              pageSize: PAGE_SIZE,
+            },
+          }
+        );
 
-      const matchesStart =
-        !startDate || asset.dateAdded >= startDate;
+        if (cancelled) return;
 
-      const matchesEnd =
-        !endDate || asset.dateAdded <= endDate;
+        const data = response.data;
+        setAssets(data.assets.map(toAsset));
+        setTotalAssets(data.total_assets);
+        setTotalPages(Math.max(1, data.total_pages));
+      } catch (error: unknown) {
+        if (cancelled) return;
 
-      return matchesKeyword && matchesStart && matchesEnd;
-    });
+        const info = getErrorInfo(error);
+        if (info.status === 401) {
+          navigate("/login", { replace: true });
+          return;
+        }
+        setListError(info.message);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
 
-    return filtered.sort((a, b) => {
-      const left = String(a[sortField as keyof Asset] ?? "");
-      const right = String(b[sortField as keyof Asset] ?? "");
+    load();
 
-      const comparison = left.localeCompare(right, undefined, {
-        numeric: true,
-        sensitivity: "base",
-      });
-
-      return sortOrder === "asc" ? comparison : -comparison;
-    });
-  }, [
-    assets,
-    keyword,
-    searchField,
-    startDate,
-    endDate,
-    sortField,
-    sortOrder,
-  ]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAssets.length / pageSize)
-  );
-
-  const visibleAssets = filteredAssets.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
+    return () => {
+      cancelled = true;
+    };
+  }, [page, applied, reloadKey, navigate]);
 
   function updateForm(field: keyof typeof emptyForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -216,63 +267,68 @@ export default function AssetRegistryPage() {
   function resetForm() {
     setForm(emptyForm);
     setEditingId(null);
-    setMessage("");
+    setMessage(null);
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // =========================
+  // CREATE / UPDATE
+  // =========================
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSaving) return;
 
-    if (startDate && endDate && startDate > endDate) {
-      setMessage("The start date cannot be later than the end date.");
-      return;
+    setIsSaving(true);
+    setMessage(null);
+
+    const payload = {
+      name: form.name.trim(),
+      tag: form.tag.trim(),
+      description: form.description.trim(),
+      status: form.status,
+      condition: form.condition,
+      category: form.category,
+      criticality: form.criticality,
+    };
+
+    try {
+      const response =
+        editingId !== null
+          ? await axios.put<AssetResponse>(
+              `${API_URLS.Admin}/assets/${editingId}`,
+              payload,
+              { withCredentials: true }
+            )
+          : await axios.post<AssetResponse>(
+              `${API_URLS.Admin}/assets`,
+              payload,
+              { withCredentials: true }
+            );
+
+      setMessage({ type: "success", text: response.data.message });
+      setForm(emptyForm);
+      setEditingId(null);
+
+      if (editingId === null) setPage(1);
+      setReloadKey((key) => key + 1);
+    } catch (error: unknown) {
+      const info = getErrorInfo(error);
+
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      setMessage({ type: "error", text: info.message });
+
+      // Asset was deleted by someone else: leave edit mode and refresh
+      if (info.status === 404) {
+        setForm(emptyForm);
+        setEditingId(null);
+        setReloadKey((key) => key + 1);
+      }
+    } finally {
+      setIsSaving(false);
     }
-
-    const normalizedTag = form.tag.trim().toLowerCase();
-
-    const duplicateTag = assets.some(
-      (asset) =>
-        asset.tag.trim().toLowerCase() === normalizedTag &&
-        asset.id !== editingId
-    );
-
-    if (duplicateTag) {
-      setMessage("This asset tag already exists. Please use a unique tag.");
-      return;
-    }
-
-    if (editingId !== null) {
-      setAssets((current) =>
-        current.map((asset) =>
-          asset.id === editingId
-            ? {
-                ...asset,
-                ...form,
-                name: form.name.trim(),
-                tag: form.tag.trim(),
-                description: form.description.trim(),
-              }
-            : asset
-        )
-      );
-
-      setMessage("Asset updated successfully.");
-    } else {
-      const newAsset: Asset = {
-        ...form,
-        id: Date.now(),
-        name: form.name.trim(),
-        tag: form.tag.trim(),
-        description: form.description.trim(),
-        dateAdded: new Date().toISOString().slice(0, 10),
-      };
-
-      setAssets((current) => [newAsset, ...current]);
-      setMessage("Asset registered successfully.");
-    }
-
-    setForm(emptyForm);
-    setEditingId(null);
-    setPage(1);
   }
 
   function handleEdit(asset: Asset) {
@@ -287,35 +343,79 @@ export default function AssetRegistryPage() {
     });
 
     setEditingId(asset.id);
-    setMessage("");
+    setMessage(null);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleDelete(asset: Asset) {
+  // =========================
+  // DELETE
+  // =========================
+  async function handleDelete(asset: Asset) {
+    if (deletingId) return;
+
     const confirmed = window.confirm(
       `Are you sure you want to delete "${asset.name}"?`
     );
-
     if (!confirmed) return;
 
-    setAssets((current) =>
-      current.filter((item) => item.id !== asset.id)
-    );
+    setDeletingId(asset.id);
+    setMessage(null);
 
-    if (editingId === asset.id) {
-      setForm(emptyForm);
-      setEditingId(null);
+    try {
+      const response = await axios.delete<{ message: string }>(
+        `${API_URLS.Admin}/assets/${asset.id}`,
+        { withCredentials: true }
+      );
+
+      setMessage({ type: "success", text: response.data.message });
+
+      if (editingId === asset.id) {
+        setForm(emptyForm);
+        setEditingId(null);
+      }
+
+      // Deleted the last row on this page: go back one page
+      if (assets.length === 1 && page > 1) setPage(page - 1);
+      else setReloadKey((key) => key + 1);
+    } catch (error: unknown) {
+      const info = getErrorInfo(error);
+
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      setMessage({ type: "error", text: info.message });
+
+      if (info.status === 404) setReloadKey((key) => key + 1);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
+  // =========================
+  // FILTERS
+  // =========================
+  function handleApply() {
+    if (startDate && endDate && startDate > endDate) {
+      setMessage({
+        type: "error",
+        text: "The start date cannot be later than the end date.",
+      });
+      return;
     }
 
-    setMessage("Asset deleted successfully.");
-
-    setPage((current) =>
-      Math.min(
-        current,
-        Math.max(1, Math.ceil((filteredAssets.length - 1) / pageSize))
-      )
-    );
+    setMessage(null);
+    setApplied({
+      keyword,
+      searchField,
+      startDate,
+      endDate,
+      sortField,
+      sortOrder,
+    });
+    setPage(1);
   }
 
   function clearFilters() {
@@ -325,7 +425,9 @@ export default function AssetRegistryPage() {
     setEndDate("");
     setSortOrder("asc");
     setSortField("name");
+    setApplied(emptyFilters);
     setPage(1);
+    setMessage(null);
   }
 
   return (
@@ -361,6 +463,7 @@ export default function AssetRegistryPage() {
                   placeholder="Enter asset name"
                   value={form.name}
                   onChange={(e) => updateForm("name", e.target.value)}
+                  maxLength={100}
                   required
                 />
               </div>
@@ -372,6 +475,7 @@ export default function AssetRegistryPage() {
                   placeholder="e.g. AST-126"
                   value={form.tag}
                   onChange={(e) => updateForm("tag", e.target.value)}
+                  maxLength={50}
                   required
                 />
               </div>
@@ -453,6 +557,7 @@ export default function AssetRegistryPage() {
                   onChange={(e) =>
                     updateForm("description", e.target.value)
                   }
+                  maxLength={500}
                   rows={2}
                 />
               </div>
@@ -474,9 +579,13 @@ export default function AssetRegistryPage() {
             {message && (
               <p
                 role="status"
-                className="mt-4 text-sm text-gray-700 dark:text-gray-300"
+                className={`mt-4 text-sm ${
+                  message.type === "error"
+                    ? "text-red-600 dark:text-red-400"
+                    : "text-emerald-700 dark:text-emerald-400"
+                }`}
               >
-                {message}
+                {message.text}
               </p>
             )}
 
@@ -484,16 +593,22 @@ export default function AssetRegistryPage() {
               <button
                 type="button"
                 onClick={resetForm}
-                className={buttonSecondary}
+                disabled={isSaving}
+                className={`${buttonSecondary} cursor-pointer disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 Reset
               </button>
 
               <button
                 type="submit"
-                className="rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
+                disabled={isSaving}
+                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
               >
-                {editingId !== null ? "Save Changes" : "+ Register Asset"}
+                {isSaving
+                  ? "Saving..."
+                  : editingId !== null
+                  ? "Save Changes"
+                  : "+ Register Asset"}
               </button>
             </div>
           </form>
@@ -512,10 +627,7 @@ export default function AssetRegistryPage() {
                 className={fieldClass}
                 placeholder="Search assets..."
                 value={keyword}
-                onChange={(e) => {
-                  setKeyword(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
 
@@ -524,10 +636,7 @@ export default function AssetRegistryPage() {
               <select
                 className={fieldClass}
                 value={searchField}
-                onChange={(e) => {
-                  setSearchField(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => setSearchField(e.target.value)}
               >
                 <option value="all">All Fields</option>
                 <option value="name">Asset Name</option>
@@ -546,10 +655,7 @@ export default function AssetRegistryPage() {
                 type="date"
                 className={fieldClass}
                 value={startDate}
-                onChange={(e) => {
-                  setStartDate(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => setStartDate(e.target.value)}
               />
             </div>
 
@@ -559,10 +665,7 @@ export default function AssetRegistryPage() {
                 type="date"
                 className={fieldClass}
                 value={endDate}
-                onChange={(e) => {
-                  setEndDate(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
 
@@ -599,8 +702,8 @@ export default function AssetRegistryPage() {
             <div className="flex items-end gap-2 sm:col-span-2">
               <button
                 type="button"
-                onClick={() => setPage(1)}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                onClick={handleApply}
+                className="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
               >
                 Apply Filters
               </button>
@@ -608,7 +711,7 @@ export default function AssetRegistryPage() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className={buttonSecondary}
+                className={`${buttonSecondary} cursor-pointer`}
               >
                 Clear
               </button>
@@ -624,7 +727,7 @@ export default function AssetRegistryPage() {
             </h2>
 
             <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-medium text-orange-800 dark:bg-orange-950 dark:text-orange-300">
-              {filteredAssets.length} assets
+              {totalAssets} assets
             </span>
           </div>
 
@@ -647,63 +750,31 @@ export default function AssetRegistryPage() {
               </thead>
 
               <tbody>
-                {visibleAssets.map((asset) => (
-                  <tr
-                    key={asset.id}
-                    className="border-t border-gray-200 text-gray-700 transition hover:bg-orange-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-orange-950/30"
-                  >
-                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
-                      {asset.name}
-                    </td>
-
-                    <td className="px-4 py-3">{asset.tag}</td>
-
+                {isLoading ? (
+                  <tr>
                     <td
-                      className="max-w-48 truncate px-4 py-3"
-                      title={asset.description}
+                      colSpan={9}
+                      className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400"
                     >
-                      {asset.description || "—"}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <StatusBadge status={asset.status} />
-                    </td>
-
-                    <td className="px-4 py-3">{asset.condition}</td>
-
-                    <td className="px-4 py-3">{asset.category}</td>
-
-                    <td className="px-4 py-3">
-                      <CriticalityBadge criticality={asset.criticality} />
-                    </td>
-
-                    <td className="whitespace-nowrap px-4 py-3">
-                      {formatDate(asset.dateAdded, dateFormat)}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <div className="flex justify-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(asset)}
-                          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(asset)}
-                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      Loading assets...
                     </td>
                   </tr>
-                ))}
-
-                {visibleAssets.length === 0 && (
+                ) : listError ? (
+                  <tr>
+                    <td colSpan={9} className="px-4 py-12 text-center text-sm">
+                      <p className="text-red-600 dark:text-red-400">
+                        {listError}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setReloadKey((key) => key + 1)}
+                        className="mt-3 cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
+                      >
+                        Retry
+                      </button>
+                    </td>
+                  </tr>
+                ) : assets.length === 0 ? (
                   <tr>
                     <td
                       colSpan={9}
@@ -713,6 +784,64 @@ export default function AssetRegistryPage() {
                       register a new asset.
                     </td>
                   </tr>
+                ) : (
+                  assets.map((asset) => (
+                    <tr
+                      key={asset.id}
+                      className="border-t border-gray-200 text-gray-700 transition hover:bg-orange-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-orange-950/30"
+                    >
+                      <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                        {asset.name}
+                      </td>
+
+                      <td className="px-4 py-3">{asset.tag}</td>
+
+                      <td
+                        className="max-w-48 truncate px-4 py-3"
+                        title={asset.description}
+                      >
+                        {asset.description || "—"}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <StatusBadge status={asset.status} />
+                      </td>
+
+                      <td className="px-4 py-3">{asset.condition}</td>
+
+                      <td className="px-4 py-3">{asset.category}</td>
+
+                      <td className="px-4 py-3">
+                        <CriticalityBadge criticality={asset.criticality} />
+                      </td>
+
+                      <td className="whitespace-nowrap px-4 py-3">
+                        {formatDate(asset.dateAdded, dateFormat)}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <div className="flex justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleEdit(asset)}
+                            disabled={deletingId === asset.id}
+                            className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(asset)}
+                            disabled={deletingId === asset.id}
+                            className="cursor-pointer rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {deletingId === asset.id ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -721,21 +850,17 @@ export default function AssetRegistryPage() {
           {/* Pagination */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 px-4 py-4 dark:border-zinc-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing{" "}
-              {filteredAssets.length === 0 ? 0 : (page - 1) * pageSize + 1}
+              Showing {totalAssets === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}
               {"–"}
-              {Math.min(page * pageSize, filteredAssets.length)} of{" "}
-              {filteredAssets.length} assets
+              {Math.min(page * PAGE_SIZE, totalAssets)} of {totalAssets} assets
             </p>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                disabled={page <= 1}
-                onClick={() =>
-                  setPage((current) => Math.max(1, current - 1))
-                }
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
+                disabled={page <= 1 || isLoading}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
               >
                 Previous
               </button>
@@ -746,21 +871,17 @@ export default function AssetRegistryPage() {
 
               <button
                 type="button"
-                disabled={page >= totalPages}
+                disabled={page >= totalPages || isLoading}
                 onClick={() =>
-                  setPage((current) =>
-                    Math.min(totalPages, current + 1)
-                  )
+                  setPage((current) => Math.min(totalPages, current + 1))
                 }
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
               >
                 Next
               </button>
             </div>
           </div>
         </section>
-
-        
       </div>
     </main>
   );
