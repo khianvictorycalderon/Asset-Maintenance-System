@@ -15,7 +15,7 @@ public class Assets
     [Column("name")]
     public string Name { get; set; } = string.Empty;
 
-    // Unique, compared case-insensitively (enforced in AdminService + unique index)
+    // Unique, compared case-insensitively (enforced in EmployeeService + unique index)
     [Required]
     [MaxLength(50)]
     [Column("tag")]

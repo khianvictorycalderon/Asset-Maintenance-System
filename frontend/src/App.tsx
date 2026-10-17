@@ -17,11 +17,11 @@ import TermsConditions from "./public_pages/TermsConditions";
 import PublicLayoutRedirect from "./layouts/PublicLayoutRedirect";
 
 // Admin pages
-import AssetRegistry from "./private_pages/Admin/AssetRegistry";
 import SystemActivityLogs from "./private_pages/Admin/SystemActivityLogs";
 import UsersRoles from "./private_pages/AdminUserRoles";
 
 // Employee pages
+import AssetRegistry from "./private_pages/Employee/AssetRegistry";
 import AssetsAssignment from "./private_pages/Employee/AssetsAssignment";
 import AssignPersonnel from "./private_pages/Employee/AssignPersonnel";
 import MaintenanceReport from "./private_pages/Employee/MaintenanceReport";
@@ -53,10 +53,10 @@ const PRIVATE_PAGES = [
   
   // Admin
   { path: "/admin/users-roles", element: <UsersRoles /> },
-  { path: "/admin/asset-registry", element: <AssetRegistry /> },
   { path: "/admin/system-activity-logs", element: <SystemActivityLogs /> },
   
   // Employee
+  { path: "/employee/asset-registry", element: <AssetRegistry /> },
   { path: "/employee/assets-assignment", element: <AssetsAssignment /> },
   { path: "/employee/assign-personnel", element: <AssignPersonnel /> },
   { path: "/employee/maintenance-report", element: <MaintenanceReport /> },

@@ -87,7 +87,7 @@ export const SIDEBAR_BUTTONS: SidebarButton[] = [
   },
   {
     label: "Asset Registry",
-    path: "/admin/asset-registry",
+    path: "/employee/asset-registry",
     icon: `
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
@@ -98,7 +98,7 @@ export const SIDEBAR_BUTTONS: SidebarButton[] = [
         />
       </svg>
     `,
-    roles: ["Admin"],
+    roles: ["Employee"],
   },
   {
     label: "System Activity Logs",

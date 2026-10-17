@@ -72,7 +72,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             // Assets (asset registry)
             modelBuilder.Entity<Assets>(entity =>
             {
-                  // Backstop for the case-insensitive duplicate check done in AdminService
+                  // Backstop for the case-insensitive duplicate check done in EmployeeService
                   entity.HasIndex(a => a.Tag).IsUnique();
                   entity.HasIndex(a => a.DateAdded);
 
