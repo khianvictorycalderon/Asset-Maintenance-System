@@ -9,6 +9,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
     public DbSet<Assets> Assets => Set<Assets>();
+    public DbSet<AssetAssignment> AssetAssignments => Set<AssetAssignment>();
+    public DbSet<PersonnelAssignment> PersonnelAssignments => Set<PersonnelAssignment>();
 
       protected override void OnModelCreating(ModelBuilder modelBuilder)
       {
@@ -86,6 +88,72 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                         .HasDefaultValue("Medium");
 
                   entity.Property(a => a.DateAdded)
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                  entity.Property(a => a.CreatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(a => a.UpdatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+            });
+
+            // Asset assignments (asset -> supervisor)
+            modelBuilder.Entity<AssetAssignment>(entity =>
+            {
+                  // One supervisor per asset; deleting an asset removes its assignment
+                  entity.HasIndex(a => a.AssetId).IsUnique();
+                  entity.HasIndex(a => a.SupervisorId);
+                  entity.HasIndex(a => a.DateAssigned);
+
+                  entity.HasOne(a => a.Asset)
+                        .WithMany()
+                        .HasForeignKey(a => a.AssetId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(a => a.Supervisor)
+                        .WithMany()
+                        .HasForeignKey(a => a.SupervisorId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(a => a.AssignedBy)
+                        .WithMany()
+                        .HasForeignKey(a => a.AssignedById)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                  entity.Property(a => a.DateAssigned)
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                  entity.Property(a => a.CreatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(a => a.UpdatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+            });
+
+            // Personnel assignments (personnel -> supervisor)
+            modelBuilder.Entity<PersonnelAssignment>(entity =>
+            {
+                  // One supervisor per personnel
+                  entity.HasIndex(a => a.PersonnelId).IsUnique();
+                  entity.HasIndex(a => a.SupervisorId);
+                  entity.HasIndex(a => a.DateAssigned);
+
+                  entity.HasOne(a => a.Personnel)
+                        .WithMany()
+                        .HasForeignKey(a => a.PersonnelId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(a => a.Supervisor)
+                        .WithMany()
+                        .HasForeignKey(a => a.SupervisorId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(a => a.AssignedBy)
+                        .WithMany()
+                        .HasForeignKey(a => a.AssignedById)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                  entity.Property(a => a.DateAssigned)
                         .HasDefaultValueSql("CURRENT_DATE");
 
                   entity.Property(a => a.CreatedAt)
