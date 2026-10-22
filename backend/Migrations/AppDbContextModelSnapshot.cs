@@ -82,6 +82,57 @@ namespace backend.Migrations
                     b.ToTable("activity_logs");
                 });
 
+            modelBuilder.Entity("backend.Models.AssetAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("asset_id");
+
+                    b.Property<Guid?>("AssignedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigned_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.Property<DateOnly>("DateAssigned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasColumnName("date_assigned")
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                    b.Property<Guid>("SupervisorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supervisor_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId")
+                        .IsUnique();
+
+                    b.HasIndex("AssignedById");
+
+                    b.HasIndex("DateAssigned");
+
+                    b.HasIndex("SupervisorId");
+
+                    b.ToTable("asset_assignments");
+                });
+
             modelBuilder.Entity("backend.Models.Assets", b =>
                 {
                     b.Property<Guid>("Id")
@@ -163,6 +214,57 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("assets");
+                });
+
+            modelBuilder.Entity("backend.Models.PersonnelAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AssignedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigned_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.Property<DateOnly>("DateAssigned")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasColumnName("date_assigned")
+                        .HasDefaultValueSql("CURRENT_DATE");
+
+                    b.Property<Guid>("PersonnelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("personnel_id");
+
+                    b.Property<Guid>("SupervisorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supervisor_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedById");
+
+                    b.HasIndex("DateAssigned");
+
+                    b.HasIndex("PersonnelId")
+                        .IsUnique();
+
+                    b.HasIndex("SupervisorId");
+
+                    b.ToTable("personnel_assignments");
                 });
 
             modelBuilder.Entity("backend.Models.Session", b =>
@@ -312,6 +414,58 @@ namespace backend.Migrations
                     b.Navigation("PerformedBy");
 
                     b.Navigation("TargetUser");
+                });
+
+            modelBuilder.Entity("backend.Models.AssetAssignment", b =>
+                {
+                    b.HasOne("backend.Models.Assets", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", "AssignedBy")
+                        .WithMany()
+                        .HasForeignKey("AssignedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("backend.Models.User", "Supervisor")
+                        .WithMany()
+                        .HasForeignKey("SupervisorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("AssignedBy");
+
+                    b.Navigation("Supervisor");
+                });
+
+            modelBuilder.Entity("backend.Models.PersonnelAssignment", b =>
+                {
+                    b.HasOne("backend.Models.User", "AssignedBy")
+                        .WithMany()
+                        .HasForeignKey("AssignedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("backend.Models.User", "Personnel")
+                        .WithMany()
+                        .HasForeignKey("PersonnelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.User", "Supervisor")
+                        .WithMany()
+                        .HasForeignKey("SupervisorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedBy");
+
+                    b.Navigation("Personnel");
+
+                    b.Navigation("Supervisor");
                 });
 
             modelBuilder.Entity("backend.Models.Session", b =>
