@@ -18,6 +18,7 @@ public static class ServicesExtension
         // Role-based services
         services.AddScoped<IAdminService, AdminService>();
         services.AddScoped<IEmployeeService, EmployeeService>();
+        services.AddScoped<IAssignmentService, AssignmentService>();
 
         return services;
     }

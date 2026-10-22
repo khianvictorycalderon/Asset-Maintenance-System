@@ -143,7 +143,22 @@ public class AdminService(AppDbContext db, AuditContext audit, IHubContext<SyncH
         user.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
 
+        // Assignments only make sense for the role they were made for - drop the ones that no longer apply
+        var removedAssets = 0;
+        var removedPersonnel = 0;
+        if (oldRole == "Supervisor")
+        {
+            removedAssets = await db.AssetAssignments.Where(a => a.SupervisorId == user.Id).ExecuteDeleteAsync();
+            removedPersonnel = await db.PersonnelAssignments.Where(a => a.SupervisorId == user.Id).ExecuteDeleteAsync();
+        }
+        else if (oldRole == "Personnel")
+        {
+            removedPersonnel = await db.PersonnelAssignments.Where(a => a.PersonnelId == user.Id).ExecuteDeleteAsync();
+        }
+
         audit.Details = $"Changed role of {Describe(user)} from {oldRole} to {role}";
+        if (removedAssets + removedPersonnel > 0)
+            audit.Details += $" (removed {removedAssets} asset and {removedPersonnel} personnel assignment(s))";
 
         return new UpdateRoleResponseDto
         {
