@@ -408,7 +408,7 @@ export default function AssignPersonnel() {
   const rangeEnd = Math.min(page * PAGE_SIZE, totalAssignments);
 
   return (
-    <div className="min-h-full w-full bg-[#f4f4f4] px-0 py-0 text-gray-800 dark:bg-zinc-950 dark:text-gray-100">
+    <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
       <div className="mb-5">
         <div className="flex items-center gap-3">
           <Users size={23} className="text-orange-600 dark:text-orange-400" />
