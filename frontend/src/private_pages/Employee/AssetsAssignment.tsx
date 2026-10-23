@@ -408,7 +408,7 @@ export default function AssetsAssignment() {
   }
 
   return (
-    <div className="min-h-full w-full bg-[#f4f4f4] px-0 py-0 text-gray-800 dark:bg-zinc-950 dark:text-gray-100">
+    <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
       <div className="w-full space-y-5">
 
         {/* PAGE HEADER */}
