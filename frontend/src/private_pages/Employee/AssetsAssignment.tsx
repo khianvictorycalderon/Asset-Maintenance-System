@@ -1,5 +1,6 @@
-
-import { useMemo, useState } from "react";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronLeft,
@@ -12,181 +13,129 @@ import {
   Check,
   X,
 } from "lucide-react";
+import LoadingState from "../../components/LoadingState";
+import ErrorState from "../../components/ErrorState";
+import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
 
+// =========================
+// TYPES
+// =========================
 type AssetAssignmentRecord = {
-  id: number;
+  id: string;
+  assetId: string;
   assetName: string;
   assetTag: string;
   category: string;
+  supervisorId: string;
   supervisorName: string;
   supervisorUsername: string;
   assignedBy: string;
-  dateAssigned: string;
+  dateAssigned: string; // yyyy-MM-dd
+};
+
+type ApiAssignment = {
+  id: string;
+  asset_id: string;
+  asset_name: string;
+  asset_tag: string;
+  category: string;
+  supervisor_id: string;
+  supervisor_name: string;
+  supervisor_username: string;
+  assigned_by: string | null;
+  date_assigned: string;
 };
 
 type AssetOption = {
+  id: string;
   name: string;
   tag: string;
   category: string;
+  isAssigned: boolean;
+  assignedTo: string | null;
 };
 
-const assets: AssetOption[] = [
-  { name: "CNC Milling Machine", tag: "AST-011", category: "Machinery" },
-  { name: "Hydraulic Press", tag: "AST-012", category: "Machinery" },
-  { name: "Forklift #03", tag: "AST-013", category: "Vehicle" },
-  { name: "Air Compressor", tag: "AST-014", category: "Equipment" },
-  { name: "Welding Station", tag: "AST-015", category: "Tools" },
-  { name: "Industrial Generator", tag: "AST-016", category: "Equipment" },
-  { name: "Conveyor Belt", tag: "AST-017", category: "Machinery" },
-  { name: "Forklift #04", tag: "AST-018", category: "Vehicle" },
-  { name: "Drill Press", tag: "AST-019", category: "Machinery" },
-  { name: "Welding Machine", tag: "AST-020", category: "Tools" },
-  { name: "Hydraulic Jack", tag: "AST-021", category: "Equipment" },
-  { name: "Lathe Machine", tag: "AST-022", category: "Machinery" },
-  { name: "Safety Equipment Set", tag: "AST-023", category: "Tools" },
-];
+type ApiAssetOption = {
+  id: string;
+  name: string;
+  tag: string;
+  category: string;
+  is_assigned: boolean;
+  assigned_to: string | null;
+};
 
-const supervisors = [
-  { name: "Maria Dela Cruz", username: "mdelacruz" },
-  { name: "Roberto Lim", username: "rlim" },
-  { name: "Teresa Gonzales", username: "tgonzales" },
-];
+type SupervisorOption = {
+  id: string;
+  full_name: string;
+  username: string;
+  is_revoked: boolean;
+};
 
-const initialAssignments: AssetAssignmentRecord[] = [
-  {
-    id: 1,
-    assetName: "CNC Milling Machine",
-    assetTag: "AST-011",
-    category: "Machinery",
-    supervisorName: "Maria Dela Cruz",
-    supervisorUsername: "mdelacruz",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-16",
-  },
-  {
-    id: 2,
-    assetName: "Hydraulic Press",
-    assetTag: "AST-012",
-    category: "Machinery",
-    supervisorName: "Maria Dela Cruz",
-    supervisorUsername: "mdelacruz",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-16",
-  },
-  {
-    id: 3,
-    assetName: "Forklift #03",
-    assetTag: "AST-013",
-    category: "Vehicle",
-    supervisorName: "Roberto Lim",
-    supervisorUsername: "rlim",
-    assignedBy: "System - admin",
-    dateAssigned: "2026-10-14",
-  },
-  {
-    id: 4,
-    assetName: "Air Compressor",
-    assetTag: "AST-014",
-    category: "Equipment",
-    supervisorName: "Roberto Lim",
-    supervisorUsername: "rlim",
-    assignedBy: "System - admin",
-    dateAssigned: "2026-10-14",
-  },
-  {
-    id: 5,
-    assetName: "Welding Station",
-    assetTag: "AST-015",
-    category: "Tools",
-    supervisorName: "Teresa Gonzales",
-    supervisorUsername: "tgonzales",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-09",
-  },
-  {
-    id: 6,
-    assetName: "Industrial Generator",
-    assetTag: "AST-016",
-    category: "Equipment",
-    supervisorName: "Maria Dela Cruz",
-    supervisorUsername: "mdelacruz",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-08",
-  },
-  {
-    id: 7,
-    assetName: "Conveyor Belt",
-    assetTag: "AST-017",
-    category: "Machinery",
-    supervisorName: "Teresa Gonzales",
-    supervisorUsername: "tgonzales",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-07",
-  },
-  {
-    id: 8,
-    assetName: "Forklift #04",
-    assetTag: "AST-018",
-    category: "Vehicle",
-    supervisorName: "Roberto Lim",
-    supervisorUsername: "rlim",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-05",
-  },
-  {
-    id: 9,
-    assetName: "Drill Press",
-    assetTag: "AST-019",
-    category: "Machinery",
-    supervisorName: "Maria Dela Cruz",
-    supervisorUsername: "mdelacruz",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-03",
-  },
-  {
-    id: 10,
-    assetName: "Welding Machine",
-    assetTag: "AST-020",
-    category: "Tools",
-    supervisorName: "Teresa Gonzales",
-    supervisorUsername: "tgonzales",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-02",
-  },
-  {
-    id: 11,
-    assetName: "Hydraulic Jack",
-    assetTag: "AST-021",
-    category: "Equipment",
-    supervisorName: "Roberto Lim",
-    supervisorUsername: "rlim",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-10-01",
-  },
-  {
-    id: 12,
-    assetName: "Lathe Machine",
-    assetTag: "AST-022",
-    category: "Machinery",
-    supervisorName: "Maria Dela Cruz",
-    supervisorUsername: "mdelacruz",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-09-29",
-  },
-  {
-    id: 13,
-    assetName: "Safety Equipment Set",
-    assetTag: "AST-023",
-    category: "Tools",
-    supervisorName: "Teresa Gonzales",
-    supervisorUsername: "tgonzales",
-    assignedBy: "John Doe",
-    dateAssigned: "2026-09-27",
-  },
-];
+type AssignerOption = { id: string; full_name: string };
 
 const PAGE_SIZE = 5;
-const CURRENT_USER = "John Doe";
+const BASE_URL = `${API_URLS.Employee}/asset-assignments`;
+const SUPERVISORS_URL = `${API_URLS.Employee}/supervisors`;
+
+const emptyFilters = {
+  search: "",
+  supervisor: "",
+  assignedBy: "",
+  from: "",
+  to: "",
+};
+
+const toRecord = (a: ApiAssignment): AssetAssignmentRecord => ({
+  id: a.id,
+  assetId: a.asset_id,
+  assetName: a.asset_name,
+  assetTag: a.asset_tag,
+  category: a.category,
+  supervisorId: a.supervisor_id,
+  supervisorName: a.supervisor_name,
+  supervisorUsername: a.supervisor_username,
+  assignedBy: a.assigned_by ?? "—",
+  dateAssigned: a.date_assigned,
+});
+
+const toAssetOption = (a: ApiAssetOption): AssetOption => ({
+  id: a.id,
+  name: a.name,
+  tag: a.tag,
+  category: a.category,
+  isAssigned: a.is_assigned,
+  assignedTo: a.assigned_to,
+});
+
+// One shared error mapper (401 is handled by the caller)
+const getErrorInfo = (error: unknown) => {
+  if (!axios.isAxiosError(error)) {
+    return { message: "Something went wrong.", status: undefined };
+  }
+  if (!error.response) {
+    return { message: "Can't reach the server.", status: undefined };
+  }
+
+  const status = error.response.status;
+  const data = error.response.data;
+
+  if (status === 401) return { message: "Your session has expired.", status };
+  if (status === 403) {
+    return {
+      message: "You don't have permission to perform this action.",
+      status,
+    };
+  }
+  if (status >= 500) {
+    return { message: "Server error. Please try again.", status };
+  }
+
+  return {
+    message:
+      data?.message ?? data?.detail ?? data?.title ?? "Something went wrong.",
+    status,
+  };
+};
 
 function formatDate(date: string) {
   if (!date) return "—";
@@ -194,100 +143,209 @@ function formatDate(date: string) {
   return `${month}/${day}/${year}`;
 }
 
-export default function AssetsAssignment() {
-  const [assignments, setAssignments] =
-    useState<AssetAssignmentRecord[]>(initialAssignments);
+const inputClass =
+  "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
 
-  const [selectedAssets, setSelectedAssets] = useState<string[]>([]);
+const labelClass =
+  "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
+
+export default function AssetsAssignment() {
+  const navigate = useNavigate();
+
+  // Table data
+  const [assignments, setAssignments] = useState<AssetAssignmentRecord[]>([]);
+  const [totalAssignments, setTotalAssignments] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [listError, setListError] = useState("");
+
+  // Dropdown options
+  const [supervisors, setSupervisors] = useState<SupervisorOption[]>([]); // active only
+  const [filterSupervisors, setFilterSupervisors] = useState<SupervisorOption[]>([]); // incl. revoked
+  const [assigners, setAssigners] = useState<AssignerOption[]>([]);
+  const [assetOptions, setAssetOptions] = useState<AssetOption[]>([]);
+  const [totalAssetOptions, setTotalAssetOptions] = useState(0);
+
+  // New assignment form
+  const [selectedAssets, setSelectedAssets] = useState<AssetOption[]>([]);
   const [selectedSupervisor, setSelectedSupervisor] = useState("");
   const [assetDropdownOpen, setAssetDropdownOpen] = useState(false);
+  const [assetKeyword, setAssetKeyword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const assetBoxRef = useRef<HTMLDivElement>(null);
 
+  // Filters: drafts = what the inputs show, filters = what the table uses
   const [search, setSearch] = useState("");
   const [filterSupervisor, setFilterSupervisor] = useState("");
   const [filterAssignedBy, setFilterAssignedBy] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-
-  const [filters, setFilters] = useState({
-    search: "",
-    supervisor: "",
-    assignedBy: "",
-    from: "",
-    to: "",
-  });
-
+  const [filters, setFilters] = useState(emptyFilters);
   const [page, setPage] = useState(1);
-  const [editing, setEditing] =
-    useState<AssetAssignmentRecord | null>(null);
+
+  // Edit modal
+  const [editing, setEditing] = useState<AssetAssignmentRecord | null>(null);
   const [editSupervisor, setEditSupervisor] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+
+  // Delete modal
+  const [deleteTarget, setDeleteTarget] = useState<AssetAssignmentRecord | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+
   const [notice, setNotice] = useState("");
+  const [noticeIsError, setNoticeIsError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  const assignedTags = useMemo(
-    () => new Set(assignments.map((item) => item.assetTag)),
-    [assignments]
-  );
+  const refresh = () => setReloadKey((k) => k + 1);
 
-  const filteredAssignments = useMemo(() => {
-    const query = filters.search.toLowerCase().trim();
+  const showNotice = (text: string, isError = false) => {
+    setNotice(text);
+    setNoticeIsError(isError);
+  };
 
-    return assignments.filter((item) => {
-      const matchesSearch =
-        !query ||
-        item.assetName.toLowerCase().includes(query) ||
-        item.assetTag.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query);
+  // =========================
+  // FETCH SUPERVISORS + ASSIGNERS
+  // =========================
+  useEffect(() => {
+    let cancelled = false;
+    const cfg = { withCredentials: true };
 
-      const matchesSupervisor =
-        !filters.supervisor ||
-        item.supervisorUsername === filters.supervisor;
+    (async () => {
+      try {
+        const [sup, supAll, asg] = await Promise.all([
+          axios.get(SUPERVISORS_URL, cfg),
+          axios.get(SUPERVISORS_URL, { ...cfg, params: { includeRevoked: true } }),
+          axios.get(`${BASE_URL}/assigner-options`, cfg),
+        ]);
+        if (cancelled) return;
+        setSupervisors(sup.data.supervisors ?? []);
+        setFilterSupervisors(supAll.data.supervisors ?? []);
+        setAssigners(asg.data.assigners ?? []);
+      } catch (error) {
+        if (cancelled) return;
+        const info = getErrorInfo(error);
+        if (info.status === 401) {
+          navigate("/login", { replace: true });
+          return;
+        }
+        showNotice(info.message, true);
+      }
+    })();
 
-      const matchesAssignedBy =
-        !filters.assignedBy ||
-        item.assignedBy === filters.assignedBy;
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey, navigate]);
 
-      const matchesFrom =
-        !filters.from || item.dateAssigned >= filters.from;
+  // =========================
+  // FETCH ASSET OPTIONS (debounced while typing in the dropdown search)
+  // =========================
+  useEffect(() => {
+    let cancelled = false;
 
-      const matchesTo =
-        !filters.to || item.dateAssigned <= filters.to;
+    const timer = setTimeout(
+      async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/asset-options`, {
+            withCredentials: true,
+            params: { keyword: assetKeyword.trim() || undefined, limit: 100 },
+          });
+          if (cancelled) return;
+          setAssetOptions((res.data.assets ?? []).map(toAssetOption));
+          setTotalAssetOptions(res.data.total_assets ?? 0);
+        } catch (error) {
+          if (cancelled) return;
+          const info = getErrorInfo(error);
+          if (info.status === 401) {
+            navigate("/login", { replace: true });
+            return;
+          }
+          showNotice(info.message, true);
+        }
+      },
+      assetKeyword ? 300 : 0
+    );
 
-      return (
-        matchesSearch &&
-        matchesSupervisor &&
-        matchesAssignedBy &&
-        matchesFrom &&
-        matchesTo
-      );
-    });
-  }, [assignments, filters]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [assetKeyword, reloadKey, navigate]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAssignments.length / PAGE_SIZE)
-  );
+  // Close the asset dropdown when clicking outside of it
+  useEffect(() => {
+    if (!assetDropdownOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!assetBoxRef.current?.contains(e.target as Node)) {
+        setAssetDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [assetDropdownOpen]);
 
-  const currentPage = Math.min(page, totalPages);
+  // =========================
+  // FETCH ASSIGNMENTS
+  // =========================
+  useEffect(() => {
+    let cancelled = false;
 
-  const visibleAssignments = filteredAssignments.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+    (async () => {
+      setLoading(true);
+      setListError("");
+      try {
+        const res = await axios.get(BASE_URL, {
+          withCredentials: true,
+          params: {
+            keyword: filters.search.trim() || undefined,
+            supervisorId: filters.supervisor || undefined,
+            assignedById: filters.assignedBy || undefined,
+            startDate: filters.from || undefined,
+            endDate: filters.to || undefined,
+            page,
+            pageSize: PAGE_SIZE,
+          },
+        });
+        if (cancelled) return;
 
-  const assignedByOptions = [
-    ...new Set(assignments.map((item) => item.assignedBy)),
-  ].sort();
+        const pages = Math.max(1, res.data.total_pages ?? 1);
+        // e.g. the last row of the last page was deleted
+        if (page > pages) {
+          setPage(pages);
+          return;
+        }
 
-  const inputClass =
-    "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
+        setAssignments((res.data.assignments ?? []).map(toRecord));
+        setTotalAssignments(res.data.total_assignments ?? 0);
+        setTotalPages(pages);
+      } catch (error) {
+        if (cancelled) return;
+        const info = getErrorInfo(error);
+        if (info.status === 401) {
+          navigate("/login", { replace: true });
+          return;
+        }
+        setListError(info.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
 
-  const labelClass =
-    "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
+    return () => {
+      cancelled = true;
+    };
+  }, [page, filters, reloadKey, navigate]);
 
-  function toggleAsset(tag: string) {
+  // =========================
+  // NEW ASSIGNMENT
+  // =========================
+  function toggleAsset(asset: AssetOption) {
     setSelectedAssets((current) =>
-      current.includes(tag)
-        ? current.filter((item) => item !== tag)
-        : [...current, tag]
+      current.some((item) => item.id === asset.id)
+        ? current.filter((item) => item.id !== asset.id)
+        : [...current, asset]
     );
   }
 
@@ -295,45 +353,45 @@ export default function AssetsAssignment() {
     setSelectedAssets([]);
     setSelectedSupervisor("");
     setAssetDropdownOpen(false);
+    setAssetKeyword("");
   }
 
-  function handleAssign() {
+  async function handleAssign() {
+    if (submitting) return;
     if (!selectedAssets.length || !selectedSupervisor) {
-      setNotice("Please select at least one asset and a supervisor.");
+      showNotice("Please select at least one asset and a supervisor.", true);
       return;
     }
 
-    const supervisor = supervisors.find(
-      (item) => item.username === selectedSupervisor
-    );
-
-    if (!supervisor) return;
-
-    const newAssignments = selectedAssets.flatMap((tag, index) => {
-      const asset = assets.find((item) => item.tag === tag);
-      if (!asset) return [];
-
-      return [
+    setSubmitting(true);
+    try {
+      await axios.post(
+        BASE_URL,
         {
-          id: Date.now() + index,
-          assetName: asset.name,
-          assetTag: asset.tag,
-          category: asset.category,
-          supervisorName: supervisor.name,
-          supervisorUsername: supervisor.username,
-          assignedBy: CURRENT_USER,
-          dateAssigned: new Date().toLocaleDateString("en-CA"),
+          asset_ids: selectedAssets.map((asset) => asset.id),
+          supervisor_id: selectedSupervisor,
         },
-      ];
-    });
-
-    setAssignments((current) => [...newAssignments, ...current]);
-    setPage(1);
-    clearFilters();
-    resetAssignmentForm();
-    setNotice(`${newAssignments.length} asset assignment(s) created.`);
+        { withCredentials: true }
+      );
+      showNotice(`${selectedAssets.length} asset assignment(s) created.`);
+      resetAssignmentForm();
+      clearFilters();
+      refresh();
+    } catch (error) {
+      const info = getErrorInfo(error);
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      showNotice(info.message, true);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
+  // =========================
+  // FILTERS
+  // =========================
   function handleSearch() {
     setFilters({
       search,
@@ -351,61 +409,115 @@ export default function AssetsAssignment() {
     setFilterAssignedBy("");
     setDateFrom("");
     setDateTo("");
-
-    setFilters({
-      search: "",
-      supervisor: "",
-      assignedBy: "",
-      from: "",
-      to: "",
-    });
-
+    setFilters(emptyFilters);
     setPage(1);
   }
 
-  function handleDelete(id: number) {
-    const assignment = assignments.find((item) => item.id === id);
-    if (!assignment) return;
+  // =========================
+  // EDIT (modal)
+  // =========================
+  function openEdit(item: AssetAssignmentRecord) {
+    setEditing(item);
+    // A revoked supervisor can't be picked again, so make them choose a new one
+    setEditSupervisor(
+      supervisors.some((s) => s.id === item.supervisorId) ? item.supervisorId : ""
+    );
+    setEditError("");
+  }
 
-    if (
-      !window.confirm(
-        `Delete the assignment for ${assignment.assetName}?`
-      )
-    ) {
+  function closeEdit() {
+    if (editSaving) return;
+    setEditing(null);
+    setEditError("");
+  }
+
+  async function handleEditSave() {
+    if (!editing || editSaving) return;
+    if (!editSupervisor) {
+      setEditError("Please select a supervisor.");
       return;
     }
 
-    setAssignments((current) =>
-      current.filter((item) => item.id !== id)
-    );
-
-    setNotice("Assignment deleted successfully.");
+    setEditSaving(true);
+    setEditError("");
+    try {
+      await axios.put(
+        `${BASE_URL}/${editing.id}`,
+        { supervisor_id: editSupervisor },
+        { withCredentials: true }
+      );
+      setEditing(null);
+      showNotice("Assignment updated successfully.");
+      refresh();
+    } catch (error) {
+      const info = getErrorInfo(error);
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      setEditError(info.message);
+    } finally {
+      setEditSaving(false);
+    }
   }
 
-  function handleEditSave() {
-    if (!editing || !editSupervisor) return;
-
-    const supervisor = supervisors.find(
-      (item) => item.username === editSupervisor
-    );
-
-    if (!supervisor) return;
-
-    setAssignments((current) =>
-      current.map((item) =>
-        item.id === editing.id
-          ? {
-              ...item,
-              supervisorName: supervisor.name,
-              supervisorUsername: supervisor.username,
-            }
-          : item
-      )
-    );
-
-    setEditing(null);
-    setNotice("Assignment updated successfully.");
+  // =========================
+  // DELETE (modal)
+  // =========================
+  function openDelete(item: AssetAssignmentRecord) {
+    setDeleteTarget(item);
+    setDeleteError("");
   }
+
+  function closeDelete() {
+    if (deleting) return;
+    setDeleteTarget(null);
+    setDeleteError("");
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deleteTarget || deleting) return;
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await axios.delete(`${BASE_URL}/${deleteTarget.id}`, {
+        withCredentials: true,
+      });
+      setDeleteTarget(null);
+      showNotice("Assignment deleted successfully.");
+      refresh();
+    } catch (error) {
+      const info = getErrorInfo(error);
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      setDeleteError(info.message);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  // Escape closes whichever modal is open
+  useEffect(() => {
+    if (!editing && !deleteTarget) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (editing && !editSaving) {
+        setEditing(null);
+        setEditError("");
+      }
+      if (deleteTarget && !deleting) {
+        setDeleteTarget(null);
+        setDeleteError("");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editing, editSaving, deleteTarget, deleting]);
+
+  const rangeStart = totalAssignments === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(page * PAGE_SIZE, totalAssignments);
 
   return (
     <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
@@ -432,14 +544,18 @@ export default function AssetsAssignment() {
         {notice && (
           <div
             role="status"
-            className="flex items-center justify-between gap-3 rounded-lg border border-orange-200 bg-orange-50 px-5 py-4 text-sm text-orange-800 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-200"
+            className={`flex items-center justify-between gap-3 rounded-lg border px-5 py-4 text-sm ${
+              noticeIsError
+                ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
+                : "border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-200"
+            }`}
           >
             <span>{notice}</span>
             <button
               type="button"
               onClick={() => setNotice("")}
               aria-label="Dismiss notification"
-              className="rounded p-1 hover:bg-orange-100 dark:hover:bg-orange-900"
+              className="cursor-pointer rounded p-1 hover:bg-black/5 dark:hover:bg-white/10"
             >
               <X size={18} />
             </button>
@@ -448,66 +564,51 @@ export default function AssetsAssignment() {
 
         {/* NEW ASSIGNMENT */}
         <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
-          <h2 className="mb-5 text-base font-bold">
-            New Assignment
-          </h2>
+          <h2 className="mb-5 text-base font-bold">New Assignment</h2>
 
           <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[1.5fr_1fr]">
 
             {/* ASSET MULTISELECT */}
-            <div className="relative">
+            <div className="relative" ref={assetBoxRef}>
               <label className={labelClass}>
                 Asset <span className="text-red-500">*</span>
               </label>
 
               <button
                 type="button"
-                onClick={() =>
-                  setAssetDropdownOpen((open) => !open)
-                }
+                onClick={() => setAssetDropdownOpen((open) => !open)}
                 aria-expanded={assetDropdownOpen}
                 className={`${inputClass} flex min-h-[48px] items-center justify-between gap-2 text-left`}
               >
                 <span className="flex min-w-0 flex-1 flex-wrap gap-2">
                   {selectedAssets.length ? (
-                    selectedAssets.map((tag) => {
-                      const asset = assets.find(
-                        (item) => item.tag === tag
-                      );
+                    selectedAssets.map((asset) => (
+                      <span
+                        key={asset.id}
+                        className="inline-flex max-w-full items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-700 dark:bg-orange-950 dark:text-orange-300"
+                      >
+                        <span className="truncate">{asset.name}</span>
 
-                      return (
                         <span
-                          key={tag}
-                          className="inline-flex max-w-full items-center gap-2 rounded-full bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-700 dark:bg-orange-950 dark:text-orange-300"
-                        >
-                          <span className="truncate">
-                            {asset?.name ?? tag}
-                          </span>
-
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            aria-label={`Remove ${asset?.name ?? tag}`}
-                            onClick={(event) => {
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Remove ${asset.name}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleAsset(asset);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
                               event.stopPropagation();
-                              toggleAsset(tag);
-                            }}
-                            onKeyDown={(event) => {
-                              if (
-                                event.key === "Enter" ||
-                                event.key === " "
-                              ) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                toggleAsset(tag);
-                              }
-                            }}
-                          >
-                            <X size={14} />
-                          </span>
+                              toggleAsset(asset);
+                            }
+                          }}
+                        >
+                          <X size={14} />
                         </span>
-                      );
-                    })
+                      </span>
+                    ))
                   ) : (
                     <span className="text-gray-400">
                       Select one or more assets
@@ -519,41 +620,70 @@ export default function AssetsAssignment() {
               </button>
 
               {assetDropdownOpen && (
-                <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-72 overflow-y-auto rounded-lg border border-gray-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
-                  {assets.map((asset) => {
-                    const selected = selectedAssets.includes(asset.tag);
-                    const alreadyAssigned = assignedTags.has(asset.tag);
+                <div className="absolute left-0 right-0 top-full z-30 mt-2 rounded-lg border border-gray-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                  <div className="relative mb-2">
+                    <Search
+                      size={16}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                    <input
+                      autoFocus
+                      value={assetKeyword}
+                      onChange={(event) => setAssetKeyword(event.target.value)}
+                      placeholder="Search asset name or tag"
+                      className={`${inputClass} py-2 pl-9`}
+                    />
+                  </div>
 
-                    return (
-                      <button
-                        type="button"
-                        key={asset.tag}
-                        disabled={alreadyAssigned && !selected}
-                        onClick={() => toggleAsset(asset.tag)}
-                        className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-zinc-800"
-                      >
-                        <span
-                          className={`flex size-5 shrink-0 items-center justify-center rounded border ${
-                            selected
-                              ? "border-orange-600 bg-orange-600 text-white"
-                              : "border-gray-300 dark:border-zinc-600"
-                          }`}
+                  <div className="max-h-64 overflow-y-auto">
+                    {assetOptions.length === 0 && (
+                      <p className="px-4 py-6 text-center text-sm text-gray-400">
+                        No assets found.
+                      </p>
+                    )}
+
+                    {assetOptions.map((asset) => {
+                      const selected = selectedAssets.some(
+                        (item) => item.id === asset.id
+                      );
+
+                      return (
+                        <button
+                          type="button"
+                          key={asset.id}
+                          disabled={asset.isAssigned && !selected}
+                          onClick={() => toggleAsset(asset)}
+                          className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-zinc-800"
                         >
-                          {selected && <Check size={14} />}
-                        </span>
+                          <span
+                            className={`flex size-5 shrink-0 items-center justify-center rounded border ${
+                              selected
+                                ? "border-orange-600 bg-orange-600 text-white"
+                                : "border-gray-300 dark:border-zinc-600"
+                            }`}
+                          >
+                            {selected && <Check size={14} />}
+                          </span>
 
-                        <span className="flex-1">
-                          <span className="block font-medium">
-                            {asset.name}
+                          <span className="flex-1">
+                            <span className="block font-medium">{asset.name}</span>
+                            <span className="text-xs text-gray-400">
+                              {asset.tag}
+                              {asset.isAssigned
+                                ? ` · Already assigned${asset.assignedTo ? ` to ${asset.assignedTo}` : ""}`
+                                : ""}
+                            </span>
                           </span>
-                          <span className="text-xs text-gray-400">
-                            {asset.tag}
-                            {alreadyAssigned ? " · Already assigned" : ""}
-                          </span>
-                        </span>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {totalAssetOptions > assetOptions.length && (
+                    <p className="px-2 pt-2 text-xs text-gray-400">
+                      Showing {assetOptions.length} of {totalAssetOptions}. Type to narrow the list.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -571,18 +701,13 @@ export default function AssetsAssignment() {
               <div className="relative">
                 <select
                   value={selectedSupervisor}
-                  onChange={(event) =>
-                    setSelectedSupervisor(event.target.value)
-                  }
+                  onChange={(event) => setSelectedSupervisor(event.target.value)}
                   className={`${inputClass} appearance-none pr-10`}
                 >
                   <option value="">Select supervisor</option>
                   {supervisors.map((supervisor) => (
-                    <option
-                      key={supervisor.username}
-                      value={supervisor.username}
-                    >
-                      {supervisor.name}
+                    <option key={supervisor.id} value={supervisor.id}>
+                      {supervisor.full_name}
                     </option>
                   ))}
                 </select>
@@ -604,7 +729,8 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={resetAssignmentForm}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-600"
+                disabled={submitting}
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-gray-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <RotateCcw size={15} />
                 Reset
@@ -613,9 +739,10 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={handleAssign}
-                className="rounded-lg bg-orange-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-700"
+                disabled={submitting}
+                className="cursor-pointer rounded-lg bg-orange-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                + Assign Assets
+                {submitting ? "Assigning..." : "+ Assign Assets"}
               </button>
             </div>
           </div>
@@ -656,18 +783,14 @@ export default function AssetsAssignment() {
               <label className={labelClass}>Supervisor</label>
               <select
                 value={filterSupervisor}
-                onChange={(event) =>
-                  setFilterSupervisor(event.target.value)
-                }
+                onChange={(event) => setFilterSupervisor(event.target.value)}
                 className={inputClass}
               >
                 <option value="">All supervisors</option>
-                {supervisors.map((supervisor) => (
-                  <option
-                    key={supervisor.username}
-                    value={supervisor.username}
-                  >
-                    {supervisor.name}
+                {filterSupervisors.map((supervisor) => (
+                  <option key={supervisor.id} value={supervisor.id}>
+                    {supervisor.full_name}
+                    {supervisor.is_revoked ? " (revoked)" : ""}
                   </option>
                 ))}
               </select>
@@ -677,15 +800,13 @@ export default function AssetsAssignment() {
               <label className={labelClass}>Assigned By</label>
               <select
                 value={filterAssignedBy}
-                onChange={(event) =>
-                  setFilterAssignedBy(event.target.value)
-                }
+                onChange={(event) => setFilterAssignedBy(event.target.value)}
                 className={inputClass}
               >
                 <option value="">All employees</option>
-                {assignedByOptions.map((employee) => (
-                  <option key={employee} value={employee}>
-                    {employee}
+                {assigners.map((assigner) => (
+                  <option key={assigner.id} value={assigner.id}>
+                    {assigner.full_name}
                   </option>
                 ))}
               </select>
@@ -719,7 +840,7 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={handleSearch}
-                className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                className="cursor-pointer rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
               >
                 Apply Filters
               </button>
@@ -727,7 +848,7 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+                className="cursor-pointer rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
               >
                 Clear
               </button>
@@ -739,16 +860,14 @@ export default function AssetsAssignment() {
         <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex flex-col gap-2 border-b border-gray-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 sm:px-6">
             <div>
-              <h2 className="text-base font-bold">
-                Asset Assignments
-              </h2>
+              <h2 className="text-base font-bold">Asset Assignments</h2>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 View and manage asset-to-supervisor assignments.
               </p>
             </div>
 
             <span className="w-fit rounded-full bg-orange-100 px-4 py-2 text-sm font-semibold text-orange-700 dark:bg-orange-950 dark:text-orange-300">
-              {filteredAssignments.length} assignments
+              {totalAssignments} assignments
             </span>
           </div>
 
@@ -768,57 +887,19 @@ export default function AssetsAssignment() {
               </thead>
 
               <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
-                {visibleAssignments.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="transition hover:bg-orange-50/50 dark:hover:bg-zinc-800/60"
-                  >
-                    <td className="max-w-[220px] px-5 py-5 font-medium">
-                      {item.assetName}
-                    </td>
-                    <td className="px-4 py-5 text-gray-500 dark:text-gray-400">
-                      {item.assetTag}
-                    </td>
-                    <td className="px-4 py-5">{item.category}</td>
-                    <td className="px-4 py-5">{item.supervisorName}</td>
-                    <td className="px-4 py-5 text-gray-500 dark:text-gray-400">
-                      {item.supervisorUsername}
-                    </td>
-                    <td className="px-4 py-5">{item.assignedBy}</td>
-                    <td className="whitespace-nowrap px-4 py-5">
-                      {formatDate(item.dateAssigned)}
-                    </td>
-
-                    <td className="px-5 py-4">
-                      <div className="flex items-center justify-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditing(item);
-                            setEditSupervisor(item.supervisorUsername);
-                          }}
-                          title={`Edit ${item.assetName}`}
-                          className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
-                        >
-                          <Pencil size={14} />
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(item.id)}
-                          title={`Delete ${item.assetName}`}
-                          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
-                        >
-                          <Trash2 size={14} />
-                          Delete
-                        </button>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan={8}>
+                      <LoadingState />
                     </td>
                   </tr>
-                ))}
-
-                {visibleAssignments.length === 0 && (
+                ) : listError ? (
+                  <tr>
+                    <td colSpan={8}>
+                      <ErrorState message={listError} onRetry={refresh} />
+                    </td>
+                  </tr>
+                ) : assignments.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-5 py-16 text-center">
                       <ClipboardList
@@ -833,6 +914,53 @@ export default function AssetsAssignment() {
                       </p>
                     </td>
                   </tr>
+                ) : (
+                  assignments.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="transition hover:bg-orange-50/50 dark:hover:bg-zinc-800/60"
+                    >
+                      <td className="max-w-[220px] px-5 py-5 font-medium">
+                        {item.assetName}
+                      </td>
+                      <td className="px-4 py-5 text-gray-500 dark:text-gray-400">
+                        {item.assetTag}
+                      </td>
+                      <td className="px-4 py-5">{item.category}</td>
+                      <td className="px-4 py-5">{item.supervisorName}</td>
+                      <td className="px-4 py-5 text-gray-500 dark:text-gray-400">
+                        {item.supervisorUsername}
+                      </td>
+                      <td className="px-4 py-5">{item.assignedBy}</td>
+                      <td className="whitespace-nowrap px-4 py-5">
+                        {formatDate(item.dateAssigned)}
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(item)}
+                            title={`Edit ${item.assetName}`}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                          >
+                            <Pencil size={14} />
+                            Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openDelete(item)}
+                            title={`Delete ${item.assetName}`}
+                            className="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700"
+                          >
+                            <Trash2 size={14} />
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -841,58 +969,39 @@ export default function AssetsAssignment() {
           {/* PAGINATION */}
           <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-5 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing{" "}
-              {filteredAssignments.length
-                ? (currentPage - 1) * PAGE_SIZE + 1
-                : 0}{" "}
-              to{" "}
-              {Math.min(
-                currentPage * PAGE_SIZE,
-                filteredAssignments.length
-              )}{" "}
-              of {filteredAssignments.length} assignments
+              Showing {rangeStart} to {rangeEnd} of {totalAssignments} assignments
             </p>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
               <button
                 type="button"
-                disabled={currentPage === 1}
-                onClick={() =>
-                  setPage((current) => Math.max(1, current - 1))
-                }
+                disabled={page === 1}
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
                 className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
               >
                 <ChevronLeft size={16} />
                 Previous
               </button>
 
-              {Array.from(
-                { length: totalPages },
-                (_, index) => index + 1
-              )
+              {Array.from({ length: totalPages }, (_, index) => index + 1)
                 .filter(
                   (number) =>
                     number === 1 ||
                     number === totalPages ||
-                    Math.abs(number - currentPage) <= 1
+                    Math.abs(number - page) <= 1
                 )
                 .map((number, index, numbers) => (
                   <span key={number} className="contents">
-                    {index > 0 &&
-                      numbers[index - 1] !== number - 1 && (
-                        <span className="px-1 text-sm text-gray-400">
-                          …
-                        </span>
-                      )}
+                    {index > 0 && numbers[index - 1] !== number - 1 && (
+                      <span className="px-1 text-sm text-gray-400">…</span>
+                    )}
 
                     <button
                       type="button"
                       onClick={() => setPage(number)}
-                      aria-current={
-                        currentPage === number ? "page" : undefined
-                      }
+                      aria-current={page === number ? "page" : undefined}
                       className={`size-10 rounded-lg border text-sm transition ${
-                        currentPage === number
+                        page === number
                           ? "border-orange-600 bg-orange-600 font-bold text-white"
                           : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
                       }`}
@@ -903,17 +1012,13 @@ export default function AssetsAssignment() {
                 ))}
 
               <span className="mx-1 text-sm text-gray-500 dark:text-gray-400">
-                Page {currentPage} of {totalPages}
+                Page {page} of {totalPages}
               </span>
 
               <button
                 type="button"
-                disabled={currentPage === totalPages}
-                onClick={() =>
-                  setPage((current) =>
-                    Math.min(totalPages, current + 1)
-                  )
-                }
+                disabled={page >= totalPages}
+                onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
                 className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
               >
                 Next
@@ -929,9 +1034,7 @@ export default function AssetsAssignment() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              setEditing(null);
-            }
+            if (event.target === event.currentTarget) closeEdit();
           }}
         >
           <div
@@ -942,10 +1045,7 @@ export default function AssetsAssignment() {
           >
             <div className="mb-6 flex items-start justify-between gap-3">
               <div>
-                <h2
-                  id="edit-assignment-title"
-                  className="text-xl font-bold"
-                >
+                <h2 id="edit-assignment-title" className="text-xl font-bold">
                   Edit Assignment
                 </h2>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -955,18 +1055,16 @@ export default function AssetsAssignment() {
 
               <button
                 type="button"
-                onClick={() => setEditing(null)}
+                onClick={closeEdit}
                 aria-label="Close edit dialog"
-                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
               >
                 <X size={20} />
               </button>
             </div>
 
             <div className="mb-5 rounded-lg bg-gray-50 p-4 dark:bg-zinc-800">
-              <p className="text-base font-semibold">
-                {editing.assetName}
-              </p>
+              <p className="text-base font-semibold">{editing.assetName}</p>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 Asset Tag: {editing.assetTag}
               </p>
@@ -981,21 +1079,26 @@ export default function AssetsAssignment() {
               onChange={(event) => setEditSupervisor(event.target.value)}
               className={inputClass}
             >
+              <option value="">Select supervisor</option>
               {supervisors.map((supervisor) => (
-                <option
-                  key={supervisor.username}
-                  value={supervisor.username}
-                >
-                  {supervisor.name}
+                <option key={supervisor.id} value={supervisor.id}>
+                  {supervisor.full_name}
                 </option>
               ))}
             </select>
 
+            {editError && (
+              <div role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                {editError}
+              </div>
+            )}
+
             <div className="mt-7 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setEditing(null)}
-                className="rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                onClick={closeEdit}
+                disabled={editSaving}
+                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-800"
               >
                 Cancel
               </button>
@@ -1003,9 +1106,58 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={handleEditSave}
-                className="rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:bg-orange-700"
+                disabled={editSaving || editSupervisor === editing.supervisorId}
+                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Save Changes
+                {editSaving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE CONFIRMATION MODAL */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeDelete();
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+          >
+            <h2 className="text-xl font-bold">Delete assignment</h2>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Remove <span className="font-semibold">{deleteTarget.assetName}</span>{" "}
+              ({deleteTarget.assetTag}) from{" "}
+              <span className="font-semibold">{deleteTarget.supervisorName}</span>? This can't be undone.
+            </p>
+
+            {deleteError && (
+              <div role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="mt-7 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeDelete}
+                disabled={deleting}
+                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className="cursor-pointer rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

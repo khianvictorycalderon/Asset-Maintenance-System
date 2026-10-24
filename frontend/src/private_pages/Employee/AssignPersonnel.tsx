@@ -147,8 +147,13 @@ export default function AssignPersonnel() {
   // Form
   const [selectedPersonnel, setSelectedPersonnel] = useState("");
   const [selectedSupervisor, setSelectedSupervisor] = useState("");
-  const [editing, setEditing] = useState<Assignment | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Edit modal
+  const [editTarget, setEditTarget] = useState<Assignment | null>(null);
+  const [editSupervisor, setEditSupervisor] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
   const [message, setMessage] = useState("");
 
   // Filters: draft = what the inputs show, applied = what the table uses
@@ -260,7 +265,6 @@ export default function AssignPersonnel() {
   function resetForm() {
     setSelectedPersonnel("");
     setSelectedSupervisor("");
-    setEditing(null);
     setMessage("");
   }
 
@@ -274,22 +278,13 @@ export default function AssignPersonnel() {
     setSubmitting(true);
     setMessage("");
     try {
-      if (editing) {
-        await axios.put(
-          `${BASE_URL}/${editing.id}`,
-          { supervisor_id: selectedSupervisor },
-          { withCredentials: true }
-        );
-        setToast({ type: "success", message: "Assignment updated successfully." });
-      } else {
-        await axios.post(
-          BASE_URL,
-          { personnel_ids: [selectedPersonnel], supervisor_id: selectedSupervisor },
-          { withCredentials: true }
-        );
-        setToast({ type: "success", message: "Personnel assigned successfully." });
-        setPage(1);
-      }
+      await axios.post(
+        BASE_URL,
+        { personnel_ids: [selectedPersonnel], supervisor_id: selectedSupervisor },
+        { withCredentials: true }
+      );
+      setToast({ type: "success", message: "Personnel assigned successfully." });
+      setPage(1);
       resetForm();
       refresh();
     } catch (error) {
@@ -304,15 +299,52 @@ export default function AssignPersonnel() {
     }
   }
 
-  function handleEdit(item: Assignment) {
-    setEditing(item);
-    setSelectedPersonnel(item.personnelId);
+  // =========================
+  // EDIT (modal)
+  // =========================
+  function openEdit(item: Assignment) {
+    setEditTarget(item);
     // A revoked supervisor can't be picked again, so make them choose a new one
-    setSelectedSupervisor(
+    setEditSupervisor(
       supervisors.some((s) => s.id === item.supervisorId) ? item.supervisorId : ""
     );
-    setMessage("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setEditError("");
+  }
+
+  function closeEdit() {
+    if (editSaving) return;
+    setEditTarget(null);
+    setEditError("");
+  }
+
+  async function handleEditSave() {
+    if (!editTarget || editSaving) return;
+    if (!editSupervisor) {
+      setEditError("Please select a supervisor.");
+      return;
+    }
+
+    setEditSaving(true);
+    setEditError("");
+    try {
+      await axios.put(
+        `${BASE_URL}/${editTarget.id}`,
+        { supervisor_id: editSupervisor },
+        { withCredentials: true }
+      );
+      setEditTarget(null);
+      setToast({ type: "success", message: "Assignment updated successfully." });
+      refresh();
+    } catch (error) {
+      const info = getErrorInfo(error);
+      if (info.status === 401) {
+        navigate("/login", { replace: true });
+        return;
+      }
+      setEditError(info.message);
+    } finally {
+      setEditSaving(false);
+    }
   }
 
   // =========================
@@ -337,7 +369,6 @@ export default function AssignPersonnel() {
       await axios.delete(`${BASE_URL}/${deleteTarget.id}`, {
         withCredentials: true,
       });
-      if (editing?.id === deleteTarget.id) resetForm();
       setDeleteTarget(null);
       setToast({ type: "success", message: "Assignment deleted successfully." });
       refresh();
@@ -353,17 +384,23 @@ export default function AssignPersonnel() {
     }
   }
 
+  // Escape closes whichever modal is open
   useEffect(() => {
-    if (!deleteTarget) return;
+    if (!deleteTarget && !editTarget) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !deleting) {
+      if (e.key !== "Escape") return;
+      if (deleteTarget && !deleting) {
         setDeleteTarget(null);
         setDeleteError("");
+      }
+      if (editTarget && !editSaving) {
+        setEditTarget(null);
+        setEditError("");
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [deleteTarget, deleting]);
+  }, [deleteTarget, deleting, editTarget, editSaving]);
 
   // =========================
   // FILTERS
@@ -386,29 +423,11 @@ export default function AssignPersonnel() {
   const setDraftField = (field: keyof typeof emptyFilters, value: string) =>
     setDraft((prev) => ({ ...prev, [field]: value }));
 
-  // =========================
-  // PERSONNEL SELECT OPTIONS
-  // =========================
-  // When editing, make sure the assigned person is listed even if outside the first 100 results
-  const personnelChoices: PersonnelOption[] =
-    editing && !personnel.some((p) => p.id === editing.personnelId)
-      ? [
-          {
-            id: editing.personnelId,
-            full_name: editing.personnelName,
-            username: editing.personnelUsername,
-            is_assigned: true,
-            assigned_to: editing.supervisorName,
-          },
-          ...personnel,
-        ]
-      : personnel;
-
   const rangeStart = totalAssignments === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeEnd = Math.min(page * PAGE_SIZE, totalAssignments);
 
   return (
-    <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
+    <div className="min-h-full w-full bg-[#f4f4f4] px-0 py-0 text-gray-800 dark:bg-zinc-950 dark:text-gray-100">
       <div className="mb-5">
         <div className="flex items-center gap-3">
           <Users size={23} className="text-orange-600 dark:text-orange-400" />
@@ -424,7 +443,7 @@ export default function AssignPersonnel() {
       {/* New Assignment Form */}
       <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
         <h2 className="mb-5 text-base font-bold text-gray-900 dark:text-gray-100">
-          {editing ? "Edit Assignment" : "New Assignment"}
+          New Assignment
         </h2>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -436,18 +455,13 @@ export default function AssignPersonnel() {
               <select
                 className={`${inputClass} appearance-none pr-8`}
                 value={selectedPersonnel}
-                disabled={!!editing}
                 onChange={(e) => setSelectedPersonnel(e.target.value)}
               >
                 <option value="">Select personnel to assign</option>
-                {personnelChoices.map((person) => (
-                  <option
-                    key={person.id}
-                    value={person.id}
-                    disabled={person.is_assigned && person.id !== editing?.personnelId}
-                  >
+                {personnel.map((person) => (
+                  <option key={person.id} value={person.id} disabled={person.is_assigned}>
                     {person.full_name} ({person.username})
-                    {person.is_assigned && person.id !== editing?.personnelId
+                    {person.is_assigned
                       ? ` — assigned to ${person.assigned_to ?? "a supervisor"}`
                       : ""}
                   </option>
@@ -489,7 +503,7 @@ export default function AssignPersonnel() {
             disabled={submitting}
             className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
           >
-            {editing ? "Cancel" : "Reset"}
+            Reset
           </button>
           <button
             type="button"
@@ -497,7 +511,7 @@ export default function AssignPersonnel() {
             disabled={submitting}
             className="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? "Saving..." : editing ? "Update" : "Assign"}
+            {submitting ? "Saving..." : "Assign"}
           </button>
         </div>
 
@@ -662,7 +676,7 @@ export default function AssignPersonnel() {
                       <div className="flex gap-1.5">
                         <button
                           type="button"
-                          onClick={() => handleEdit(item)}
+                          onClick={() => openEdit(item)}
                           title="Edit assignment"
                           className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700"
                         >
@@ -740,6 +754,86 @@ export default function AssignPersonnel() {
           </div>
         </div>
       </section>
+
+      {/* Edit modal */}
+      {editTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onMouseDown={(e) => e.target === e.currentTarget && closeEdit()}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+          >
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              Edit assignment
+            </h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Move this personnel to another supervisor.
+            </p>
+
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className={labelClass}>Personnel</label>
+                <input
+                  type="text"
+                  disabled
+                  className={inputClass}
+                  value={`${editTarget.personnelName} (${editTarget.personnelUsername})`}
+                  readOnly
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>
+                  Supervisor <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    className={`${inputClass} appearance-none pr-8`}
+                    value={editSupervisor}
+                    onChange={(e) => setEditSupervisor(e.target.value)}
+                  >
+                    <option value="">Select supervisor</option>
+                    {supervisors.map((supervisor) => (
+                      <option key={supervisor.id} value={supervisor.id}>
+                        {supervisor.full_name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                </div>
+              </div>
+            </div>
+
+            {editError && (
+              <div role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                {editError}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeEdit}
+                disabled={editSaving}
+                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleEditSave}
+                disabled={editSaving || editSupervisor === editTarget.supervisorId}
+                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {editSaving ? "Saving..." : "Update"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete confirmation modal */}
       {deleteTarget && (
