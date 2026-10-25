@@ -340,7 +340,11 @@ export default function AssetRegistryPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [editError, setEditError] = useState("");
 
+  // Delete popup
+  const [deleteTarget, setDeleteTarget] = useState<Asset | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState("");
+
   const [message, setMessage] = useState<FormMessage | null>(null);
 
   // Filter inputs (draft values)
@@ -431,6 +435,29 @@ export default function AssetRegistryPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isModalOpen, isUpdating]);
+
+  // Delete popup: close on Escape and lock background scroll while open
+  const isDeleteOpen = deleteTarget !== null;
+
+  useEffect(() => {
+    if (!isDeleteOpen) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !deletingId) {
+        setDeleteTarget(null);
+        setDeleteError("");
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isDeleteOpen, deletingId]);
 
   function updateForm(field: keyof AssetForm, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -547,15 +574,24 @@ export default function AssetRegistryPage() {
   // =========================
   // DELETE
   // =========================
-  async function handleDelete(asset: Asset) {
+  function openDelete(asset: Asset) {
     if (deletingId) return;
+    setDeleteTarget(asset);
+    setDeleteError("");
+  }
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${asset.name}"?`
-    );
-    if (!confirmed) return;
+  function closeDelete() {
+    if (deletingId) return;
+    setDeleteTarget(null);
+    setDeleteError("");
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deleteTarget || deletingId) return;
+
+    const asset = deleteTarget;
     setDeletingId(asset.id);
+    setDeleteError("");
     setMessage(null);
 
     try {
@@ -564,6 +600,7 @@ export default function AssetRegistryPage() {
         { withCredentials: true }
       );
 
+      setDeleteTarget(null);
       setMessage({ type: "success", text: response.data.message });
 
       // Deleted the last row on this page: go back one page
@@ -577,9 +614,15 @@ export default function AssetRegistryPage() {
         return;
       }
 
-      setMessage({ type: "error", text: info.message });
+      // Asset was already deleted by someone else: close the popup and refresh
+      if (info.status === 404) {
+        setDeleteTarget(null);
+        setMessage({ type: "error", text: info.message });
+        setReloadKey((key) => key + 1);
+        return;
+      }
 
-      if (info.status === 404) setReloadKey((key) => key + 1);
+      setDeleteError(info.message);
     } finally {
       setDeletingId(null);
     }
@@ -929,7 +972,7 @@ export default function AssetRegistryPage() {
 
                           <button
                             type="button"
-                            onClick={() => handleDelete(asset)}
+                            onClick={() => openDelete(asset)}
                             disabled={deletingId === asset.id}
                             className="cursor-pointer rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                           >
@@ -1055,6 +1098,64 @@ export default function AssetRegistryPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Asset Popup */}
+      {deleteTarget && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) closeDelete();
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-asset-title"
+            className="my-auto w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 sm:p-6"
+          >
+            <h2
+              id="delete-asset-title"
+              className="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              Delete Asset
+            </h2>
+
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+              Are you sure you want to delete{" "}
+              <span className="font-semibold">{deleteTarget.name}</span> (
+              {deleteTarget.tag})? This can't be undone.
+            </p>
+
+            {deleteError && (
+              <p
+                role="alert"
+                className="mt-4 text-sm text-red-600 dark:text-red-400"
+              >
+                {deleteError}
+              </p>
+            )}
+
+            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
+              <button
+                type="button"
+                onClick={closeDelete}
+                disabled={!!deletingId}
+                className={`${buttonSecondary} cursor-pointer disabled:cursor-not-allowed disabled:opacity-60`}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={!!deletingId}
+                className="cursor-pointer rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
+              >
+                {deletingId ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}
