@@ -21,7 +21,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 border-b border-orange-400/30 dark:border-b-2 dark:border-orange-500/80 bg-orange-600/95 dark:bg-zinc-950/90 backdrop-blur-md shadow-sm shadow-orange-900/10 dark:shadow-black/40">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-orange-500 dark:bg-orange-600">
 
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
@@ -37,7 +37,7 @@ export default function Navbar() {
         />
 
         <span
-          className="text-sm md:text-md lg:text-lg font-bold tracking-tight text-white dark:text-zinc-100 truncate max-w-[70%] md:max-w-[85%] lg:max-w-full"
+          className="text-sm md:text-md lg:text-lg font-bold tracking-tight text-white truncate max-w-[70%] md:max-w-[85%] lg:max-w-full"
         >
           {NAVBAR_HEADER}
         </span>
@@ -50,7 +50,7 @@ export default function Navbar() {
             <Link
               key={btn.path}
               to={btn.path}
-              className="text-sm text-white/90 dark:text-zinc-300 hover:text-white dark:hover:text-orange-400 transition"
+              className="text-sm text-white hover:text-neutral-200 transition duration-300"
             >
               {btn.label}
             </Link>
@@ -60,7 +60,7 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setThemeOpen((v) => !v)}
-              className="cursor-pointer px-3 py-1.5 rounded-lg border border-white/25 dark:border-zinc-700 bg-white/15 dark:bg-zinc-900 text-xs text-white dark:text-orange-300 hover:bg-white/25 dark:hover:bg-zinc-800 transition"
+              className="cursor-pointer px-3 py-1.5 rounded-lg border border-white/25 bg-neutral-100/15 dark:bg-neutral-900/15 text-xs text-white hover:bg-neutral-100/25 dark:hover:bg-neutral-900/25 transition"
             >
               Theme: {theme} ▾
             </button>
@@ -119,7 +119,7 @@ export default function Navbar() {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-6 h-6 text-zinc-800 dark:text-zinc-200"
+              className="w-6 h-6 text-white"
             >
               <path
                 strokeLinecap="round"
@@ -133,7 +133,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="text-center md:hidden border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 px-6 py-4 space-y-3">
+        <div className="shadow text-center md:hidden border-b-3 border-orange-500 dark:border-orange-600 bg-zinc-50 dark:bg-zinc-950 px-6 py-4 space-y-3">
 
           {NAVBAR_BUTTONS.map((btn) => (
             <Link

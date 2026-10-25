@@ -48,6 +48,11 @@ const PUBLIC_PAGES_REDIRECT = [
 ];
 
 const PRIVATE_PAGES = [
+  // NOTE: DO NOT put a background on invidiual private pages as it is handled by the private layout itself
+  // Bad EXAMPLE: <div className="min-h-full w-full bg-[#f4f4f4] px-0 py-0 text-gray-800 dark:bg-zinc-950 dark:text-gray-100">
+  // Example: <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
+  // Just don't put any bg at all in private pages.
+
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/account", element: <Account /> },
   
