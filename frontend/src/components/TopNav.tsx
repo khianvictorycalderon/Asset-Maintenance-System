@@ -86,7 +86,7 @@ export default function TopNav({ onMenuClick }: Props) {
     }, [profileOpen]);
 
     return (
-        <nav className="h-14 flex items-center px-4 dark:border-b dark:border-zinc-800 bg-orange-600 dark:bg-zinc-900">
+        <nav className="h-14 flex items-center px-4 dark:border-b bg-orange-500 dark:bg-orange-600">
 
             {/* Left: Hamburger */}
             <button
@@ -132,7 +132,7 @@ export default function TopNav({ onMenuClick }: Props) {
                             setThemeOpen(false);
                         }
                     }}
-                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-500 dark:hover:bg-zinc-800 transition"
+                    className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-400 dark:hover:bg-orange-700 transition"
                 >
                     <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-white text-orange-600 dark:bg-orange-500 dark:text-white text-xs font-semibold">
                         {initials}
@@ -177,7 +177,7 @@ export default function TopNav({ onMenuClick }: Props) {
                             className="cursor-pointer w-full flex items-center justify-between px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-zinc-800 transition"
                         >
                             <span>Theme</span>
-                            <span className="text-xs text-orange-600 dark:text-orange-400">
+                            <span className="text-xs">
                                 {theme} ▾
                             </span>
                         </button>
