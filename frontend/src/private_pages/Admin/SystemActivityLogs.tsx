@@ -105,7 +105,7 @@ function PerformedBy({
     <div className="flex items-center gap-2">
       <span
         title="Unidentified actor"
-        className="inline-flex items-center gap-1 rounded-md bg-neutral-100 px-2 py-1 font-mono text-xs text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+        className="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 font-mono text-xs text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300"
       >
         <span className="text-neutral-400">?</span>
         {log.ipAddress || "Unknown IP"}
@@ -135,7 +135,7 @@ function Pagination({
   const end = Math.min(page * pageSize, totalItems);
 
   return (
-    <div className="flex flex-col gap-3 border-t border-neutral-200 px-4 py-4 text-sm dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-t border-neutral-200 px-4 py-4 text-sm dark:border-neutral-600 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-neutral-500 dark:text-neutral-400">
         Showing {start}–{end} of {totalItems}
       </p>
@@ -144,7 +144,7 @@ function Pagination({
         <button
           disabled={page === 1}
           onClick={() => onPageChange(page - 1)}
-          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
+          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-500 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
           Previous
         </button>
@@ -156,7 +156,7 @@ function Pagination({
         <button
           disabled={page === totalPages}
           onClick={() => onPageChange(page + 1)}
-          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-800"
+          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-500 dark:text-neutral-200 dark:hover:bg-neutral-700"
         >
           Next
         </button>
@@ -205,10 +205,10 @@ function LoadingState() {
           className="animate-pulse px-4 py-5"
         >
           <div className="flex flex-col gap-3 md:flex-row md:items-center">
-            <div className="h-4 w-40 rounded bg-neutral-200 dark:bg-neutral-700" />
-            <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-700" />
-            <div className="h-6 w-16 rounded-full bg-neutral-200 dark:bg-neutral-700" />
-            <div className="h-4 w-28 rounded bg-neutral-200 dark:bg-neutral-700" />
+            <div className="h-4 w-40 rounded bg-neutral-200 dark:bg-neutral-600" />
+            <div className="h-4 w-32 rounded bg-neutral-200 dark:bg-neutral-600" />
+            <div className="h-6 w-16 rounded-full bg-neutral-200 dark:bg-neutral-600" />
+            <div className="h-4 w-28 rounded bg-neutral-200 dark:bg-neutral-600" />
           </div>
         </div>
       ))}
@@ -385,7 +385,7 @@ export default function SystemActivityLogs() {
       )}
 
       {/* Activity table */}
-      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-600 dark:bg-neutral-800">
 
         {loading ? (
           <LoadingState />
@@ -398,27 +398,27 @@ export default function SystemActivityLogs() {
             <div className="overflow-x-auto">
               <table className="min-w-[1050px] w-full text-left">
 
-                <thead className="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/70">
+                <thead className="border-b border-neutral-200 bg-white dark:border-neutral-600 dark:bg-neutral-700">
                   <tr>
                     <th className="w-10 px-4 py-3" />
 
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
                       Activity
                     </th>
 
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
                       Performed By
                     </th>
 
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
                       Result
                     </th>
 
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
                       Date Performed
                     </th>
 
-                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-300">
                       Timestamp
                     </th>
                   </tr>
@@ -453,7 +453,7 @@ export default function SystemActivityLogs() {
                                 ? "Hide details"
                                 : "Show details"
                             }
-                            className="rounded-md p-1.5 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:bg-neutral-700 dark:hover:text-white"
+                            className="rounded-md p-1.5 text-neutral-500 transition hover:bg-neutral-200 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:bg-neutral-600 dark:hover:text-white"
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -490,7 +490,7 @@ export default function SystemActivityLogs() {
                           </div>
 
                           {expanded && (
-                            <div className="mt-3 max-w-lg rounded-lg bg-neutral-50 p-3 dark:bg-neutral-800">
+                            <div className="mt-3 max-w-lg rounded-lg bg-white p-3 dark:bg-neutral-700">
                               {log.targetUser && (
                                 <p className="mb-1 text-xs text-neutral-500 dark:text-neutral-400">
                                   <span className="font-semibold">

@@ -121,20 +121,20 @@ const getErrorInfo = (error: unknown) => {
 };
 
 const fieldClass =
-  "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 outline-none placeholder:text-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-gray-100 dark:placeholder:text-zinc-500";
+  "w-full rounded-lg border border-gray-300 bg-neutral-50 px-3 py-2 text-sm text-gray-800 outline-none placeholder:text-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-100 dark:placeholder:text-neutral-400";
 
 const labelClass =
   "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200";
 
 const buttonSecondary =
-  "rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-zinc-700 dark:text-gray-100 dark:hover:bg-zinc-600";
+  "rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-100 dark:hover:bg-neutral-600";
 
 function StatusBadge({ status }: { status: AssetStatus }) {
   const styles: Record<AssetStatus, string> = {
     Active:
       "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300",
     Inactive:
-      "bg-gray-200 text-gray-700 dark:bg-zinc-700 dark:text-gray-300",
+      "bg-gray-200 text-gray-700 dark:bg-neutral-700 dark:text-gray-300",
     "Under Maintenance":
       "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300",
   };
@@ -700,8 +700,8 @@ export default function AssetRegistryPage() {
         )}
 
         {/* Registration Form */}
-        <section className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900 sm:p-5">
-          <div className="mb-4 border-b border-gray-200 pb-3 dark:border-zinc-700">
+        <section className="mb-5 rounded-2xl border border-gray-200 bg-neutral-50 p-4 shadow-sm transition-colors dark:border-neutral-700 dark:bg-neutral-800 sm:p-5">
+          <div className="mb-4 border-b border-gray-200 pb-3 dark:border-neutral-700">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
               Register New Asset
             </h2>
@@ -718,7 +718,7 @@ export default function AssetRegistryPage() {
               className="grid grid-cols-1 gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4"
             />
 
-            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
+            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-700">
               <button
                 type="button"
                 onClick={resetForm}
@@ -731,7 +731,7 @@ export default function AssetRegistryPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
+                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-900"
               >
                 {isSaving ? "Saving..." : "+ Register Asset"}
               </button>
@@ -740,7 +740,7 @@ export default function AssetRegistryPage() {
         </section>
 
         {/* Search and Filters */}
-        <section className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900">
+        <section className="mb-5 rounded-2xl border border-gray-200 bg-neutral-50 p-4 shadow-sm transition-colors dark:border-neutral-700 dark:bg-neutral-800">
           <h2 className="mb-3 text-base font-semibold text-gray-900 dark:text-white">
             Search and Filter Assets
           </h2>
@@ -844,7 +844,7 @@ export default function AssetRegistryPage() {
           </div>
         </section>
 
-        <section className="mb-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900">
+        <section className="mb-5 rounded-2xl border border-gray-200 bg-neutral-50 p-4 shadow-sm transition-colors dark:border-neutral-700 dark:bg-neutral-800">
           <div>
             <label className={labelClass}>Date Format</label>
             <select
@@ -860,8 +860,8 @@ export default function AssetRegistryPage() {
         </section>
 
         {/* Asset Table */}
-        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-colors dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-4 dark:border-zinc-700">
+        <section className="overflow-hidden rounded-2xl border border-gray-200 bg-neutral-50 shadow-sm transition-colors dark:border-neutral-700 dark:bg-neutral-800">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-4 dark:border-neutral-700">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
               Registered Assets
             </h2>
@@ -873,7 +873,7 @@ export default function AssetRegistryPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1050px] border-collapse text-left text-sm">
-              <thead className="bg-gray-50 text-gray-700 dark:bg-zinc-800 dark:text-gray-200">
+              <thead className="bg-gray-50 text-gray-700 dark:bg-neutral-700 dark:text-gray-200">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Asset Name</th>
                   <th className="px-4 py-3 font-semibold">Asset Tag</th>
@@ -928,7 +928,7 @@ export default function AssetRegistryPage() {
                   assets.map((asset) => (
                     <tr
                       key={asset.id}
-                      className="border-t border-gray-200 text-gray-700 transition hover:bg-orange-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-orange-950/30"
+                      className="border-t border-gray-200 text-gray-700 transition hover:bg-orange-50 dark:border-neutral-700 dark:text-gray-200 dark:hover:bg-orange-950/30"
                     >
                       <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                         {asset.name}
@@ -988,7 +988,7 @@ export default function AssetRegistryPage() {
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 px-4 py-4 dark:border-zinc-700">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-200 px-4 py-4 dark:border-neutral-700">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Showing {totalAssets === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}
               {"–"}
@@ -1000,7 +1000,7 @@ export default function AssetRegistryPage() {
                 type="button"
                 disabled={page <= 1 || isLoading}
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
-                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-gray-200 dark:hover:bg-neutral-800"
               >
                 Previous
               </button>
@@ -1015,7 +1015,7 @@ export default function AssetRegistryPage() {
                 onClick={() =>
                   setPage((current) => Math.min(totalPages, current + 1))
                 }
-                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-600 dark:text-gray-200 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-gray-200 dark:hover:bg-neutral-800"
               >
                 Next
               </button>
@@ -1036,9 +1036,9 @@ export default function AssetRegistryPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-asset-title"
-            className="my-auto w-full max-w-3xl rounded-2xl border border-gray-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 sm:p-6"
+            className="my-auto w-full max-w-3xl rounded-2xl border border-gray-200 bg-neutral-50 p-5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-6"
           >
-            <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-200 pb-3 dark:border-zinc-700">
+            <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-200 pb-3 dark:border-neutral-700">
               <div>
                 <h2
                   id="edit-asset-title"
@@ -1056,7 +1056,7 @@ export default function AssetRegistryPage() {
                 onClick={closeEditModal}
                 disabled={isUpdating}
                 aria-label="Close"
-                className="cursor-pointer rounded-lg p-1.5 text-xl leading-none text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-zinc-800 dark:hover:text-gray-200"
+                className="cursor-pointer rounded-lg p-1.5 text-xl leading-none text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-neutral-800 dark:hover:text-gray-200"
               >
                 ×
               </button>
@@ -1079,7 +1079,7 @@ export default function AssetRegistryPage() {
                 </p>
               )}
 
-              <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
+              <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-700">
                 <button
                   type="button"
                   onClick={closeEditModal}
@@ -1092,7 +1092,7 @@ export default function AssetRegistryPage() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
+                  className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-900"
                 >
                   {isUpdating ? "Saving..." : "Save Changes"}
                 </button>
@@ -1113,7 +1113,7 @@ export default function AssetRegistryPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-asset-title"
-            className="my-auto w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900 sm:p-6"
+            className="my-auto w-full max-w-md rounded-2xl border border-gray-200 bg-neutral-50 p-5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-6"
           >
             <h2
               id="delete-asset-title"
@@ -1137,7 +1137,7 @@ export default function AssetRegistryPage() {
               </p>
             )}
 
-            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-zinc-700">
+            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-700">
               <button
                 type="button"
                 onClick={closeDelete}
@@ -1151,7 +1151,7 @@ export default function AssetRegistryPage() {
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={!!deletingId}
-                className="cursor-pointer rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-zinc-900"
+                className="cursor-pointer rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-900"
               >
                 {deletingId ? "Deleting..." : "Delete"}
               </button>

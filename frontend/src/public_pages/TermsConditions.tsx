@@ -2,16 +2,16 @@ import { TERMS_CONDITIONS, TERMS_LAST_UPDATED_DATE } from "../config";
 
 export default function TermsConditions() {
   return (
-    <div className="min-h-screen w-full flex justify-center bg-orange-50/40 dark:bg-zinc-950 text-zinc-900 dark:text-orange-100 px-4 sm:px-6 py-24 transition-colors duration-300">
+    <div className="min-h-screen w-full flex justify-center bg-orange-50/40 dark:bg-neutral-950 text-neutral-900 dark:text-orange-100 px-4 sm:px-6 py-24 transition-colors duration-300">
       <div className="w-full max-w-3xl space-y-10">
 
         {/* Header */}
         <div className="text-center space-y-3">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-zinc-900 dark:text-orange-50">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-neutral-900 dark:text-orange-50">
             Terms & Conditions
           </h1>
 
-          <p className="text-zinc-600 dark:text-orange-200/70 text-sm md:text-base">
+          <p className="text-neutral-600 dark:text-orange-200/70 text-sm md:text-base">
             Last updated: {TERMS_LAST_UPDATED_DATE}
           </p>
 
@@ -28,19 +28,19 @@ export default function TermsConditions() {
                 p-5 sm:p-6
                 rounded-xl
                 border
-                border-zinc-200
-                dark:border-zinc-800
+                border-neutral-200
+                dark:border-neutral-800
                 bg-white
-                dark:bg-zinc-900
+                dark:bg-neutral-900
                 shadow-sm
                 dark:shadow-none
                 hover:bg-orange-50
-                dark:hover:bg-zinc-800
+                dark:hover:bg-neutral-800
                 transition-colors
                 duration-200
               "
             >
-              <h2 className="text-lg sm:text-xl font-semibold text-zinc-900 dark:text-orange-50">
+              <h2 className="text-lg sm:text-xl font-semibold text-neutral-900 dark:text-orange-50">
                 {item.title}
               </h2>
 
@@ -48,7 +48,7 @@ export default function TermsConditions() {
                 className="
                   mt-2
                   text-sm sm:text-base
-                  text-zinc-600
+                  text-neutral-600
                   dark:text-orange-200/80
                   leading-relaxed
                 "

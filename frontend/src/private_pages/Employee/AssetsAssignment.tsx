@@ -144,7 +144,7 @@ function formatDate(date: string) {
 }
 
 const inputClass =
-  "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
+  "w-full min-w-0 rounded-lg border border-gray-200 bg-neutral-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-700 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
 
 const labelClass =
   "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
@@ -525,15 +525,9 @@ export default function AssetsAssignment() {
 
         {/* PAGE HEADER */}
         <header className="mb-5">
-          <div className="flex items-center gap-3">
-            <ClipboardList
-              size={22}
-              className="text-orange-600 dark:text-orange-400"
-            />
-            <h1 className="text-2xl font-bold tracking-tight">
-              Employee Assets Assignment
-            </h1>
-          </div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Employee Assets Assignment
+          </h1>
 
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Assign assets to supervisors and manage existing assignments.
@@ -563,7 +557,7 @@ export default function AssetsAssignment() {
         )}
 
         {/* NEW ASSIGNMENT */}
-        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800 sm:p-6">
           <h2 className="mb-5 text-base font-bold">New Assignment</h2>
 
           <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[1.5fr_1fr]">
@@ -620,7 +614,7 @@ export default function AssetsAssignment() {
               </button>
 
               {assetDropdownOpen && (
-                <div className="absolute left-0 right-0 top-full z-30 mt-2 rounded-lg border border-gray-200 bg-white p-2 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                <div className="absolute left-0 right-0 top-full z-30 mt-2 rounded-lg border border-gray-200 bg-white p-2 shadow-xl dark:border-neutral-700 dark:bg-neutral-900">
                   <div className="relative mb-2">
                     <Search
                       size={16}
@@ -653,13 +647,13 @@ export default function AssetsAssignment() {
                           key={asset.id}
                           disabled={asset.isAssigned && !selected}
                           onClick={() => toggleAsset(asset)}
-                          className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-zinc-800"
+                          className="flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-neutral-800"
                         >
                           <span
                             className={`flex size-5 shrink-0 items-center justify-center rounded border ${
                               selected
                                 ? "border-orange-600 bg-orange-600 text-white"
-                                : "border-gray-300 dark:border-zinc-600"
+                                : "border-gray-300 dark:border-neutral-600"
                             }`}
                           >
                             {selected && <Check size={14} />}
@@ -749,7 +743,7 @@ export default function AssetsAssignment() {
         </section>
 
         {/* SEARCH AND FILTERS */}
-        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+        <section className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-800 sm:p-6">
           <div className="mb-5">
             <h2 className="text-base font-bold">
               Search and Filter Assignments
@@ -848,7 +842,7 @@ export default function AssetsAssignment() {
               <button
                 type="button"
                 onClick={clearFilters}
-                className="cursor-pointer rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+                className="cursor-pointer rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-neutral-800 dark:text-gray-200 dark:hover:bg-neutral-700"
               >
                 Clear
               </button>
@@ -857,8 +851,8 @@ export default function AssetsAssignment() {
         </section>
 
         {/* ASSIGNMENTS TABLE */}
-        <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex flex-col gap-2 border-b border-gray-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 sm:px-6">
+        <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-800">
+          <div className="flex flex-col gap-2 border-b border-gray-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between dark:border-neutral-800 sm:px-6">
             <div>
               <h2 className="text-base font-bold">Asset Assignments</h2>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -873,7 +867,7 @@ export default function AssetsAssignment() {
 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1200px] border-collapse text-left text-sm">
-              <thead className="bg-gray-50 text-xs font-semibold text-gray-600 dark:bg-zinc-800/80 dark:text-gray-300">
+              <thead className="bg-gray-50 text-xs font-semibold text-gray-600 dark:bg-neutral-700 dark:text-gray-300">
                 <tr>
                   <th className="px-5 py-5">Asset Name</th>
                   <th className="px-4 py-5">Asset Tag</th>
@@ -886,7 +880,7 @@ export default function AssetsAssignment() {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
                 {loading ? (
                   <tr>
                     <td colSpan={8}>
@@ -904,7 +898,7 @@ export default function AssetsAssignment() {
                     <td colSpan={8} className="px-5 py-16 text-center">
                       <ClipboardList
                         size={36}
-                        className="mx-auto mb-3 text-gray-300 dark:text-zinc-600"
+                        className="mx-auto mb-3 text-gray-300 dark:text-neutral-600"
                       />
                       <p className="text-base font-semibold text-gray-600 dark:text-gray-300">
                         No assignments found
@@ -918,7 +912,7 @@ export default function AssetsAssignment() {
                   assignments.map((item) => (
                     <tr
                       key={item.id}
-                      className="transition hover:bg-orange-50/50 dark:hover:bg-zinc-800/60"
+                      className="transition hover:bg-orange-50/50 dark:hover:bg-neutral-800/60"
                     >
                       <td className="max-w-[220px] px-5 py-5 font-medium">
                         {item.assetName}
@@ -967,7 +961,7 @@ export default function AssetsAssignment() {
           </div>
 
           {/* PAGINATION */}
-          <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-5 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-t border-gray-200 px-5 py-5 dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Showing {rangeStart} to {rangeEnd} of {totalAssignments} assignments
             </p>
@@ -977,7 +971,7 @@ export default function AssetsAssignment() {
                 type="button"
                 disabled={page === 1}
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
-                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800"
               >
                 <ChevronLeft size={16} />
                 Previous
@@ -1003,7 +997,7 @@ export default function AssetsAssignment() {
                       className={`size-10 rounded-lg border text-sm transition ${
                         page === number
                           ? "border-orange-600 bg-orange-600 font-bold text-white"
-                          : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+                          : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800"
                       }`}
                     >
                       {number}
@@ -1019,7 +1013,7 @@ export default function AssetsAssignment() {
                 type="button"
                 disabled={page >= totalPages}
                 onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-700 dark:text-gray-300 dark:hover:bg-neutral-800"
               >
                 Next
                 <ChevronRight size={16} />
@@ -1041,7 +1035,7 @@ export default function AssetsAssignment() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-assignment-title"
-            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
           >
             <div className="mb-6 flex items-start justify-between gap-3">
               <div>
@@ -1057,13 +1051,13 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeEdit}
                 aria-label="Close edit dialog"
-                className="cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="mb-5 rounded-lg bg-gray-50 p-4 dark:bg-zinc-800">
+            <div className="mb-5 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800">
               <p className="text-base font-semibold">{editing.assetName}</p>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 Asset Tag: {editing.assetTag}
@@ -1098,7 +1092,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeEdit}
                 disabled={editSaving}
-                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:hover:bg-neutral-800"
               >
                 Cancel
               </button>
@@ -1127,7 +1121,7 @@ export default function AssetsAssignment() {
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
           >
             <h2 className="text-xl font-bold">Delete assignment</h2>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
@@ -1147,7 +1141,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeDelete}
                 disabled={deleting}
-                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:hover:bg-neutral-800"
               >
                 Cancel
               </button>

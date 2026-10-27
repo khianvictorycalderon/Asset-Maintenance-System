@@ -152,7 +152,7 @@ const SessionRow = ({
       className={`
         flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border transition-colors
         ${session.is_current
-          ? "border-neutral-400 dark:border-neutral-500 bg-neutral-50 dark:bg-neutral-700/50"
+          ? "border-neutral-400 dark:border-neutral-500 bg-white dark:bg-neutral-700/50"
           : "border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/50"
         }
       `}
@@ -163,7 +163,7 @@ const SessionRow = ({
           mt-0.5 shrink-0 p-2 rounded-lg
           ${session.is_current
             ? "text-neutral-900 dark:text-neutral-100 bg-neutral-200 dark:bg-neutral-600"
-            : "text-neutral-500 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-700"
+            : "text-neutral-500 dark:text-neutral-400 bg-gray-50 dark:bg-neutral-700"
           }
         `}>
           <DeviceIcon device={session.device} />
@@ -175,7 +175,7 @@ const SessionRow = ({
               {browserLabel}
             </span>
             {session.is_current && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-neutral-900 dark:bg-gray-50 text-white dark:text-neutral-900">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 dark:bg-green-500 inline-block" />
                 Current
               </span>
@@ -406,8 +406,8 @@ export default function Account() {
     outline-none transition
     disabled:cursor-not-allowed
     ${disabled
-      ? "bg-neutral-100 dark:bg-neutral-800 opacity-70"
-      : "bg-white dark:bg-neutral-950 focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-500 cursor-text"
+      ? "bg-gray-50 dark:bg-neutral-900 opacity-70"
+      : "bg-white dark:bg-neutral-800 focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-500 cursor-text"
     }
   `;
 
@@ -605,7 +605,7 @@ export default function Account() {
                           className={`
                             w-8 h-8 rounded-lg text-sm font-medium transition
                             ${p === page
-                              ? "bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-900 cursor-default"
+                              ? "bg-neutral-900 text-white dark:bg-gray-50 dark:text-neutral-900 cursor-default"
                               : "border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 hover:opacity-80 cursor-pointer"
                             }
                           `}

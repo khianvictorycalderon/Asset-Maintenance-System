@@ -11,6 +11,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Assets> Assets => Set<Assets>();
     public DbSet<AssetAssignment> AssetAssignments => Set<AssetAssignment>();
     public DbSet<PersonnelAssignment> PersonnelAssignments => Set<PersonnelAssignment>();
+    public DbSet<MaintenanceTask> MaintenanceTasks => Set<MaintenanceTask>();
+    public DbSet<MaintenanceTaskAssignee> MaintenanceTaskAssignees => Set<MaintenanceTaskAssignee>();
 
       protected override void OnModelCreating(ModelBuilder modelBuilder)
       {
@@ -161,6 +163,47 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
                   entity.Property(a => a.UpdatedAt)
                         .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+            });
+
+            modelBuilder.Entity<MaintenanceTask>(entity =>
+            {
+                  entity.HasIndex(t => new { t.SupervisorId, t.DueAt });
+                  entity.HasIndex(t => t.Status);
+
+                  entity.HasOne(t => t.Supervisor)
+                        .WithMany()
+                        .HasForeignKey(t => t.SupervisorId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(t => t.AssignedBy)
+                        .WithMany()
+                        .HasForeignKey(t => t.AssignedById)
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                  entity.Property(t => t.Status)
+                        .HasDefaultValue("Pending");
+
+                  entity.Property(t => t.CreatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                  entity.Property(t => t.UpdatedAt)
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+            });
+
+            modelBuilder.Entity<MaintenanceTaskAssignee>(entity =>
+            {
+                  entity.HasKey(a => new { a.TaskId, a.PersonnelId });
+                  entity.HasIndex(a => a.PersonnelId);
+
+                  entity.HasOne(a => a.Task)
+                        .WithMany(t => t.Assignees)
+                        .HasForeignKey(a => a.TaskId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  entity.HasOne(a => a.Personnel)
+                        .WithMany()
+                        .HasForeignKey(a => a.PersonnelId)
+                        .OnDelete(DeleteBehavior.Cascade);
             });
       }
 
