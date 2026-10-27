@@ -91,7 +91,7 @@ export default function TopNav({ onMenuClick }: Props) {
             {/* Left: Hamburger */}
             <button
                 onClick={onMenuClick}
-                className="md:hidden p-2 rounded hover:bg-orange-500 dark:hover:bg-zinc-800 cursor-pointer"
+                className="md:hidden p-2 rounded hover:bg-orange-500 dark:hover:bg-neutral-800 cursor-pointer"
                 aria-label="Open sidebar"
             >
                 <svg
@@ -160,13 +160,13 @@ export default function TopNav({ onMenuClick }: Props) {
 
                 {/* Profile menu */}
                 {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden z-50">
+                    <div className="absolute right-0 mt-2 w-56 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden z-50">
 
                         {/* Account */}
                         <Link
                             to="/account"
                             onClick={closeProfileMenu}
-                            className="block px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-zinc-800 transition"
+                            className="block px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-neutral-800 transition"
                         >
                             Account
                         </Link>
@@ -174,7 +174,7 @@ export default function TopNav({ onMenuClick }: Props) {
                         {/* Theme */}
                         <button
                             onClick={() => setThemeOpen((v) => !v)}
-                            className="cursor-pointer w-full flex items-center justify-between px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-zinc-800 transition"
+                            className="cursor-pointer w-full flex items-center justify-between px-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-gray-50 dark:hover:bg-neutral-800 transition"
                         >
                             <span>Theme</span>
                             <span className="text-xs">
@@ -184,12 +184,12 @@ export default function TopNav({ onMenuClick }: Props) {
 
                         {/* Theme submenu */}
                         {themeOpen && (
-                            <div className="border-t border-neutral-200 dark:border-zinc-800 bg-neutral-50 dark:bg-zinc-950">
+                            <div className="border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
                                 {THEMES.map((t) => (
                                     <button
                                         key={t}
                                         onClick={() => changeTheme(t)}
-                                        className="cursor-pointer w-full text-left pl-6 pr-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-zinc-800 transition"
+                                        className="cursor-pointer w-full text-left pl-6 pr-3 py-2 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-orange-50 dark:hover:bg-neutral-800 transition"
                                     >
                                         {t}
                                     </button>
@@ -203,7 +203,7 @@ export default function TopNav({ onMenuClick }: Props) {
                                 closeProfileMenu();
                                 handleLogout();
                             }}
-                            className="cursor-pointer w-full text-left px-3 py-2 text-sm text-red-500 dark:text-red-400 border-t border-neutral-200 dark:border-zinc-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                            className="cursor-pointer w-full text-left px-3 py-2 text-sm text-red-500 dark:text-red-400 border-t border-neutral-200 dark:border-neutral-800 hover:bg-red-50 dark:hover:bg-red-900/20 transition"
                         >
                             Logout
                         </button>

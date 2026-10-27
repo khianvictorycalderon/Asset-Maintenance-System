@@ -19,10 +19,10 @@ const EyeIcon = ({ open }: { open: boolean }) =>
 
 const inputClass = `
   w-full px-4 py-3 rounded-xl
-  border border-zinc-300/70 dark:border-zinc-700/60
-  bg-white/80 dark:bg-zinc-800/60
-  text-zinc-900 dark:text-zinc-100
-  placeholder:text-zinc-400 dark:placeholder:text-zinc-500
+  border border-neutral-300/70 dark:border-neutral-700/60
+  bg-white/80 dark:bg-neutral-800/60
+  text-neutral-900 dark:text-neutral-100
+  placeholder:text-neutral-400 dark:placeholder:text-neutral-500
   focus:outline-none
   focus:border-orange-500
   focus:ring-2 focus:ring-orange-500/30
@@ -74,7 +74,7 @@ export default function Login() {
         w-full max-w-md space-y-6
         rounded-3xl p-8
         border border-white/30
-        bg-white/90 dark:bg-zinc-950/85
+        bg-white/90 dark:bg-neutral-950/85
         backdrop-blur-xl
         shadow-2xl shadow-orange-950/30
       ">
@@ -94,10 +94,10 @@ export default function Login() {
 
         {/* Header */}
         <div className="text-center space-y-1">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-orange-50">
+          <h1 className="text-3xl font-bold text-neutral-900 dark:text-orange-50">
             Welcome back
           </h1>
-          <p className="text-sm text-zinc-500 dark:text-orange-50/80">
+          <p className="text-sm text-neutral-500 dark:text-orange-50/80">
             Login to your account
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function Login() {
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="text-sm text-zinc-700 dark:text-orange-50">
+            <label className="text-sm text-neutral-700 dark:text-orange-50">
               Email
             </label>
             <input
@@ -122,7 +122,7 @@ export default function Login() {
 
           {/* Password */}
           <div className="space-y-1">
-            <label className="text-sm text-zinc-700 dark:text-orange-50">
+            <label className="text-sm text-neutral-700 dark:text-orange-50">
               Password
             </label>
             <div className="relative">
@@ -137,7 +137,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="mt-1 absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer transition"
+                className="mt-1 absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer transition"
                 tabIndex={-1}
               >
                 <EyeIcon open={showPassword} />
@@ -180,7 +180,7 @@ export default function Login() {
         </form>
 
         {/* Footer */}
-        <p className="text-sm text-center text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-center text-neutral-500 dark:text-neutral-400">
           Don't have an account?{" "}
           <Link
             to="/register"

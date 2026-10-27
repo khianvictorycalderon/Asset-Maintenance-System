@@ -216,6 +216,85 @@ namespace backend.Migrations
                     b.ToTable("assets");
                 });
 
+            modelBuilder.Entity("backend.Models.MaintenanceTask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("AssignedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("assigned_by");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTimeOffset>("DueAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("due_at");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("status");
+
+                    b.Property<Guid>("SupervisorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("supervisor_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("TIMEZONE('UTC', NOW())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignedById");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("SupervisorId", "DueAt");
+
+                    b.ToTable("maintenance_tasks");
+                });
+
+            modelBuilder.Entity("backend.Models.MaintenanceTaskAssignee", b =>
+                {
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("task_id");
+
+                    b.Property<Guid>("PersonnelId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("personnel_id");
+
+                    b.HasKey("TaskId", "PersonnelId");
+
+                    b.HasIndex("PersonnelId");
+
+                    b.ToTable("maintenance_task_assignees");
+                });
+
             modelBuilder.Entity("backend.Models.PersonnelAssignment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -442,6 +521,43 @@ namespace backend.Migrations
                     b.Navigation("Supervisor");
                 });
 
+            modelBuilder.Entity("backend.Models.MaintenanceTask", b =>
+                {
+                    b.HasOne("backend.Models.User", "AssignedBy")
+                        .WithMany()
+                        .HasForeignKey("AssignedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("backend.Models.User", "Supervisor")
+                        .WithMany()
+                        .HasForeignKey("SupervisorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AssignedBy");
+
+                    b.Navigation("Supervisor");
+                });
+
+            modelBuilder.Entity("backend.Models.MaintenanceTaskAssignee", b =>
+                {
+                    b.HasOne("backend.Models.User", "Personnel")
+                        .WithMany()
+                        .HasForeignKey("PersonnelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.MaintenanceTask", "Task")
+                        .WithMany("Assignees")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Personnel");
+
+                    b.Navigation("Task");
+                });
+
             modelBuilder.Entity("backend.Models.PersonnelAssignment", b =>
                 {
                     b.HasOne("backend.Models.User", "AssignedBy")
@@ -477,6 +593,11 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Models.MaintenanceTask", b =>
+                {
+                    b.Navigation("Assignees");
                 });
 
             modelBuilder.Entity("backend.Models.User", b =>

@@ -7,7 +7,6 @@ import {
   ChevronDown,
   Pencil,
   Trash2,
-  Users,
 } from "lucide-react";
 import LoadingState from "../../components/LoadingState";
 import EmptyState from "../../components/EmptyState";
@@ -116,7 +115,7 @@ const getErrorInfo = (error: unknown) => {
 };
 
 const inputClass =
-  "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
+  "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
 
 const labelClass =
   "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
@@ -429,19 +428,16 @@ export default function AssignPersonnel() {
   return (
     <div className="min-h-full w-full px-0 py-0 text-gray-800 dark:text-gray-100">
       <div className="mb-5">
-        <div className="flex items-center gap-3">
-          <Users size={23} className="text-orange-600 dark:text-orange-400" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Assign Personnel
-          </h1>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Assign Personnel
+        </h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           Assign personnel to a supervisor and manage existing assignments.
         </p>
       </div>
 
       {/* New Assignment Form */}
-      <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+      <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 sm:p-6">
         <h2 className="mb-5 text-base font-bold text-gray-900 dark:text-gray-100">
           New Assignment
         </h2>
@@ -501,7 +497,7 @@ export default function AssignPersonnel() {
             type="button"
             onClick={resetForm}
             disabled={submitting}
-            className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+            className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
           >
             Reset
           </button>
@@ -523,7 +519,7 @@ export default function AssignPersonnel() {
       </section>
 
       {/* Search and Filters */}
-      <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+      <section className="mb-5 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 sm:p-6">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           <div>
             <label className={labelClass}>Search</label>
@@ -614,7 +610,7 @@ export default function AssignPersonnel() {
             <button
               type="button"
               onClick={resetFilters}
-              className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+              className="rounded-lg bg-gray-100 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
             >
               Clear
             </button>
@@ -623,11 +619,11 @@ export default function AssignPersonnel() {
       </section>
 
       {/* Assignments Table */}
-      <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1200px] border-collapse text-left">
-            <thead className="bg-gray-50 dark:bg-zinc-800/80">
-              <tr className="border-b border-gray-200 dark:border-zinc-700">
+            <thead className="bg-gray-50 dark:bg-neutral-700/80">
+              <tr className="border-b border-gray-200 dark:border-neutral-600">
                 {[
                   "Personnel Name",
                   "Personnel Username",
@@ -665,7 +661,7 @@ export default function AssignPersonnel() {
                 </tr>
               ) : (
                 assignments.map((item) => (
-                  <tr key={item.id} className="border-b border-gray-100 even:bg-[#fafafa] hover:bg-orange-50/60 dark:border-zinc-800 dark:even:bg-zinc-900 dark:hover:bg-zinc-800/70">
+                  <tr key={item.id} className="border-b border-gray-100 even:bg-[#fafafa] hover:bg-orange-50/60 dark:border-neutral-700 dark:even:bg-neutral-800 dark:hover:bg-neutral-700/70">
                     <td className="whitespace-nowrap px-5 py-5 text-sm text-gray-800 dark:text-gray-100">{item.personnelName}</td>
                     <td className="whitespace-nowrap px-5 py-5 text-sm text-gray-500 dark:text-gray-400">{item.personnelUsername}</td>
                     <td className="whitespace-nowrap px-5 py-5 text-sm text-gray-800 dark:text-gray-100">{item.supervisorName}</td>
@@ -702,7 +698,7 @@ export default function AssignPersonnel() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col gap-3 border-t border-gray-100 px-5 py-5 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-t border-gray-100 px-5 py-5 dark:border-neutral-700 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {rangeStart} to {rangeEnd} of {totalAssignments} assignments
           </p>
@@ -712,7 +708,7 @@ export default function AssignPersonnel() {
               type="button"
               disabled={page === 1}
               onClick={() => setPage((previous) => previous - 1)}
-              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700"
             >
               Previous
             </button>
@@ -731,7 +727,7 @@ export default function AssignPersonnel() {
                     className={`h-10 min-w-10 rounded-lg border px-3 text-sm ${
                       page === number
                         ? "border-orange-600 bg-orange-600 font-bold text-white"
-                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+                        : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
                     }`}
                   >
                     {number}
@@ -747,7 +743,7 @@ export default function AssignPersonnel() {
               type="button"
               disabled={page >= totalPages}
               onClick={() => setPage((previous) => previous + 1)}
-              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-gray-300 dark:hover:bg-zinc-800"
+              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700"
             >
               Next
             </button>
@@ -764,7 +760,7 @@ export default function AssignPersonnel() {
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-600 dark:bg-neutral-800"
           >
             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
               Edit assignment
@@ -818,7 +814,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={closeEdit}
                 disabled={editSaving}
-                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
               >
                 Cancel
               </button>
@@ -844,7 +840,7 @@ export default function AssignPersonnel() {
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-600 dark:bg-neutral-800"
           >
             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
               Delete assignment
@@ -865,7 +861,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={closeDelete}
                 disabled={deleting}
-                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-800 dark:text-gray-200 dark:hover:bg-zinc-700"
+                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
               >
                 Cancel
               </button>

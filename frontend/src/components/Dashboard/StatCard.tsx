@@ -50,7 +50,7 @@ export default function DashboardStatCard({
                 group
                 rounded-2xl
                 border border-neutral-300 dark:border-neutral-600
-                bg-neutral-100 dark:bg-neutral-800
+                bg-gray-50 dark:bg-neutral-800
                 p-4 sm:p-5 lg:p-6
                 shadow-sm
                 transition-all duration-300
@@ -80,7 +80,7 @@ export default function DashboardStatCard({
                 className="
                     flex h-12 w-12 shrink-0 items-center justify-center
                     rounded-xl
-                    bg-neutral-100 text-neutral-700
+                    bg-gray-50 text-neutral-700
                     dark:bg-neutral-800 dark:text-neutral-300
                     transition-colors
                     group-hover:bg-blue-100
