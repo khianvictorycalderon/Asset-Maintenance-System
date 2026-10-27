@@ -2,14 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { BUILT_IN_API_URLS, NAVBAR_HEADER } from "../config";
+import { BUILT_IN_API_URLS, NAVBAR_HEADER, type UserRole } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
 import { clearUser } from "../slices/userSlice";
 import type { RootState } from "../config/store";
-import assetMaintenanceLogo from "/public/images/asset-maintenance-logo.png";
 
 type Props = {
     onMenuClick: () => void;
+};
+
+const PORTAL_TITLES: Record<UserRole, string> = {
+    Employee: "Office Employee Portal",
+    Admin: "Administrator Portal",
+    Supervisor: "On-Site Supervisor Portal",
+    Personnel: "Maintenance Personnel Portal",
 };
 
 export default function TopNav({ onMenuClick }: Props) {
@@ -85,8 +91,12 @@ export default function TopNav({ onMenuClick }: Props) {
         };
     }, [profileOpen]);
 
+    const portalTitle = user.role
+        ? PORTAL_TITLES[user.role]
+        : "Asset Maintenance Portal";
+
     return (
-        <nav className="h-14 flex items-center px-4 dark:border-b bg-orange-500 dark:bg-orange-600">
+        <nav className="h-16 flex items-center px-4 dark:border-b bg-orange-500 dark:bg-orange-600">
 
             {/* Left: Hamburger */}
             <button
@@ -110,14 +120,19 @@ export default function TopNav({ onMenuClick }: Props) {
             </button>
 
             {/* Title */}
-            <div className="ml-2 flex items-center gap-2 min-w-0">
+            <div className="ml-2 flex min-w-0 items-center gap-2">
            <img
-             src={assetMaintenanceLogo}
+             src="/images/asset-maintenance-logo.png"
              alt="Asset Maintenance System Logo"
-             className="h-15 w-15 object-contain shrink-0"
+             className="h-15 w-15 object-contain shrink-0 hidden lg:block"
                 />
-            <div className="ml-2 font-semibold text-white dark:text-neutral-100 truncate">
-                {NAVBAR_HEADER}
+            <div className="ml-2 min-w-0 truncate">
+                <div className="truncate text-sm font-semibold text-white dark:text-neutral-100">
+                    {portalTitle}
+                </div>
+                <div className="truncate text-xs font-medium text-orange-100/90 dark:text-neutral-200">
+                    {NAVBAR_HEADER}
+                </div>
             </div>
         </div>
 
@@ -134,7 +149,7 @@ export default function TopNav({ onMenuClick }: Props) {
                     }}
                     className="cursor-pointer flex items-center gap-2 pl-1.5 pr-2 py-1.5 rounded-lg hover:bg-orange-400 dark:hover:bg-orange-700 transition"
                 >
-                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-white text-orange-600 dark:bg-orange-500 dark:text-white text-xs font-semibold">
+                    <span className="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-neutral-50 text-orange-600 dark:bg-neutral-900 dark:text-white text-xs font-semibold">
                         {initials}
                     </span>
 
