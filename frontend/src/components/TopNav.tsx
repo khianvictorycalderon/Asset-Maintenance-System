@@ -6,7 +6,6 @@ import { BUILT_IN_API_URLS, NAVBAR_HEADER } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
 import { clearUser } from "../slices/userSlice";
 import type { RootState } from "../config/store";
-import assetMaintenanceLogo from "/public/images/asset-maintenance-logo.png";
 
 type Props = {
     onMenuClick: () => void;
@@ -112,7 +111,7 @@ export default function TopNav({ onMenuClick }: Props) {
             {/* Title */}
             <div className="ml-2 flex items-center gap-2 min-w-0">
            <img
-             src={assetMaintenanceLogo}
+             src="/images/asset-maintenance-logo.png"
              alt="Asset Maintenance System Logo"
              className="h-15 w-15 object-contain shrink-0"
                 />

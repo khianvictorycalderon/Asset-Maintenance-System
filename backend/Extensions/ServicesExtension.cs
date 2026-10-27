@@ -20,6 +20,7 @@ public static class ServicesExtension
         services.AddScoped<IEmployeeService, EmployeeService>();
         services.AddScoped<IAssignmentService, AssignmentService>();
         services.AddScoped<ISupervisorAssignedAssetsService, SupervisorAssignedAssetsService>();
+        services.AddScoped<IMaintenanceTaskService, MaintenanceTaskService>();
 
         return services;
     }

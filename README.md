@@ -1,9 +1,9 @@
 # Asset Maintenance and Monitoring System
 
 ## Members:
-- Calderon, Khian Victory D. *(Backend Developer + Database Designer & Engineer)*
-- Camunag, Dishiela Ingrid *(Frontend Designer (Frontend Developer))*
-- Metran, Rafael *(Frontend Engineer (Frontend Developer))*
+- Calderon, Khian Victory
+- Camunag, Dishiela Ingrid
+- Metran, Rafael
 
 ---
 

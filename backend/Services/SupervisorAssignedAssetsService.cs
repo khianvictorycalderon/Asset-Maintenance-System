@@ -13,8 +13,8 @@ public class SupervisorAssignedAssetsService(AppDbContext db) : ISupervisorAssig
     public async Task<GetAssignedAssetsResponseDto> GetAssignedAssets(
         Guid supervisorId, GetAssignedAssetsQueryDto query)
     {
-        var page = Math.Max(1, query.Page);
-        var pageSize = Math.Clamp(query.PageSize, 1, 100);
+        var requestedPage = Math.Max(1, query.Page);
+        var pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 100);
 
         // A supervisor only ever sees their OWN assignments
         var assignments = db.AssetAssignments
@@ -46,6 +46,7 @@ public class SupervisorAssignedAssetsService(AppDbContext db) : ISupervisorAssig
 
         var total = await assignments.CountAsync();
         var totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+        var page = Math.Min(requestedPage, totalPages);
 
         var items = await assignments
             .OrderByDescending(a => a.DateAssigned)
