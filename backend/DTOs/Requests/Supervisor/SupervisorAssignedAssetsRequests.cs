@@ -1,0 +1,22 @@
+namespace backend.DTOs.Requests;
+
+// Query parameters for GET api/supervisor/assigned-assets
+// e.g. ?keyword=cnc&category=Machinery&assignedById=...&startDate=2026-10-01&endDate=2026-10-31&page=1&pageSize=5
+public class GetAssignedAssetsQueryDto
+{
+    // Matches asset name OR asset tag
+    public string? Keyword { get; set; }
+
+    // Exact asset category (omit / empty = all categories)
+    public string? Category { get; set; }
+
+    // The Employee/Admin who made the assignment (omit = all)
+    public Guid? AssignedById { get; set; }
+
+    // "Date assigned" range, inclusive (yyyy-MM-dd)
+    public DateOnly? StartDate { get; set; }
+    public DateOnly? EndDate { get; set; }
+
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+}
