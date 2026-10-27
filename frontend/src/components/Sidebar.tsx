@@ -40,7 +40,7 @@ export default function Sidebar({ open, setOpen, collapsed, setCollapsed }: Prop
                 className={`
                     fixed md:static z-50
                     top-0 left-0 h-screen ${sidebarWidthClass}
-                    bg-neutral-100 dark:bg-neutral-800
+                    bg-neutral-50 dark:bg-neutral-800
                     flex flex-col
                     overflow-y-auto
                     transform transition-all duration-200
