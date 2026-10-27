@@ -3,7 +3,7 @@ import { FOOTER_BUTTONS } from "../config";
 
 export default function Footer() {
   return (
-    <footer className="bg-neutral-100 dark:bg-neutral-900 text-black dark:text-white">
+    <footer className="bg-gray-50 dark:bg-neutral-900 text-black dark:text-white">
 
       <div className="max-w-6xl mx-auto px-6 py-12">
 
@@ -44,7 +44,7 @@ export default function Footer() {
             © {new Date().getFullYear()} Asset Maintenance and Monitoring System. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-4 text-sm text-white/70 dark:text-zinc-500">
+          <div className="flex items-center gap-4 text-sm text-white/70 dark:text-neutral-500">
             <Link
               to="/privacy-policy"
               className="text-black dark:text-white transition"

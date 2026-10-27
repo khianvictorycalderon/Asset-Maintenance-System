@@ -120,10 +120,10 @@ export default function Register() {
 
     const baseInputClass = `
       w-full px-3 py-2 rounded-md
-      border border-zinc-300/70 dark:border-zinc-700/60
-      bg-white/70 dark:bg-zinc-900/80
-      text-zinc-900 dark:text-zinc-100
-      placeholder:text-zinc-400 dark:placeholder:text-zinc-500
+      border border-neutral-300/70 dark:border-neutral-700/60
+      bg-white/70 dark:bg-neutral-900/80
+      text-neutral-900 dark:text-neutral-100
+      placeholder:text-neutral-400 dark:placeholder:text-neutral-500
       focus:outline-none
       focus:ring-2 focus:ring-orange-500/30
       focus:border-orange-500
@@ -155,7 +155,7 @@ export default function Register() {
         <div className="
           relative z-10
           w-full max-w-2xl space-y-6
-          bg-white/95 dark:bg-zinc-950/95
+          bg-white/95 dark:bg-neutral-950/95
           backdrop-blur-xl
           border border-white/30
           rounded-3xl p-8
@@ -172,17 +172,17 @@ export default function Register() {
 
           {/* Header */}
           <div className="text-center space-y-1">
-            <h1 className="text-3xl font-bold text-zinc-900 dark:text-orange-50">
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-orange-50">
               Create account
             </h1>
-            <p className="text-sm text-zinc-500 dark:text-orange-50/80">
+            <p className="text-sm text-neutral-500 dark:text-orange-50/80">
               Fill in your details
             </p>
           </div>
 
           {/* Role Selection */}
           <div className="space-y-3">
-          <label className="text-sm font-medium text-zinc-700 dark:text-orange-100">
+          <label className="text-sm font-medium text-neutral-700 dark:text-orange-100">
              Select your role
           </label>
 
@@ -204,7 +204,7 @@ export default function Register() {
           ${
             role === item.id
               ? "bg-orange-600 dark:bg-orange-700 text-white border-orange-600 dark:border-orange-600 shadow-lg shadow-orange-900/30"
-              : "bg-white dark:bg-zinc-900 text-zinc-700 dark:text-orange-100 border-zinc-200 dark:border-zinc-700 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-zinc-800"
+              : "bg-white dark:bg-neutral-900 text-neutral-700 dark:text-orange-100 border-neutral-200 dark:border-neutral-700 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-neutral-800"
           }
         `}
       >
@@ -231,7 +231,7 @@ export default function Register() {
               {REGISTER_FIELDS.map((field) => (
                 <div key={field.id} className="space-y-1">
 
-                  <label className="text-sm font-medium text-zinc-700 dark:text-orange-200">
+                  <label className="text-sm font-medium text-neutral-700 dark:text-orange-200">
                     {field.label}
                   </label>
 
@@ -250,7 +250,7 @@ export default function Register() {
                       <button
                         type="button"
                         onClick={() => toggleShow(field.id)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 cursor-pointer transition"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200 cursor-pointer transition"
                         tabIndex={-1}
                       >
                         <EyeIcon open={!!showPassword[field.id]} />
@@ -271,7 +271,7 @@ export default function Register() {
                   )}
 
                   {field.id === "password" && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
                       Min 8 chars, uppercase, lowercase, number, special character.
                     </p>
                   )}
@@ -328,7 +328,7 @@ export default function Register() {
           </form>
 
           {/* Footer */}
-          <p className="text-sm text-center text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-center text-neutral-500 dark:text-neutral-400">
             Already have an account?{" "}
             <Link to="/login" className="text-orange-600 hover:text-orange-700 hover:underline">
               Login

@@ -176,7 +176,7 @@ export default function DashboardChart({
               className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition ${
                 chartType === type
                   ? "bg-blue-600 text-white"
-                  : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
+                  : "bg-gray-50 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
               }`}
             >
               {type}
