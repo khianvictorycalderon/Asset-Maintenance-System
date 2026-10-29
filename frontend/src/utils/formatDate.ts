@@ -21,3 +21,10 @@ export function isPastDue(value: string): boolean {
   const date = new Date(value);
   return !Number.isNaN(date.getTime()) && date.getTime() < Date.now();
 }
+
+// "2026-10-16" -> "10/16/2026"
+export function formatDateOnly(value: string): string {
+  if (!value) return "—";
+  const [year, month, day] = value.split("-");
+  return `${month}/${day}/${year}`;
+}
