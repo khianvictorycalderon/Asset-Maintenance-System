@@ -115,10 +115,10 @@ const getErrorInfo = (error: unknown) => {
 };
 
 const inputClass =
-  "w-full min-w-0 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
+  "w-full min-w-0 rounded-lg border border-neutral-200 bg-transparent px-4 py-3 text-sm text-neutral-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
 
 const labelClass =
-  "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
+  "mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300";
 
 // "2026-10-16" -> "10/16/2026"
 function formatDate(date: string) {
@@ -754,18 +754,18 @@ export default function AssignPersonnel() {
       {/* Edit modal */}
       {editTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4"
           onMouseDown={(e) => e.target === e.currentTarget && closeEdit()}
         >
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-600 dark:bg-neutral-800"
+            className="w-full max-w-md rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-neutral-900 shadow-xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
           >
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
               Edit assignment
             </h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
               Move this personnel to another supervisor.
             </p>
 
@@ -798,7 +798,7 @@ export default function AssignPersonnel() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown size={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <ChevronDown size={18} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500" />
                 </div>
               </div>
             </div>
@@ -814,7 +814,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={closeEdit}
                 disabled={editSaving}
-                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
+                className="rounded-lg bg-neutral-200 px-5 py-2.5 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-600"
               >
                 Cancel
               </button>
@@ -822,7 +822,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={handleEditSave}
                 disabled={editSaving || editSupervisor === editTarget.supervisorId}
-                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-neutral-50 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {editSaving ? "Saving..." : "Update"}
               </button>
@@ -834,18 +834,18 @@ export default function AssignPersonnel() {
       {/* Delete confirmation modal */}
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4"
           onMouseDown={(e) => e.target === e.currentTarget && closeDelete()}
         >
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-xl dark:border-neutral-600 dark:bg-neutral-800"
+            className="w-full max-w-md rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-neutral-900 shadow-xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
           >
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-50">
               Delete assignment
             </h3>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
               Remove <span className="font-semibold">{deleteTarget.personnelName}</span> from{" "}
               <span className="font-semibold">{deleteTarget.supervisorName}</span>? This can't be undone.
             </p>
@@ -861,7 +861,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={closeDelete}
                 disabled={deleting}
-                className="rounded-lg bg-gray-100 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-700"
+                className="rounded-lg bg-neutral-200 px-5 py-2.5 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-600"
               >
                 Cancel
               </button>
@@ -869,7 +869,7 @@ export default function AssignPersonnel() {
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={deleting}
-                className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-neutral-50 transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleting ? "Deleting..." : "Delete"}
               </button>

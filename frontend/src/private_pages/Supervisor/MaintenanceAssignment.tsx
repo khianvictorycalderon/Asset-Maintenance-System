@@ -78,8 +78,8 @@ const EMPTY_FILTERS: TaskFilters = {
 };
 
 const fieldClass =
-  "w-full rounded-lg border border-neutral-200 px-3 py-2.5 text-sm text-gray-800 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-100 dark:focus:ring-orange-950";
-const labelClass = "mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-300";
+  "w-full rounded-lg border border-neutral-200 bg-transparent px-3 py-2.5 text-sm text-neutral-800 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:focus:ring-orange-950";
+const labelClass = "mb-1.5 block text-xs font-medium text-neutral-600 dark:text-neutral-300";
 
 function getErrorInfo(error: unknown) {
   if (!axios.isAxiosError(error)) return { message: "Something went wrong.", status: undefined };
@@ -686,33 +686,33 @@ export default function MaintenanceAssignment() {
       </section>
 
       {editTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
-          <form onSubmit={(event) => void saveTask(event, true)} className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl dark:border-2 dark:border-neutral-600 bg-neutral-50 p-5 shadow-2xl dark:bg-neutral-900 sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4" role="dialog" aria-modal="true" aria-labelledby="edit-task-title">
+          <form onSubmit={(event) => void saveTask(event, true)} className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-neutral-200 bg-neutral-50 p-5 text-neutral-900 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 sm:p-6">
             <div className="mb-5 flex items-center justify-between">
               <h2 id="edit-task-title" className="text-lg font-bold">Edit Maintenance Task</h2>
-              <button type="button" onClick={() => setEditTarget(null)} disabled={editSaving} aria-label="Close edit dialog"><X size={20} /></button>
+              <button type="button" onClick={() => setEditTarget(null)} disabled={editSaving} aria-label="Close edit dialog" className="rounded-lg p-1 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 disabled:opacity-50 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-50"><X size={20} /></button>
             </div>
             <div className="space-y-4">{TaskFields(true)}</div>
             {editError && <p role="alert" className="mt-3 text-sm text-red-600">{editError}</p>}
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setEditTarget(null)} disabled={editSaving} className="rounded-lg bg-gray-100 px-4 py-2 text-sm dark:bg-neutral-800">Cancel</button>
-              <button type="submit" disabled={editSaving} className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{editSaving ? "Saving..." : "Save Changes"}</button>
+              <button type="button" onClick={() => setEditTarget(null)} disabled={editSaving} className="rounded-lg bg-neutral-200 px-4 py-2 text-sm text-neutral-800 transition hover:bg-neutral-300 disabled:opacity-50 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-600">Cancel</button>
+              <button type="submit" disabled={editSaving} className="rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-neutral-50 disabled:opacity-50">{editSaving ? "Saving..." : "Save Changes"}</button>
             </div>
           </form>
         </div>
       )}
 
       {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-task-title">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl dark:bg-neutral-900">
-            <h2 id="delete-task-title" className="text-lg font-bold">Delete Maintenance Task</h2>
-            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4" role="dialog" aria-modal="true" aria-labelledby="delete-task-title">
+          <div className="w-full max-w-md rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-neutral-900 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50">
+            <h2 id="delete-task-title" className="text-lg font-bold text-neutral-900 dark:text-neutral-50">Delete Maintenance Task</h2>
+            <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
               Delete “{deleteTarget.name}”? This will remove its assignments and cannot be undone.
             </p>
             {deleteError && <p role="alert" className="mt-3 text-sm text-red-600">{deleteError}</p>}
             <div className="mt-6 flex justify-end gap-2">
-              <button type="button" onClick={() => setDeleteTarget(null)} disabled={deleting} className="rounded-lg bg-gray-100 px-4 py-2 text-sm dark:bg-neutral-800">Cancel</button>
-              <button type="button" onClick={() => void confirmDelete()} disabled={deleting} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">{deleting ? "Deleting..." : "Delete Task"}</button>
+              <button type="button" onClick={() => setDeleteTarget(null)} disabled={deleting} className="rounded-lg bg-neutral-200 px-4 py-2 text-sm text-neutral-800 transition hover:bg-neutral-300 disabled:opacity-50 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-600">Cancel</button>
+              <button type="button" onClick={() => void confirmDelete()} disabled={deleting} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-neutral-50 disabled:opacity-50">{deleting ? "Deleting..." : "Delete Task"}</button>
             </div>
           </div>
         </div>

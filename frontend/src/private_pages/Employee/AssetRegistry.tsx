@@ -121,13 +121,13 @@ const getErrorInfo = (error: unknown) => {
 };
 
 const fieldClass =
-  "w-full rounded-lg border border-gray-300 bg-neutral-50 px-3 py-2 text-sm text-gray-800 outline-none placeholder:text-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-gray-100 dark:placeholder:text-neutral-400";
+  "w-full rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-100 dark:placeholder:text-neutral-400";
 
 const labelClass =
-  "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-200";
+  "mb-1.5 block text-sm font-medium text-neutral-700 dark:text-neutral-200";
 
 const buttonSecondary =
-  "rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-200 dark:bg-neutral-700 dark:text-gray-100 dark:hover:bg-neutral-600";
+  "rounded-lg bg-neutral-200 px-4 py-2 text-sm font-medium text-neutral-800 transition hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-50 dark:hover:bg-neutral-600";
 
 function StatusBadge({ status }: { status: AssetStatus }) {
   const styles: Record<AssetStatus, string> = {
@@ -1027,7 +1027,7 @@ export default function AssetRegistryPage() {
       {/* Edit Asset Popup */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-neutral-950/60 p-4 backdrop-blur-sm"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget && !isUpdating) closeEditModal();
           }}
@@ -1036,17 +1036,17 @@ export default function AssetRegistryPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-asset-title"
-            className="my-auto w-full max-w-3xl rounded-2xl border border-gray-200 bg-neutral-50 p-5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-6"
+            className="my-auto w-full max-w-3xl rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-neutral-900 shadow-xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 sm:p-6"
           >
-            <div className="mb-4 flex items-start justify-between gap-3 border-b border-gray-200 pb-3 dark:border-neutral-700">
+            <div className="mb-4 flex items-start justify-between gap-3 border-b border-neutral-200 pb-3 dark:border-neutral-700">
               <div>
                 <h2
                   id="edit-asset-title"
-                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                  className="text-lg font-semibold text-neutral-900 dark:text-neutral-50"
                 >
                   Edit Asset
                 </h2>
-                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
                   Update the asset details, then save your changes.
                 </p>
               </div>
@@ -1056,7 +1056,7 @@ export default function AssetRegistryPage() {
                 onClick={closeEditModal}
                 disabled={isUpdating}
                 aria-label="Close"
-                className="cursor-pointer rounded-lg p-1.5 text-xl leading-none text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-neutral-800 dark:hover:text-gray-200"
+                className="cursor-pointer rounded-lg p-1.5 text-xl leading-none text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-50"
               >
                 ×
               </button>
@@ -1079,7 +1079,7 @@ export default function AssetRegistryPage() {
                 </p>
               )}
 
-              <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-700">
+              <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
                 <button
                   type="button"
                   onClick={closeEditModal}
@@ -1092,7 +1092,7 @@ export default function AssetRegistryPage() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-900"
+                  className="cursor-pointer rounded-lg bg-orange-600 px-5 py-2 text-sm font-semibold text-neutral-50 transition hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-800"
                 >
                   {isUpdating ? "Saving..." : "Save Changes"}
                 </button>
@@ -1104,7 +1104,7 @@ export default function AssetRegistryPage() {
       {/* Delete Asset Popup */}
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-neutral-950/60 p-4 backdrop-blur-sm"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) closeDelete();
           }}
@@ -1113,16 +1113,16 @@ export default function AssetRegistryPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-asset-title"
-            className="my-auto w-full max-w-md rounded-2xl border border-gray-200 bg-neutral-50 p-5 shadow-xl dark:border-neutral-700 dark:bg-neutral-900 sm:p-6"
+            className="my-auto w-full max-w-md rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-neutral-900 shadow-xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50 sm:p-6"
           >
             <h2
               id="delete-asset-title"
-              className="text-lg font-semibold text-gray-900 dark:text-white"
+              className="text-lg font-semibold text-neutral-900 dark:text-neutral-50"
             >
               Delete Asset
             </h2>
 
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
               Are you sure you want to delete{" "}
               <span className="font-semibold">{deleteTarget.name}</span> (
               {deleteTarget.tag})? This can't be undone.
@@ -1137,7 +1137,7 @@ export default function AssetRegistryPage() {
               </p>
             )}
 
-            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-gray-200 pt-4 dark:border-neutral-700">
+            <div className="mt-5 flex flex-wrap justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
               <button
                 type="button"
                 onClick={closeDelete}
@@ -1151,7 +1151,7 @@ export default function AssetRegistryPage() {
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={!!deletingId}
-                className="cursor-pointer rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-900"
+                className="cursor-pointer rounded-lg bg-red-600 px-5 py-2 text-sm font-semibold text-neutral-50 transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-neutral-800"
               >
                 {deletingId ? "Deleting..." : "Delete"}
               </button>

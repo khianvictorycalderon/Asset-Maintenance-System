@@ -40,12 +40,6 @@ public class AdminController(IAdminService _adminService) : ControllerBase
     public async Task<IActionResult> ToggleAccessRevocation([FromRoute] Guid userId)
         => Ok(await _adminService.UpdateRevocationStatus(userId));
 
-    [HttpPatch("api/admin/users/{userId}/role-update")]
-    [Audit("Update user role")]
-    public async Task<IActionResult> UpdateRole(
-        [FromRoute] Guid userId, [FromBody] UpdateRoleRequestDto request)
-        => Ok(await _adminService.UpdateRole(userId, request));
-
     [HttpPatch("api/admin/users/{userId}/password-change")]
     [Audit("Change user password")]
     public async Task<IActionResult> ChangePassword(
