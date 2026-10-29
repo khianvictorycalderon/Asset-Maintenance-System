@@ -144,10 +144,10 @@ function formatDate(date: string) {
 }
 
 const inputClass =
-  "w-full min-w-0 rounded-lg border border-gray-200 bg-neutral-50 px-4 py-3 text-sm text-gray-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-700 dark:text-gray-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
+  "w-full min-w-0 rounded-lg border border-neutral-200 bg-transparent px-4 py-3 text-sm text-neutral-700 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-700 dark:text-neutral-200 dark:focus:border-orange-500 dark:focus:ring-orange-950";
 
 const labelClass =
-  "mb-2 block text-sm font-medium text-gray-600 dark:text-gray-300";
+  "mb-2 block text-sm font-medium text-neutral-600 dark:text-neutral-300";
 
 export default function AssetsAssignment() {
   const navigate = useNavigate();
@@ -1026,7 +1026,7 @@ export default function AssetsAssignment() {
       {/* EDIT ASSIGNMENT MODAL */}
       {editing && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeEdit();
           }}
@@ -1035,14 +1035,14 @@ export default function AssetsAssignment() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-assignment-title"
-            className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
+            className="w-full max-w-lg rounded-2xl border border-neutral-200 bg-neutral-50 p-7 text-neutral-900 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
           >
             <div className="mb-6 flex items-start justify-between gap-3">
               <div>
                 <h2 id="edit-assignment-title" className="text-xl font-bold">
                   Edit Assignment
                 </h2>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                   Update the supervisor responsible for this asset.
                 </p>
               </div>
@@ -1051,15 +1051,15 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeEdit}
                 aria-label="Close edit dialog"
-                className="cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-neutral-800"
+                className="cursor-pointer rounded-lg p-2 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
               >
                 <X size={20} />
               </button>
             </div>
 
-            <div className="mb-5 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800">
+            <div className="mb-5 rounded-lg bg-neutral-100 p-4 dark:bg-neutral-700">
               <p className="text-base font-semibold">{editing.assetName}</p>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
                 Asset Tag: {editing.assetTag}
               </p>
             </div>
@@ -1092,7 +1092,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeEdit}
                 disabled={editSaving}
-                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                className="cursor-pointer rounded-lg border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
               >
                 Cancel
               </button>
@@ -1101,7 +1101,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={handleEditSave}
                 disabled={editSaving || editSupervisor === editing.supervisorId}
-                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer rounded-lg bg-orange-600 px-5 py-3 text-sm font-semibold text-neutral-50 hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {editSaving ? "Saving..." : "Save Changes"}
               </button>
@@ -1113,7 +1113,7 @@ export default function AssetsAssignment() {
       {/* DELETE CONFIRMATION MODAL */}
       {deleteTarget && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/60 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) closeDelete();
           }}
@@ -1121,10 +1121,10 @@ export default function AssetsAssignment() {
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-2xl dark:border-neutral-700 dark:bg-neutral-900"
+            className="w-full max-w-md rounded-2xl border border-neutral-200 bg-neutral-50 p-7 text-neutral-900 shadow-2xl dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-50"
           >
-            <h2 className="text-xl font-bold">Delete assignment</h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-neutral-50">Delete assignment</h2>
+            <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
               Remove <span className="font-semibold">{deleteTarget.assetName}</span>{" "}
               ({deleteTarget.assetTag}) from{" "}
               <span className="font-semibold">{deleteTarget.supervisorName}</span>? This can't be undone.
@@ -1141,7 +1141,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={closeDelete}
                 disabled={deleting}
-                className="cursor-pointer rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                className="cursor-pointer rounded-lg border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700"
               >
                 Cancel
               </button>
@@ -1149,7 +1149,7 @@ export default function AssetsAssignment() {
                 type="button"
                 onClick={handleDeleteConfirm}
                 disabled={deleting}
-                className="cursor-pointer rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="cursor-pointer rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-neutral-50 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {deleting ? "Deleting..." : "Delete"}
               </button>

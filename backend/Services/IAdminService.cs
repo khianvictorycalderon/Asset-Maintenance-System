@@ -7,8 +7,6 @@ public interface IAdminService
 
     Task<UpdateRevocationAccessResponseDto> UpdateRevocationStatus(Guid userId);
 
-    Task<UpdateRoleResponseDto> UpdateRole(Guid userId, UpdateRoleRequestDto request);
-
     Task<string> ChangePassword(Guid userId, ChangePasswordRequestDto request, Guid actorId, Guid? currentSessionId);
 
     Task<GetActivityLogsResponseDto> GetActivityLogs(int page, int pageSize);

@@ -83,17 +83,6 @@ const AdminUsersRoles = () => {
     useState<string | null>(null);
 
   // =========================
-  // ROLE MODAL
-  // =========================
-  const [roleModalOpen, setRoleModalOpen] =
-    useState(false);
-
-  const [selectedRole, setSelectedRole] =
-    useState<Exclude<UserRole, "Admin">>(
-      "Employee"
-    );
-
-  // =========================
   // PASSWORD MODAL
   // =========================
   const [passwordModalOpen, setPasswordModalOpen] =
@@ -276,75 +265,6 @@ const AdminUsersRoles = () => {
 
     } finally {
       setLoadingId(null);
-    }
-  };
-
-  // =========================
-  // OPEN UPDATE ROLE MODAL
-  // =========================
-
-  const openRoleModal = (user: User) => {
-
-    // Admin accounts cannot have their role changed
-    if (user.role === "Admin") return;
-
-    setSelectedUser(user);
-    setSelectedRole(user.role as Exclude<UserRole, "Admin">);
-    setModalError("");
-    setRoleModalOpen(true);
-  };  
-
-  // =========================
-  // UPDATE ROLE
-  // =========================
-
-  // True when the selected role equals the current role (backend returns 400 for this)
-  const roleUnchanged =
-    selectedUser !== null && selectedUser.role === selectedRole;
-
-  const handleUpdateRole = async () => {
-
-    if (!selectedUser || modalLoading || roleUnchanged) return;
-
-    setModalLoading(true);
-    setModalError("");
-
-    try {
-      const response = await axios.patch<{
-        role: UserRole;
-        message: string;
-      }>(
-        `${API_URLS.Admin}/users/${selectedUser.id}/role-update`,
-        { role: selectedRole },
-        { withCredentials: true }
-      );
-
-      const { role, message } = response.data;
-
-      setUsers((currentUsers) =>
-        currentUsers.map((user) =>
-          user.id === selectedUser.id
-            ? { ...user, role }
-            : user
-        )
-      );
-
-      setToast({ type: "success", message });
-      setRoleModalOpen(false);
-      setSelectedUser(null);
-
-    } catch (error: unknown) {
-      const { message, status } = getErrorInfo(error);
-
-      setModalError(message);
-      setToast({ type: "error", message });
-
-      if (status === 404 || status === 409) {
-        fetchUsers(currentPage);
-      }
-
-    } finally {
-      setModalLoading(false);
     }
   };
 
@@ -601,21 +521,6 @@ const AdminUsersRoles = () => {
                               : "Undo Revoke"}
                           </button>
 
-                          {/* UPDATE ROLE */}
-                          <button
-                            type="button"
-                            disabled={isAdmin}
-                            title={
-                              isAdmin
-                                ? "Admin accounts can't be modified"
-                                : "Update user role"
-                            }
-                            onClick={() => openRoleModal(user)}
-                            className="cursor-pointer rounded-lg bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            Update Role
-                          </button>
-
                           {/* CHANGE PASSWORD */}
                           <button
                             type="button"
@@ -765,173 +670,6 @@ const AdminUsersRoles = () => {
       </div>
 
       {/* ==================================================
-          UPDATE ROLE MODAL
-      ================================================== */}
-      <Modal
-        isOpen={roleModalOpen}
-        title="Update Role"
-        onClose={() => {
-
-          if (!modalLoading) {
-
-            setRoleModalOpen(false);
-            setModalError("");
-
-          }
-
-        }}
-      >
-
-        {selectedUser && (
-
-          <div className="space-y-5">
-
-            {/* USER INFORMATION */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800/50">
-
-              <p className="font-medium text-neutral-900 dark:text-white">
-
-                {selectedUser.firstName}{" "}
-
-                {selectedUser.middleName
-                  ? `${selectedUser.middleName} `
-                  : ""}
-
-                {selectedUser.lastName}
-
-              </p>
-
-              <p className="mt-1 truncate text-sm text-neutral-500 dark:text-gray-400">
-                {selectedUser.email}
-              </p>
-
-            </div>
-
-            {/* ROLE SELECT */}
-            <div>
-
-              <label
-                htmlFor="user-role"
-                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
-              >
-                Role
-              </label>
-
-              <select
-                id="user-role"
-                value={selectedRole}
-                onChange={(e) =>
-                  setSelectedRole(
-                    e.target.value as Exclude<
-                      UserRole,
-                      "Admin"
-                    >
-                  )
-                }
-                disabled={modalLoading}
-                className="
-                  w-full
-                  rounded-lg
-                  border border-neutral-300 dark:border-gray-700
-                  bg-white dark:bg-gray-800
-                  px-3 py-2.5
-                  text-neutral-900 dark:text-white
-                  outline-none
-                  focus:border-green-500
-                "
-              >
-
-                <option value="Employee">
-                  Office Employee
-                </option>
-
-                <option value="Supervisor">
-                  Maintenance Supervisor
-                </option>
-
-                <option value="Personnel">
-                  On-Site Personnel
-                </option>
-
-              </select>
-
-            </div>
-
-            {/* ERROR MESSAGE */}
-            {modalError && (
-
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
-                {modalError}
-              </div>
-
-            )}
-
-            {/* BUTTONS */}
-            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-
-              <button
-                type="button"
-                disabled={modalLoading}
-                onClick={() => {
-
-                  setRoleModalOpen(false);
-                  setModalError("");
-
-                }}
-                className="
-                  cursor-pointer
-                  rounded-lg
-                  border border-neutral-300 dark:border-gray-700
-                  px-4 py-2.5
-                  text-sm font-medium
-                  text-neutral-700 dark:text-gray-300
-                  transition
-                  hover:bg-gray-50 dark:hover:bg-gray-800
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                "
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                disabled={modalLoading || roleUnchanged}
-                onClick={handleUpdateRole}
-                className="
-                  flex cursor-pointer items-center
-                  justify-center gap-2
-                  rounded-lg
-                  bg-green-600
-                  px-4 py-2.5
-                  text-sm font-medium
-                  text-white
-                  transition
-                  hover:bg-green-500
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                "
-              >
-
-                {modalLoading && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                )}
-
-                {modalLoading
-                  ? "Updating..."
-                  : "Update Role"}
-
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
-
-      </Modal>
-
-      {/* ==================================================
           CHANGE PASSWORD MODAL
       ================================================== */}
       <Modal
@@ -956,9 +694,9 @@ const AdminUsersRoles = () => {
           <div className="space-y-5">
 
             {/* USER INFORMATION */}
-            <div className="rounded-lg border border-neutral-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800/50">
+            <div className="rounded-lg border border-neutral-200 bg-neutral-100 p-3 dark:border-neutral-700 dark:bg-neutral-700">
 
-              <p className="font-medium text-neutral-900 dark:text-white">
+              <p className="font-medium text-neutral-900 dark:text-neutral-50">
 
                 {selectedUser.firstName}{" "}
 
@@ -970,7 +708,7 @@ const AdminUsersRoles = () => {
 
               </p>
 
-              <p className="mt-1 truncate text-sm text-neutral-500 dark:text-gray-400">
+              <p className="mt-1 truncate text-sm text-neutral-500 dark:text-neutral-400">
                 {selectedUser.email}
               </p>
 
@@ -981,7 +719,7 @@ const AdminUsersRoles = () => {
 
               <label
                 htmlFor="new-password"
-                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
+                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
                 New Password
               </label>
@@ -1004,13 +742,13 @@ const AdminUsersRoles = () => {
                   className="
                     w-full
                     rounded-lg
-                    border border-neutral-300 dark:border-gray-700
-                    bg-white dark:bg-gray-800
+                    border border-neutral-300 dark:border-neutral-600
+                    bg-transparent dark:bg-neutral-700
                     px-3 py-2.5
                     pr-16
-                    text-neutral-900 dark:text-white
+                    text-neutral-900 dark:text-neutral-50
                     outline-none
-                    placeholder:text-gray-500
+                    placeholder:text-neutral-500
                     focus:border-green-500
                   "
                 />
@@ -1029,8 +767,8 @@ const AdminUsersRoles = () => {
                     -translate-y-1/2
                     cursor-pointer
                     text-xs
-                    text-neutral-500 dark:text-gray-400
-                    hover:text-neutral-900 dark:hover:text-white
+                    text-neutral-500 dark:text-neutral-400
+                    hover:text-neutral-900 dark:hover:text-neutral-50
                   "
                 >
                   {showNewPassword
@@ -1040,7 +778,7 @@ const AdminUsersRoles = () => {
 
               </div>
 
-              <p className="mt-1.5 text-xs text-gray-500">
+              <p className="mt-1.5 text-xs text-neutral-500">
                 At least 8 characters
               </p>
 
@@ -1051,7 +789,7 @@ const AdminUsersRoles = () => {
 
               <label
                 htmlFor="confirm-password"
-                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-gray-300"
+                className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300"
               >
                 Confirm New Password
               </label>
@@ -1076,13 +814,13 @@ const AdminUsersRoles = () => {
                   className="
                     w-full
                     rounded-lg
-                    border border-neutral-300 dark:border-gray-700
-                    bg-white dark:bg-gray-800
+                    border border-neutral-300 dark:border-neutral-600
+                    bg-transparent dark:bg-neutral-700
                     px-3 py-2.5
                     pr-16
-                    text-neutral-900 dark:text-white
+                    text-neutral-900 dark:text-neutral-50
                     outline-none
-                    placeholder:text-gray-500
+                    placeholder:text-neutral-500
                     focus:border-green-500
                   "
                 />
@@ -1101,8 +839,8 @@ const AdminUsersRoles = () => {
                     -translate-y-1/2
                     cursor-pointer
                     text-xs
-                    text-neutral-500 dark:text-gray-400
-                    hover:text-neutral-900 dark:hover:text-white
+                    text-neutral-500 dark:text-neutral-400
+                    hover:text-neutral-900 dark:hover:text-neutral-50
                   "
                 >
                   {showConfirmPassword
@@ -1140,12 +878,12 @@ const AdminUsersRoles = () => {
                 className="
                   cursor-pointer
                   rounded-lg
-                  border border-neutral-300 dark:border-gray-700
+                  border border-neutral-300 dark:border-neutral-600
                   px-4 py-2.5
                   text-sm font-medium
-                  text-neutral-700 dark:text-gray-300
+                  text-neutral-700 dark:text-neutral-300
                   transition
-                  hover:bg-gray-50 dark:hover:bg-gray-800
+                  hover:bg-neutral-100 dark:hover:bg-neutral-700
                   disabled:cursor-not-allowed
                   disabled:opacity-50
                 "
@@ -1164,7 +902,7 @@ const AdminUsersRoles = () => {
                   bg-green-600
                   px-4 py-2.5
                   text-sm font-medium
-                  text-white
+                  text-neutral-50
                   transition
                   hover:bg-green-500
                   disabled:cursor-not-allowed
@@ -1173,7 +911,7 @@ const AdminUsersRoles = () => {
               >
 
                 {modalLoading && (
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-50/30 border-t-neutral-50" />
                 )}
 
                 {modalLoading

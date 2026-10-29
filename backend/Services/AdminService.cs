@@ -15,15 +15,11 @@ public class AdminService(AppDbContext db, AuditContext audit, IHubContext<SyncH
     // ----------------------------------------------------------------
     // Static variables
     // ----------------------------------------------------------------
-    private static readonly string[] AssignableRoles = ["Employee", "Supervisor", "Personnel"];
-
     private static (int Page, int PageSize) Normalize(int page, int pageSize) =>
         (Math.Max(page, 1), pageSize < 1 ? 10 : Math.Min(pageSize, 100));
 
     private static int TotalPagesOf(int total, int pageSize) =>
         Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
-
-    private static string Trunc(string s, int max = 30) => s.Length <= max ? s : s[..max];
 
     private static string Describe(User u) =>
         $"{u.FirstName} {u.LastName} ({u.Email})";
@@ -112,58 +108,6 @@ public class AdminService(AppDbContext db, AuditContext audit, IHubContext<SyncH
             Message = isUserBanned
                 ? "User access revoked successfully."
                 : "User access restored successfully."
-        };
-    }
-
-    // ----------------------------------------------------------------
-    // PATCH role-update
-    // ----------------------------------------------------------------
-    public async Task<UpdateRoleResponseDto> UpdateRole(Guid userId, UpdateRoleRequestDto request)
-    {
-        var user = await FindTargetAsync(userId);
-        var role = request.Role?.Trim();
-
-        if (string.IsNullOrWhiteSpace(role))
-            throw new BadRequestException("Role is required.");
-
-        if (!AssignableRoles.Contains(role))
-        {
-            audit.Details = $"Attempted to set invalid role '{Trunc(role)}' on {Describe(user)}";
-            throw new BadRequestException("Invalid role. Allowed roles: Employee, Supervisor, Personnel.");
-        }
-
-        if (user.Role == "Admin")
-            throw new BadRequestException("The role of an Admin account cannot be changed.");
-
-        if (user.Role == role)
-            throw new BadRequestException($"User already has the role '{role}'.");
-
-        var oldRole = user.Role;
-        user.Role = role;
-        user.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
-
-        // Assignments only make sense for the role they were made for - drop the ones that no longer apply
-        var removedAssets = 0;
-        var removedPersonnel = 0;
-        if (oldRole == "Supervisor")
-        {
-            removedAssets = await db.AssetAssignments.Where(a => a.SupervisorId == user.Id).ExecuteDeleteAsync();
-            removedPersonnel = await db.PersonnelAssignments.Where(a => a.SupervisorId == user.Id).ExecuteDeleteAsync();
-        }
-        else if (oldRole == "Personnel")
-        {
-            removedPersonnel = await db.PersonnelAssignments.Where(a => a.PersonnelId == user.Id).ExecuteDeleteAsync();
-        }
-
-        audit.Details = $"Changed role of {Describe(user)} from {oldRole} to {role}";
-        if (removedAssets + removedPersonnel > 0)
-            audit.Details += $" (removed {removedAssets} asset and {removedPersonnel} personnel assignment(s))";
-
-        return new UpdateRoleResponseDto
-        {
-            Role = role,
-            Message = "User role updated successfully."
         };
     }
 
