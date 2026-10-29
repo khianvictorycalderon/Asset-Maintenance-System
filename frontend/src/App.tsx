@@ -68,6 +68,7 @@ import MaintenanceSchedule from "./private_pages/Supervisor/MaintenanceSchedule"
 
 // Personnel pages
 import MaintenanceTasks from "./private_pages/Personnel/MaintenanceTasks";
+import AssetList from "./private_pages/Personnel/AssetList";
 
 const PUBLIC_PAGES = [
   { path: "/", element: <LandingPage /> },
@@ -110,7 +111,7 @@ const PRIVATE_PAGES = [
   
   // Personnel
   { path: "/personnel/maintenance-tasks", element: <MaintenanceTasks /> },
-  { path: "/personnel/asset-list", element: <MaintenanceTasks /> },
+  { path: "/personnel/asset-list", element: <AssetList /> },
 ];
 
 export default function App() {
