@@ -2,6 +2,8 @@ using backend.Auditing;
 using backend.Data;
 using backend.DTOs;
 using backend.DTOs.Requests;
+using backend.DTOs.Requests.Employee;
+using backend.DTOs.Responses.Employee;
 using backend.Exceptions;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,9 @@ namespace backend.Services;
 
 public class EmployeeService(AppDbContext db, AuditContext audit) : IEmployeeService
 {
+    private static readonly string[] MaintenanceReportStatuses =
+        ["Pending", "In Progress", "Completed", "Overdue"];
+    private static readonly TimeSpan PhilippineOffset = TimeSpan.FromHours(8);
     private static readonly string[] AssetStatuses = ["Active", "Inactive", "Under Maintenance"];
     private static readonly string[] AssetConditions = ["Good", "Fair", "Poor", "Damaged"];
     private static readonly string[] AssetCategories =
@@ -109,6 +114,119 @@ public class EmployeeService(AppDbContext db, AuditContext audit) : IEmployeeSer
             PageSize = pageSize,
             TotalPages = TotalPagesOf(total, pageSize)
         };
+    }
+
+    public async Task<GetMaintenanceReportResponse> GetMaintenanceReport(
+        GetMaintenanceReportQuery query, CancellationToken cancellationToken)
+    {
+        var page = Math.Max(1, query.Page);
+        var pageSize = query.PageSize < 1 ? 10 : Math.Min(query.PageSize, 100);
+        if (query.StartDate is { } startDate && query.EndDate is { } endDate && startDate > endDate)
+            throw new BadRequestException("The start date cannot be later than the end date.");
+
+        var tasks = db.MaintenanceTasks.AsNoTracking().AsQueryable();
+        if (query.StartDate is { } start)
+        {
+            var startAtUtc = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue), PhilippineOffset)
+                .UtcDateTime;
+            tasks = tasks.Where(task => task.CreatedAt >= startAtUtc);
+        }
+
+        if (query.EndDate is { } end)
+        {
+            var endAtUtc = new DateTimeOffset(end.AddDays(1).ToDateTime(TimeOnly.MinValue), PhilippineOffset)
+                .UtcDateTime;
+            tasks = tasks.Where(task => task.CreatedAt < endAtUtc);
+        }
+
+        var keyword = query.Keyword?.Trim();
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            var pattern = $"%{EscapeLike(keyword)}%";
+            tasks = tasks.Where(task =>
+                EF.Functions.ILike(task.Name, pattern) ||
+                EF.Functions.ILike(task.Description, pattern) ||
+                EF.Functions.ILike(task.Supervisor.FirstName + " " + task.Supervisor.LastName, pattern) ||
+                task.Assignees.Any(assignee =>
+                    EF.Functions.ILike(
+                        assignee.Personnel.FirstName + " " + assignee.Personnel.LastName, pattern)));
+        }
+
+        var nowInPhilippines = DateTimeOffset.UtcNow.ToOffset(PhilippineOffset);
+        var today = DateOnly.FromDateTime(nowInPhilippines.DateTime);
+        var todayStart = new DateTimeOffset(today.ToDateTime(TimeOnly.MinValue), PhilippineOffset)
+            .ToUniversalTime();
+        if (!string.IsNullOrWhiteSpace(query.Status) &&
+            !query.Status.Equals("All", StringComparison.OrdinalIgnoreCase))
+        {
+            var status = MaintenanceReportStatuses.FirstOrDefault(value =>
+                value.Equals(query.Status.Trim(), StringComparison.OrdinalIgnoreCase))
+                ?? throw new BadRequestException("The selected maintenance report status is invalid.");
+
+            tasks = status switch
+            {
+                "Overdue" => tasks.Where(task => task.Status != "Completed" && task.DueAt < todayStart),
+                "Pending" => tasks.Where(task => task.Status == "Pending" && task.DueAt >= todayStart),
+                "In Progress" => tasks.Where(task => task.Status == "In Progress" && task.DueAt >= todayStart),
+                _ => tasks.Where(task => task.Status == status)
+            };
+        }
+
+        var total = await tasks.CountAsync(cancellationToken);
+        var completed = await tasks.CountAsync(task => task.Status == "Completed", cancellationToken);
+        var inProgress = await tasks.CountAsync(
+            task => task.Status == "In Progress" && task.DueAt >= todayStart,
+            cancellationToken);
+        var overdue = await tasks.CountAsync(
+            task => task.Status != "Completed" && task.DueAt < todayStart,
+            cancellationToken);
+        var pending = await tasks.CountAsync(
+            task => task.Status == "Pending" && task.DueAt >= todayStart,
+            cancellationToken);
+
+        var items = await tasks
+            .OrderByDescending(task => task.CreatedAt)
+            .ThenBy(task => task.Name)
+            .ThenBy(task => task.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Include(task => task.Supervisor)
+            .Include(task => task.Assignees)
+                .ThenInclude(assignee => assignee.Personnel)
+            .ToListAsync(cancellationToken);
+
+        var reportTasks = items.Select(task =>
+        {
+            var status = task.Status != "Completed" && task.DueAt < todayStart
+                ? "Overdue"
+                : task.Status;
+            return new MaintenanceReportTaskResponse(
+                task.Id,
+                task.Name,
+                task.Description,
+                status,
+                task.Assignees
+                    .Select(assignee => $"{assignee.Personnel.FirstName} {assignee.Personnel.LastName}")
+                    .OrderBy(name => name)
+                    .ToList(),
+                $"{task.Supervisor.FirstName} {task.Supervisor.LastName}",
+                new DateTimeOffset(DateTime.SpecifyKind(task.CreatedAt, DateTimeKind.Utc)),
+                task.DueAt,
+                new DateTimeOffset(DateTime.SpecifyKind(task.UpdatedAt, DateTimeKind.Utc)));
+        }).ToList();
+
+        audit.Details =
+            $"Returned maintenance report page {page} (page size {pageSize}), {items.Count} of {total} tasks";
+        return new GetMaintenanceReportResponse(
+            reportTasks,
+            total,
+            completed,
+            inProgress,
+            pending,
+            overdue,
+            page,
+            pageSize,
+            TotalPagesOf(total, pageSize));
     }
 
     public async Task<AssetResponseDto> CreateAsset(SaveAssetRequestDto request)

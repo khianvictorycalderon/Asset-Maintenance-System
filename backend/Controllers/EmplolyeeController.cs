@@ -1,6 +1,8 @@
 using backend.Auditing;
 using backend.DTOs.Requests;
+using backend.DTOs.Requests.Employee;
 using backend.DTOs.Responses;
+using backend.DTOs.Responses.Employee;
 using backend.Middleware;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +21,15 @@ public class EmployeeController(IEmployeeService employeeService) : ControllerBa
     [Audit("Fetch assets")]
     public async Task<IActionResult> GetAssets([FromQuery] GetAssetsQueryDto query)
         => Ok(await employeeService.GetAssets(query));
+
+    /// <summary>Returns a filtered and paginated maintenance report for employees.</summary>
+    [HttpGet("api/employee/maintenance-report")]
+    [Audit("Fetch employee maintenance report")]
+    [ProducesResponseType(typeof(GetMaintenanceReportResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetMaintenanceReport(
+        [FromQuery] GetMaintenanceReportQuery query, CancellationToken cancellationToken)
+        => Ok(await employeeService.GetMaintenanceReport(query, cancellationToken));
 
     [HttpPost("api/employee/assets")]
     [Audit("Register asset")]
