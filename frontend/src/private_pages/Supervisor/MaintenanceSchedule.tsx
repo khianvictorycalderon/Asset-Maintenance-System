@@ -1,7 +1,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  CalendarDays,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -22,7 +21,6 @@ type MaintenanceTask = {
   deadline: string;
 };
 
-// Shape returned by the ASP.NET Core API.
 type ApiMaintenanceTask = {
   id: string;
   name: string;
@@ -89,14 +87,10 @@ const STATUS_OPTIONS = [
 const PAGE_SIZE = 5;
 const API_PAGE_SIZE = 100;
 
-// Converts the API's date into a Philippine calendar date.
-// This avoids shifting a deadline to the previous or next day.
 function toPhilippineDate(dateString: string) {
   const date = new Date(dateString);
 
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
+  if (Number.isNaN(date.getTime())) return "";
 
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Manila",
@@ -113,14 +107,14 @@ function toPhilippineDate(dateString: string) {
 }
 
 function formatDate(dateString: string) {
-  return new Date(`${dateString}T12:00:00`).toLocaleDateString(
-    "en-US",
-    {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    }
-  );
+  if (!dateString) return "—";
+
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Manila",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  }).format(new Date(`${dateString}T12:00:00+08:00`));
 }
 
 function formatMonth(date: Date) {
@@ -130,7 +124,6 @@ function formatMonth(date: Date) {
   });
 }
 
-// Creates the API query string using the selected filters.
 function createQueryString(
   search: string,
   status: string,
@@ -140,21 +133,10 @@ function createQueryString(
 ) {
   const params = new URLSearchParams();
 
-  if (search.trim()) {
-    params.set("keyword", search.trim());
-  }
-
-  if (status !== "All Statuses") {
-    params.set("status", status);
-  }
-
-  if (fromDate) {
-    params.set("startDate", fromDate);
-  }
-
-  if (toDate) {
-    params.set("endDate", toDate);
-  }
+  if (search.trim()) params.set("keyword", search.trim());
+  if (status !== "All Statuses") params.set("status", status);
+  if (fromDate) params.set("startDate", fromDate);
+  if (toDate) params.set("endDate", toDate);
 
   params.set("page", String(page));
   params.set("pageSize", String(API_PAGE_SIZE));
@@ -162,7 +144,6 @@ function createQueryString(
   return params.toString();
 }
 
-// Reads a useful error message from the backend.
 async function getApiError(response: Response) {
   const result = await response.json().catch(() => null);
 
@@ -174,8 +155,6 @@ async function getApiError(response: Response) {
   );
 }
 
-// Fetches every page so the calendar can display all matching tasks,
-// while the visible table keeps its own five-row pagination.
 async function fetchAllMaintenanceTasks(
   search: string,
   status: string,
@@ -196,9 +175,7 @@ async function fetchAllMaintenanceTasks(
     {
       method: "GET",
       credentials: "include",
-      headers: {
-        Accept: "application/json",
-      },
+      headers: { Accept: "application/json" },
       signal,
     }
   );
@@ -212,7 +189,6 @@ async function fetchAllMaintenanceTasks(
 
   let allTasks = [...firstPage.tasks];
 
-  // Request the remaining API pages if there are more than 100 tasks.
   if (firstPage.total_pages > 1) {
     const remainingRequests = Array.from(
       { length: firstPage.total_pages - 1 },
@@ -234,9 +210,7 @@ async function fetchAllMaintenanceTasks(
           {
             method: "GET",
             credentials: "include",
-            headers: {
-              Accept: "application/json",
-            },
+            headers: { Accept: "application/json" },
             signal,
           }
         );
@@ -262,11 +236,7 @@ async function fetchAllMaintenanceTasks(
   }));
 }
 
-function StatusBadge({
-  status,
-}: {
-  status: MaintenanceStatus;
-}) {
+function StatusBadge({ status }: { status: MaintenanceStatus }) {
   const style = STATUS_STYLES[status];
 
   return (
@@ -284,23 +254,19 @@ export default function MaintenanceSchedule() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Start on October 2026, matching your Figma reference.
   const [currentMonth, setCurrentMonth] = useState(
     () => new Date(new Date().getFullYear(), new Date().getMonth(), 1)
   );
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] =
-    useState("All Statuses");
+  const [statusFilter, setStatusFilter] = useState("All Statuses");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [tablePage, setTablePage] = useState(1);
 
-  // Load maintenance tasks from the backend whenever filters change.
   useEffect(() => {
     const controller = new AbortController();
 
-    // Small delay prevents unnecessary requests while typing.
     const timeout = window.setTimeout(async () => {
       try {
         setLoading(true);
@@ -338,10 +304,8 @@ export default function MaintenanceSchedule() {
     };
   }, [search, statusFilter, fromDate, toDate]);
 
-  // The backend already applies the selected filters.
   const filteredTasks = tasks;
 
-  // Generate every date needed to display the complete month.
   const calendarCells = useMemo(() => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -350,30 +314,21 @@ export default function MaintenanceSchedule() {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const previousMonthDays = new Date(year, month, 0).getDate();
 
-    const totalCells =
-      Math.ceil((firstDay + daysInMonth) / 7) * 7;
+    const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
 
     return Array.from({ length: totalCells }, (_, index) => {
       const dayNumber = index - firstDay + 1;
 
       if (dayNumber < 1) {
         return {
-          date: new Date(
-            year,
-            month - 1,
-            previousMonthDays + dayNumber
-          ),
+          date: new Date(year, month - 1, previousMonthDays + dayNumber),
           current: false,
         };
       }
 
       if (dayNumber > daysInMonth) {
         return {
-          date: new Date(
-            year,
-            month + 1,
-            dayNumber - daysInMonth
-          ),
+          date: new Date(year, month + 1, dayNumber - daysInMonth),
           current: false,
         };
       }
@@ -385,7 +340,6 @@ export default function MaintenanceSchedule() {
     });
   }, [currentMonth]);
 
-  // Table pagination.
   const totalPages = Math.max(
     1,
     Math.ceil(filteredTasks.length / PAGE_SIZE)
@@ -415,39 +369,12 @@ export default function MaintenanceSchedule() {
     setTablePage(1);
   }
 
-  function changeSearch(value: string) {
-    setSearch(value);
-    setTablePage(1);
-  }
-
-  function changeStatus(value: string) {
-    setStatusFilter(value);
-    setTablePage(1);
-  }
-
-  function changeFromDate(value: string) {
-    setFromDate(value);
-
-    if (toDate && value && value > toDate) {
-      setToDate("");
-    }
-
-    setTablePage(1);
-  }
-
-  function changeToDate(value: string) {
-    setToDate(value);
-    setTablePage(1);
-  }
-
   function goToTablePage(page: number) {
-    setTablePage(
-      Math.min(Math.max(page, 1), totalPages)
-    );
+    setTablePage(Math.min(Math.max(page, 1), totalPages));
   }
 
   return (
-    <div className="min-h-full w-full bg-[#f4f4f4] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 sm:px-5 lg:px-0">
+    <div className="min-h-full w-full text-neutral-900 dark:text-neutral-50">
       <main className="mx-auto w-full max-w-none space-y-4">
 
         {/* Page heading */}
@@ -455,80 +382,94 @@ export default function MaintenanceSchedule() {
           <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
             Maintenance Schedule
           </h1>
-
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
+          <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400 sm:text-sm">
             Monitor upcoming maintenance deadlines and task progress.
           </p>
         </section>
 
         {/* Search and filters */}
-        <section className="rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-4">
+        <section className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 sm:p-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(200px,1.5fr)_minmax(160px,1fr)_minmax(130px,0.7fr)_minmax(130px,0.7fr)_auto]">
 
-            {/* Search */}
             <div className="relative">
               <Search
                 size={17}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
               />
-
               <input
                 type="text"
                 value={search}
-                onChange={(e) => changeSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setTablePage(1);
+                }}
                 placeholder="Search maintenance task..."
                 aria-label="Search maintenance tasks"
-                className="h-10 w-full rounded-lg border border-zinc-200 bg-white pl-9 pr-3 text-sm outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-zinc-700 dark:bg-zinc-950 dark:focus:ring-orange-950"
+                className="h-10 w-full rounded-lg border border-neutral-300 bg-transparent pl-9 pr-3 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-500 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-50 dark:placeholder:text-neutral-400 dark:focus:ring-orange-950"
               />
             </div>
 
-            {/* Status filter */}
             <div className="relative">
               <select
                 value={statusFilter}
-                onChange={(e) => changeStatus(e.target.value)}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setTablePage(1);
+                }}
                 aria-label="Filter by maintenance status"
-                className="h-10 w-full appearance-none rounded-lg border border-zinc-200 bg-white px-3 pr-9 text-sm outline-none focus:border-orange-500 dark:border-zinc-700 dark:bg-zinc-950"
+                className="h-10 w-full appearance-none rounded-lg border border-neutral-300 bg-transparent px-3 pr-9 text-sm text-neutral-900 outline-none focus:border-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-50"
               >
                 {STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
+                  <option
+                    key={status}
+                    value={status}
+                    className="bg-neutral-50 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50"
+                  >
                     {status}
                   </option>
                 ))}
               </select>
-
               <ChevronDown
                 size={16}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400"
               />
             </div>
 
-            {/* Start date */}
             <input
               type="date"
               value={fromDate}
-              onChange={(e) => changeFromDate(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setFromDate(value);
+
+                if (toDate && value && value > toDate) {
+                  setToDate("");
+                }
+
+                setTablePage(1);
+              }}
               aria-label="From date"
               title="From date"
-              className="h-10 w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-2 text-sm outline-none focus:border-orange-500 dark:border-zinc-700 dark:bg-zinc-950 sm:px-3"
+              className="h-10 w-full min-w-0 rounded-lg border border-neutral-300 bg-transparent px-2 text-sm text-neutral-900 outline-none focus:border-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-50 sm:px-3"
             />
 
-            {/* End date */}
             <input
               type="date"
               value={toDate}
               min={fromDate || undefined}
-              onChange={(e) => changeToDate(e.target.value)}
+              onChange={(e) => {
+                setToDate(e.target.value);
+                setTablePage(1);
+              }}
               aria-label="To date"
               title="To date"
-              className="h-10 w-full min-w-0 rounded-lg border border-zinc-200 bg-white px-2 text-sm outline-none focus:border-orange-500 dark:border-zinc-700 dark:bg-zinc-950 sm:px-3"
+              className="h-10 w-full min-w-0 rounded-lg border border-neutral-300 bg-transparent px-2 text-sm text-neutral-900 outline-none focus:border-orange-500 dark:border-neutral-600 dark:bg-neutral-700 dark:text-neutral-50 sm:px-3"
             />
 
-            {/* Reset */}
             <button
               type="button"
               onClick={resetFilters}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-zinc-100 px-4 text-sm font-medium transition hover:bg-orange-100 hover:text-orange-700 dark:bg-zinc-800 dark:hover:bg-orange-950 dark:hover:text-orange-300"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-neutral-200 px-4 text-sm font-medium text-neutral-800 transition hover:bg-orange-100 hover:text-orange-800 dark:bg-neutral-700 dark:text-neutral-100 dark:hover:bg-orange-950 dark:hover:text-orange-300"
             >
               <RotateCcw size={14} />
               Reset
@@ -537,21 +478,13 @@ export default function MaintenanceSchedule() {
         </section>
 
         {/* Schedule calendar */}
-        <section className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
           <div className="p-3 sm:p-4">
 
-            {/* Calendar heading and legend */}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <CalendarDays
-                  size={20}
-                  className="text-orange-600"
-                />
-
-                <h2 className="text-lg font-bold">
-                  Schedule Calendar
-                </h2>
-              </div>
+              <h2 className="text-lg font-bold">
+                Schedule Calendar
+              </h2>
 
               <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[10px] sm:text-xs">
                 {(
@@ -562,15 +495,11 @@ export default function MaintenanceSchedule() {
                     "Overdue",
                   ] as MaintenanceStatus[]
                 ).map((status) => (
-                  <div
-                    key={status}
-                    className="flex items-center gap-1.5"
-                  >
+                  <div key={status} className="flex items-center gap-1.5">
                     <span
                       className={`h-2 w-2 rounded-full ${STATUS_STYLES[status].dot}`}
                     />
-
-                    <span className="text-zinc-600 dark:text-zinc-300">
+                    <span className="text-neutral-600 dark:text-neutral-300">
                       {status}
                     </span>
                   </div>
@@ -578,12 +507,11 @@ export default function MaintenanceSchedule() {
               </div>
             </div>
 
-            {/* Month navigation */}
             <div className="mt-3 flex items-center justify-between gap-2">
               <button
                 type="button"
                 onClick={() => changeMonth(-1)}
-                className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1.5 text-xs font-medium text-orange-700 transition hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+                className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2.5 py-1.5 text-xs font-medium text-orange-800 transition hover:bg-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
               >
                 <ChevronLeft size={14} />
                 Previous
@@ -596,19 +524,18 @@ export default function MaintenanceSchedule() {
               <button
                 type="button"
                 onClick={() => changeMonth(1)}
-                className="inline-flex items-center gap-1 rounded-md bg-orange-50 px-2.5 py-1.5 text-xs font-medium text-orange-700 transition hover:bg-orange-100 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
+                className="inline-flex items-center gap-1 rounded-md bg-orange-100 px-2.5 py-1.5 text-xs font-medium text-orange-800 transition hover:bg-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:hover:bg-orange-900"
               >
                 Next
                 <ChevronRight size={14} />
               </button>
             </div>
 
-            {/* Full monthly calendar */}
             <div className="mt-3 overflow-x-auto">
               <div className="min-w-[600px]">
 
-                {/* Weekday headers */}
-                <div className="grid grid-cols-7 border-b border-zinc-300 bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-800">
+                {/* Weekday headers: horizontal divider only */}
+                <div className="grid grid-cols-7 divide-x divide-neutral-200 border-y border-neutral-200 bg-neutral-100 dark:divide-neutral-700 dark:border-neutral-700 dark:bg-neutral-700">
                   {[
                     "Sun",
                     "Mon",
@@ -620,7 +547,7 @@ export default function MaintenanceSchedule() {
                   ].map((day) => (
                     <div
                       key={day}
-                      className="border-r border-zinc-300 px-1 py-2 text-center text-xs font-semibold last:border-r-0 dark:border-zinc-700"
+                      className="px-1 py-2 text-center text-xs font-semibold text-neutral-700 dark:text-neutral-200"
                     >
                       {day}
                     </div>
@@ -628,7 +555,7 @@ export default function MaintenanceSchedule() {
                 </div>
 
                 {/* Calendar dates */}
-                <div className="grid grid-cols-7">
+                <div className="grid grid-cols-7 divide-x divide-neutral-200 dark:divide-neutral-700">
                   {calendarCells.map((cell, index) => {
                     const dateKey = [
                       cell.date.getFullYear(),
@@ -643,17 +570,17 @@ export default function MaintenanceSchedule() {
                     return (
                       <div
                         key={`${dateKey}-${index}`}
-                        className={`min-h-[84px] border-b border-r border-zinc-300 p-1.5 last:border-r-0 dark:border-zinc-700 sm:min-h-[94px] sm:p-2 ${
+                        className={`min-h-[84px] border-b border-neutral-200 p-1.5 dark:border-neutral-700 sm:min-h-[94px] sm:p-2 ${
                           cell.current
-                            ? "bg-white dark:bg-zinc-900"
-                            : "bg-zinc-50 dark:bg-zinc-950"
+                            ? "bg-neutral-50 dark:bg-neutral-800"
+                            : "bg-neutral-100/70 dark:bg-neutral-900/40"
                         }`}
                       >
                         <span
                           className={`text-[11px] font-semibold ${
                             cell.current
-                              ? "text-zinc-800 dark:text-zinc-200"
-                              : "text-zinc-400 dark:text-zinc-600"
+                              ? "text-neutral-800 dark:text-neutral-200"
+                              : "text-neutral-400 dark:text-neutral-500"
                           }`}
                         >
                           {cell.date.getDate()}
@@ -669,12 +596,10 @@ export default function MaintenanceSchedule() {
                               <span
                                 className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_STYLES[task.status].dot}`}
                               />
-
                               <span className="min-w-0 break-words">
                                 <span className="font-semibold">
                                   {task.name}
                                 </span>
-
                                 <span className="block opacity-80">
                                   {task.status}
                                 </span>
@@ -690,7 +615,7 @@ export default function MaintenanceSchedule() {
             </div>
 
             {loading && (
-              <p className="mt-3 text-center text-xs text-zinc-500">
+              <p className="mt-3 text-center text-xs text-neutral-500 dark:text-neutral-400">
                 Loading maintenance schedule...
               </p>
             )}
@@ -698,43 +623,42 @@ export default function MaintenanceSchedule() {
         </section>
 
         {/* Maintenance tasks table */}
-        <section className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-700 dark:bg-neutral-800">
 
-          {/* Table heading */}
           <div className="flex flex-wrap items-center gap-3 p-3 sm:p-4">
             <h2 className="text-lg font-bold">
               Maintenance Tasks
             </h2>
 
-            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+            <span className="rounded-full bg-neutral-200 px-3 py-1 text-xs font-medium text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300">
               {filteredTasks.length}{" "}
               {filteredTasks.length === 1 ? "task" : "tasks"}
             </span>
           </div>
 
-          {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full min-w-[600px] border-collapse text-left text-xs sm:text-sm">
               <thead>
-                <tr className="border-y border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+                <tr className="border-y border-neutral-200 dark:border-neutral-700">
                   <th className="w-[36%] px-4 py-3 font-semibold sm:px-6">
                     Maintenance Name
                   </th>
-
                   <th className="w-[30%] px-4 py-3 font-semibold sm:px-6">
                     Maintenance Status
                   </th>
-
                   <th className="px-4 py-3 font-semibold sm:px-6">
                     Maintenance Deadline
                   </th>
                 </tr>
               </thead>
 
-              <tbody>
+              <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
                 {loading && (
                   <tr>
-                    <td colSpan={3} className="px-4 py-12 text-center text-zinc-500">
+                    <td
+                      colSpan={3}
+                      className="px-4 py-12 text-center text-neutral-500 dark:text-neutral-400"
+                    >
                       Loading maintenance tasks...
                     </td>
                   </tr>
@@ -746,7 +670,7 @@ export default function MaintenanceSchedule() {
                       <p className="font-medium text-red-600 dark:text-red-400">
                         Unable to load maintenance tasks
                       </p>
-                      <p className="mt-2 text-xs text-zinc-500">
+                      <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
                         {error}
                       </p>
                     </td>
@@ -758,65 +682,55 @@ export default function MaintenanceSchedule() {
                   paginatedTasks.map((task) => (
                     <tr
                       key={task.id}
-                      className="border-b border-zinc-200 transition hover:bg-orange-50/60 dark:border-zinc-800 dark:hover:bg-zinc-800/60"
+                      className="transition hover:bg-orange-50/70 dark:hover:bg-neutral-700/60"
                     >
                       <td className="px-4 py-3 sm:px-6">
                         <span className="font-medium">
                           {task.name}
                         </span>
                       </td>
-
                       <td className="px-4 py-2 sm:px-6">
                         <StatusBadge status={task.status} />
                       </td>
-
-                      <td className="px-4 py-3 text-zinc-600 dark:text-zinc-300 sm:px-6">
+                      <td className="px-4 py-3 text-neutral-600 dark:text-neutral-300 sm:px-6">
                         {formatDate(task.deadline)}
                       </td>
                     </tr>
                   ))}
 
-                {!loading &&
-                  !error &&
-                  paginatedTasks.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={3}
-                        className="px-4 py-12 text-center"
-                      >
-                        <div className="flex flex-col items-center gap-2 text-zinc-500">
-                          <Search size={24} />
-
-                          <p className="font-medium">
-                            No maintenance tasks found
-                          </p>
-
-                          <p className="text-xs">
-                            There are no maintenance tasks matching your filters.
-                          </p>
-
-                          <button
-                            type="button"
-                            onClick={resetFilters}
-                            className="mt-1 font-semibold text-orange-600 hover:text-orange-700"
-                          >
-                            Clear filters
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                {!loading && !error && paginatedTasks.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-4 py-12 text-center">
+                      <div className="flex flex-col items-center gap-2 text-neutral-500 dark:text-neutral-400">
+                        <Search size={24} />
+                        <p className="font-medium">
+                          No maintenance tasks found
+                        </p>
+                        <p className="text-xs">
+                          There are no maintenance tasks matching your filters.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={resetFilters}
+                          className="mt-1 font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                        >
+                          Clear filters
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
 
-          {/* Table pagination */}
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-zinc-200 p-3 dark:border-zinc-800 sm:p-4">
+          {/* Pagination */}
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-neutral-200 p-3 dark:border-neutral-700 sm:p-4">
             <button
               type="button"
               onClick={() => goToTablePage(tablePage - 1)}
               disabled={tablePage === 1 || loading}
-              className="rounded-lg border border-zinc-200 px-3 py-2 text-xs transition hover:border-orange-400 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700"
+              className="rounded-lg border border-neutral-300 px-3 py-2 text-xs transition hover:border-orange-400 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:hover:text-orange-300"
             >
               Previous
             </button>
@@ -830,20 +744,18 @@ export default function MaintenanceSchedule() {
                 type="button"
                 onClick={() => goToTablePage(page)}
                 disabled={loading}
-                aria-current={
-                  tablePage === page ? "page" : undefined
-                }
+                aria-current={tablePage === page ? "page" : undefined}
                 className={`h-8 min-w-8 rounded-lg px-2 text-xs font-medium transition ${
                   tablePage === page
-                    ? "bg-orange-600 text-white"
-                    : "border border-zinc-200 hover:border-orange-400 dark:border-zinc-700"
+                    ? "bg-orange-600 text-neutral-50"
+                    : "border border-neutral-300 text-neutral-700 hover:border-orange-400 hover:text-orange-700 dark:border-neutral-600 dark:text-neutral-200 dark:hover:text-orange-300"
                 }`}
               >
                 {page}
               </button>
             ))}
 
-            <span className="px-1 text-xs text-zinc-500">
+            <span className="px-1 text-xs text-neutral-500 dark:text-neutral-400">
               Page {tablePage} of {totalPages}
             </span>
 
@@ -851,13 +763,12 @@ export default function MaintenanceSchedule() {
               type="button"
               onClick={() => goToTablePage(tablePage + 1)}
               disabled={tablePage === totalPages || loading}
-              className="rounded-lg border border-zinc-200 px-3 py-2 text-xs transition hover:border-orange-400 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700"
+              className="rounded-lg border border-neutral-300 px-3 py-2 text-xs transition hover:border-orange-400 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:hover:text-orange-300"
             >
               Next
             </button>
           </div>
         </section>
-
       </main>
     </div>
   );
