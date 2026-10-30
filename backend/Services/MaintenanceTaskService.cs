@@ -18,6 +18,39 @@ public sealed class MaintenanceTaskService(AppDbContext db, AuditContext audit) 
     private static string EscapeLike(string value) =>
         value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 
+    // Philippine timezone (UTC+8)
+private static readonly TimeSpan PhilippineOffset = TimeSpan.FromHours(8);
+
+// Gets the UTC equivalent of midnight in the Philippines.
+private static DateTimeOffset PhilippineStartOfDayUtc(DateOnly date)
+{
+    var localMidnight = new DateTimeOffset(
+        date.ToDateTime(TimeOnly.MinValue),
+        PhilippineOffset
+    );
+
+    return localMidnight.ToUniversalTime();
+}
+
+// Determines the status displayed on the frontend.
+private static string GetDisplayStatus(MaintenanceTask task)
+{
+    if (task.Status == "Completed")
+        return "Completed";
+
+    var nowInPhilippines = DateTimeOffset.UtcNow.ToOffset(PhilippineOffset);
+    var today = DateOnly.FromDateTime(nowInPhilippines.DateTime);
+    var todayStart = PhilippineStartOfDayUtc(today);
+
+    if (task.DueAt < todayStart)
+        return "Overdue";
+
+    if (task.Status == "Pending")
+        return "Scheduled";
+
+    return task.Status;
+}
+
     public async Task<GetMaintenanceTasksResponse> GetTasksAsync(
         GetMaintenanceTasksQuery query, Guid supervisorId, CancellationToken cancellationToken)
     {
@@ -41,31 +74,58 @@ public sealed class MaintenanceTaskService(AppDbContext db, AuditContext audit) 
         }
 
         if (!string.IsNullOrWhiteSpace(query.Status) &&
-            !query.Status.Equals("All", StringComparison.OrdinalIgnoreCase))
-        {
-            var status = AllowedStatuses.FirstOrDefault(value =>
-                value.Equals(query.Status, StringComparison.OrdinalIgnoreCase));
-            if (status is null)
-                throw new BadRequestException("The selected task status is invalid.");
+    !query.Status.Equals("All", StringComparison.OrdinalIgnoreCase) &&
+    !query.Status.Equals("All Statuses", StringComparison.OrdinalIgnoreCase))
+{
+    var status = query.Status.Trim();
 
-            tasks = tasks.Where(task => task.Status == status);
-        }
+    var nowInPhilippines = DateTimeOffset.UtcNow.ToOffset(PhilippineOffset);
+    var today = DateOnly.FromDateTime(nowInPhilippines.DateTime);
+    var todayStart = PhilippineStartOfDayUtc(today);
+
+    if (status.Equals("Scheduled", StringComparison.OrdinalIgnoreCase) ||
+        status.Equals("Pending", StringComparison.OrdinalIgnoreCase))
+    {
+        tasks = tasks.Where(task =>
+            task.Status == "Pending" &&
+            task.DueAt >= todayStart);
+    }
+    else if (status.Equals("Overdue", StringComparison.OrdinalIgnoreCase))
+    {
+        tasks = tasks.Where(task =>
+            task.Status != "Completed" &&
+            task.DueAt < todayStart);
+    }
+    else if (status.Equals("In Progress", StringComparison.OrdinalIgnoreCase))
+    {
+        tasks = tasks.Where(task => task.Status == "In Progress");
+    }
+    else if (status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+    {
+        tasks = tasks.Where(task => task.Status == "Completed");
+    }
+    else
+    {
+        throw new BadRequestException("The selected task status is invalid.");
+    }
+}
 
         if (query.PersonnelId is { } personnelId)
             tasks = tasks.Where(task => task.Assignees.Any(assignee => assignee.PersonnelId == personnelId));
 
         if (query.StartDate is { } start)
-        {
-            var startAt = new DateTimeOffset(start.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-            tasks = tasks.Where(task => task.DueAt >= startAt);
-        }
+{
+    var startAt = PhilippineStartOfDayUtc(start);
 
-        if (query.EndDate is { } end)
-        {
-            var dayAfterEnd = end.AddDays(1);
-            var endAt = new DateTimeOffset(dayAfterEnd.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc));
-            tasks = tasks.Where(task => task.DueAt < endAt);
-        }
+    tasks = tasks.Where(task => task.DueAt >= startAt);
+}
+
+if (query.EndDate is { } end)
+{
+    var endAt = PhilippineStartOfDayUtc(end.AddDays(1));
+
+    tasks = tasks.Where(task => task.DueAt < endAt);
+}
 
         var total = await tasks.CountAsync(cancellationToken);
         var items = await tasks
@@ -241,7 +301,7 @@ public sealed class MaintenanceTaskService(AppDbContext db, AuditContext audit) 
             task.Name,
             task.Description,
             task.DueAt,
-            task.Status,
+            GetDisplayStatus(task),
             task.AssignedById,
             task.AssignedBy is null
                 ? null
