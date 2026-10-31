@@ -1,242 +1,162 @@
 import axios from "axios";
-import { useEffect } from "react";
-import { ROLE_BASED_API_URLS } from "../config";
+import { useEffect, useState } from "react";
+import type { ChartData, ChartTypeRegistry } from "chart.js";
+import {
+  AlertTriangle,
+  Boxes,
+  BriefcaseBusiness,
+  ClipboardCheck,
+  Users,
+  UserCheck,
+  Wrench,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import DashboardStatCard from "../components/Dashboard/StatCard";
-import { BriefcaseBusiness, CalendarCheck, Users, Wallet } from "lucide-react";
 import DashboardChart from "../components/Dashboard/Chart";
 
+interface DashboardMetric {
+  title: string;
+  value: string;
+  icon: string;
+  trend: string | null;
+}
+
+interface DashboardChartData {
+  title: string;
+  chart_type: "doughnut" | "bar";
+  labels: string[];
+  values: number[];
+}
+
+interface DashboardData {
+  role: string;
+  metrics: DashboardMetric[];
+  charts: DashboardChartData[];
+}
+
+const metricIcons: Record<string, LucideIcon> = {
+  users: Users,
+  assets: Boxes,
+  tasks: ClipboardCheck,
+  alert: AlertTriangle,
+  people: UserCheck,
+  wrench: Wrench,
+};
+
+const chartColors = ["#2563eb", "#16a34a", "#f59e0b", "#9333ea", "#ef4444", "#0891b2"];
+
+function getChartData(chart: DashboardChartData): ChartData<keyof ChartTypeRegistry, number[], unknown> {
+  const isDoughnut = chart.chart_type === "doughnut";
+  return {
+    labels: chart.labels,
+    datasets: [
+      {
+        label: chart.title,
+        data: chart.values,
+        backgroundColor: isDoughnut ? chartColors : "rgba(37, 99, 235, .65)",
+        borderColor: isDoughnut ? chartColors : "#2563eb",
+        borderWidth: 2,
+        borderRadius: isDoughnut ? undefined : 6,
+      },
+    ],
+  };
+}
+
 export default function Dashboard() {
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-    const handleFetchData = async() => {
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchDashboard = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const res = await axios.get(`${ROLE_BASED_API_URLS.Employee}/test`, { withCredentials: true });
-        console.log(`Backend response: ${res.data.message}`);
-      } catch (e: unknown) {
-        console.error(`Failed to fetch Role-Based API test URLs: ${String(e)}`);
+        const response = await axios.get<DashboardData>(
+          `${import.meta.env.VITE_API_URL}/api/dashboard`,
+          { withCredentials: true, signal: controller.signal },
+        );
+        setDashboard(response.data);
+      } catch (requestError: unknown) {
+        if (controller.signal.aborted) return;
+        const detail = axios.isAxiosError(requestError)
+          ? requestError.response?.data?.detail ?? requestError.response?.data?.message
+          : null;
+        setError(typeof detail === "string" ? detail : "Dashboard data could not be loaded.");
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
-    }
-
-    useEffect(() => {
-      handleFetchData();
-    }, []);
-
-    // -----------------------------------------------------
-    // SAMPLE DATA ONLY
-
-    const employeeGrowthData = {
-      labels: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-      ],
-      datasets: [
-        {
-          label: "New Employees",
-          data: [
-            12,
-            19,
-            15,
-            25,
-            32,
-            40,
-          ],
-          backgroundColor: "#2563eb",
-          borderColor: "#2563eb",
-          borderWidth: 2,
-          borderRadius: 6,
-        },
-      ],
     };
 
+    void fetchDashboard();
+    return () => controller.abort();
+  }, [refreshKey]);
 
-    const departmentData = {
-      labels: [
-        "IT",
-        "HR",
-        "Finance",
-        "Marketing",
-      ],
-      datasets: [
-        {
-          label: "Employees",
-          data: [
-            40,
-            20,
-            25,
-            15,
-          ],
-          backgroundColor: [
-            "#2563eb",
-            "#16a34a",
-            "#f59e0b",
-            "#9333ea",
-          ],
-          borderWidth: 2,
-        },
-      ],
-    };
+  if (loading) {
+    return <div className="rounded-2xl bg-gray-50 p-8 text-center text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">Loading dashboard...</div>;
+  }
 
-
-    const attendanceData = {
-      labels: [
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-      ],
-      datasets: [
-        {
-          label: "Attendance Rate",
-          data: [
-            95,
-            92,
-            98,
-            90,
-            97,
-          ],
-          borderColor: "#16a34a",
-          backgroundColor: "rgba(22,163,74,.2)",
-          borderWidth: 3,
-          tension: 0.4,
-          fill: true,
-        },
-      ],
-    };
-
-
-    const performanceData = {
-      labels: [
-        "Excellent",
-        "Good",
-        "Average",
-        "Poor",
-      ],
-      datasets: [
-        {
-          label: "Employees",
-          data: [
-            30,
-            50,
-            15,
-            5,
-          ],
-          backgroundColor: [
-            "#16a34a",
-            "#2563eb",
-            "#f59e0b",
-            "#ef4444",
-          ],
-          borderWidth: 2,
-        },
-      ],
-    };
-
-    // -----------------------------------------------------
-
+  if (error || !dashboard) {
     return (
-      <>
-        {/* SAMPLE USAGES ONLY, DATA MUST COME FROM THE BACKEND */}
-
-        {/* STATS CARD SECTION */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <DashboardStatCard
-            title="Total Employees"
-            value={248}
-            icon={<Users className="h-6 w-6" />}
-            trend="-3.1% this month"
-          />
-
-          <DashboardStatCard
-            title="Departments"
-            value={12}
-            icon={<BriefcaseBusiness className="h-6 w-6" />}
-            trend="+2 new"
-          />
-
-          <DashboardStatCard
-            title="Monthly Payroll"
-            value="₱1,284,500"
-            icon={<Wallet className="h-6 w-6" />}
-            trend="+5.3%"
-          />
-
-          <DashboardStatCard
-            title="Attendance Today"
-            value="231 / 248"
-            icon={<CalendarCheck className="h-6 w-6" />}
-            trend="93.1%"
-          />
-        </div>
-
-        {/* CHARTS CARD SECTION */}
-        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-
-          <DashboardChart
-            title="Employee Growth"
-            types={[
-              "bar",
-              "line",
-              "radar",
-            ]}
-            defaultType="bar"
-            data={employeeGrowthData}
-          />
-
-
-          <DashboardChart
-            title="Department Distribution"
-            types={[
-              "doughnut",
-              "pie",
-              "polarArea",
-            ]}
-            defaultType="doughnut"
-            data={departmentData}
-          />
-
-
-          <DashboardChart
-            title="Weekly Attendance"
-            types={[
-              "line",
-              "bar",
-            ]}
-            defaultType="line"
-            data={attendanceData}
-          />
-
-
-          <DashboardChart
-            title="Employee Performance"
-            types={[
-              "bar",
-              "pie",
-              "doughnut",
-            ]}
-            defaultType="bar"
-            filters={[
-              {
-                label: "All Departments",
-                value: "all",
-              },
-              {
-                label: "IT",
-                value: "it",
-              },
-              {
-                label: "HR",
-                value: "hr",
-              },
-            ]}
-            data={performanceData}
-          />
-
-        </div>
-
-      </>
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950/30">
+        <p className="text-sm text-red-700 dark:text-red-300">{error ?? "Dashboard data is unavailable."}</p>
+        <button
+          type="button"
+          onClick={() => setRefreshKey((key) => key + 1)}
+          className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Try again
+        </button>
+      </div>
     );
+  }
+
+  const charts = dashboard.charts.filter((chart) => chart.labels.length > 0).slice(0, 2);
+
+  return (
+    <section>
+      <div className="mb-5">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">{dashboard.role} Dashboard</h1>
+        <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
+          A current overview of the information relevant to your role.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {dashboard.metrics.map((metric) => {
+          const Icon = metricIcons[metric.icon] ?? BriefcaseBusiness;
+          return (
+            <DashboardStatCard
+              key={metric.title}
+              title={metric.title}
+              value={metric.value}
+              icon={<Icon className="h-6 w-6" />}
+              trend={metric.trend ?? undefined}
+            />
+          );
+        })}
+      </div>
+
+      {charts.length > 0 ? (
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          {charts.map((chart) => (
+            <DashboardChart
+              key={chart.title}
+              title={chart.title}
+              types={chart.chart_type === "doughnut" ? ["doughnut", "pie", "polarArea"] : ["bar", "line"]}
+              defaultType={chart.chart_type}
+              data={getChartData(chart)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-5 rounded-xl bg-gray-50 p-5 text-center text-sm text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400">
+          There is not enough data to display charts yet.
+        </p>
+      )}
+    </section>
+  );
 }
