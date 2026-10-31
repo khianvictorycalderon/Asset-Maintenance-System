@@ -415,18 +415,10 @@ export const ABOUT: { title: string; desc: string }[] = [
 // ---------------------------------------------------
 export const CHANGELOGS: { release: string; changes: string[] }[] = [
     {
-        release: "1.0.1",
-        changes: [
-            "Updated public pages with system information and documentation.",
-            "Improved navigation and user-facing content."
-        ]
-    },
-    {
         release: "1.0.0",
         changes: [
-            "Initial release of the Asset Maintenance and Monitoring System.", 
-            "Implemented role-based access for system users.",
-            "Added account and authentication functionality.",
+            "Released on October 31, 2026",
+            "Initial release of the Asset Maintenance and Monitoring System.",
         ]
     },
   ];
