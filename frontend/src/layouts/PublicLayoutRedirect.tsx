@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import http from "../utils/http";
+import { setCsrfToken } from "../utils/csrf";
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { BUILT_IN_API_URLS, PRIVATE_ROUTE_FIRST_PATH } from "../config";
 import Footer from "../components/Footer";
@@ -13,10 +14,13 @@ export default function PublicLayoutRedirect() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get(BUILT_IN_API_URLS.verify, {
+        const res = await http.get(BUILT_IN_API_URLS.verify, {
           withCredentials: true,
         });
         setIsAuth(res.data.authenticated);
+        if (res.data.authenticated) {
+          setCsrfToken(res.data.csrf_token);
+        }
       } catch {
         setIsAuth(false);
       } finally {

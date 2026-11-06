@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
@@ -289,7 +290,7 @@ export default function SystemActivityLogs() {
     setError(false);
 
     try {
-      const response = await axios.get<LogsResponse>(
+      const response = await http.get<LogsResponse>(
         `${API_URLS.Admin}/activity-logs?page=${target}&pageSize=${PAGE_SIZE}`,
         { withCredentials: true }
       );

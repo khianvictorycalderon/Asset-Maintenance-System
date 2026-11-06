@@ -119,6 +119,7 @@ export default function App() {
   // Theme initializer
   useEffect(() => {
     setTheme(getTheme());
+    console.log("This project has CSRF protection!");
   }, []);
 
   return (

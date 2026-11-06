@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -232,13 +233,13 @@ export default function MaintenanceReport() {
         pageSize: 100,
       };
       const allTasks: ReportTask[] = [];
-      const firstPage = await axios.get<ReportResponse>(BASE_URL, {
+      const firstPage = await http.get<ReportResponse>(BASE_URL, {
         withCredentials: true,
         params: { ...params, page: 1 },
       });
       allTasks.push(...(firstPage.data.tasks ?? []));
       for (let currentPage = 2; currentPage <= firstPage.data.total_pages; currentPage += 1) {
-        const response = await axios.get<ReportResponse>(BASE_URL, {
+        const response = await http.get<ReportResponse>(BASE_URL, {
           withCredentials: true,
           params: { ...params, page: currentPage },
         });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import http from "../utils/http";
+import { setCsrfToken, clearCsrfToken } from "../utils/csrf";
 
 import {
   Outlet,
@@ -40,15 +41,22 @@ export default function PrivateLayout() {
 
   const checkAuth = async () => {
     try {
-      const res = await axios.get(
+      const res = await http.get(
         BUILT_IN_API_URLS.verify,
         {
           withCredentials: true,
         }
       );
 
+      if (res.data.authenticated) {
+        setCsrfToken(res.data.csrf_token);
+      } else {
+        clearCsrfToken();
+      }
+
       return res.data.authenticated;
     } catch {
+      clearCsrfToken();
       return(false);
     } 
   };
@@ -57,7 +65,7 @@ export default function PrivateLayout() {
   const dispatch = useDispatch();
   const loadUserData = async () => {
     try {
-      const res = await axios.get(
+      const res = await http.get(
         BUILT_IN_API_URLS.getUserData,
         {
           withCredentials: true

@@ -37,6 +37,9 @@
         "Session": {
             "DurationHours": 6
         },
+        "Csrf": {
+            "TokenKey": "YOUR-RANDOM-CHARACTERS-HERE"
+        },
         "Roles": [
             "Admin",
             "Employee",
@@ -58,6 +61,7 @@
     - *Replace with your actual credentials and configuration. Also put actual values for default admin username and password (auto creates on start of the backend application)*
     - *Admin default email should be a valid email.*
     - *Admin password must be strong enough just like in register page.*
+    - *`Csrf:TokenKey` is required (the backend refuses requests without it). Use a long random string and keep it secret, e.g. `openssl rand -hex 32`. Changing it makes already-open tabs send stale tokens (403 on saves) until the page is refreshed; users do not need to log in again.*
 2. Run this if you haven't installed entity framework before:
     ```cmd
     dotnet tool install --global dotnet-ef --version 8.0.4

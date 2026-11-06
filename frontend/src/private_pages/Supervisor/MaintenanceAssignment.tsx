@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import {
   CalendarDays,
   Check,
@@ -297,7 +298,7 @@ export default function MaintenanceAssignment() {
       setLoading(true);
       setListError("");
       try {
-        const response = await axios.get<TasksResponse>(BASE_URL, {
+        const response = await http.get<TasksResponse>(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: filters.keyword.trim() || undefined,
@@ -352,11 +353,11 @@ export default function MaintenanceAssignment() {
         status: currentForm.status,
       };
       if (editing && editTarget) {
-        await axios.put(`${BASE_URL}/${editTarget.id}`, payload, { withCredentials: true });
+        await http.put(`${BASE_URL}/${editTarget.id}`, payload, { withCredentials: true });
         setEditTarget(null);
         showNotice("Maintenance task updated successfully.");
       } else {
-        await axios.post(BASE_URL, payload, { withCredentials: true });
+        await http.post(BASE_URL, payload, { withCredentials: true });
         setForm(EMPTY_FORM);
         showNotice("Maintenance task created successfully.");
       }
@@ -410,7 +411,7 @@ export default function MaintenanceAssignment() {
     setDeleting(true);
     setDeleteError("");
     try {
-      await axios.delete(`${BASE_URL}/${deleteTarget.id}`, { withCredentials: true });
+      await http.delete(`${BASE_URL}/${deleteTarget.id}`, { withCredentials: true });
       setDeleteTarget(null);
       showNotice("Maintenance task deleted successfully.");
       refresh();

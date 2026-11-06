@@ -1,5 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
+import http from "../utils/http";
+import { setCsrfToken } from "../utils/csrf";
 import { Link, useNavigate } from "react-router-dom";
 import { BUILT_IN_API_URLS, PRIVATE_ROUTE_FIRST_PATH } from "../config";
 
@@ -45,11 +46,13 @@ export default function Login() {
     setError("");
 
     try {
-      await axios.post(
+      const res = await http.post(
         BUILT_IN_API_URLS.login,
         { email, password },
         { withCredentials: true }
       );
+
+      setCsrfToken(res.data.csrf_token);
 
       navigate(PRIVATE_ROUTE_FIRST_PATH, { replace: true });
 

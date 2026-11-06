@@ -10,6 +10,8 @@ Cors__AllowedOrigins__1=X
 
 Session__DurationHours=6
 
+Csrf__TokenKey=X
+
 Roles__0=Admin
 Roles__1=Employee
 Roles__2=Supervisor

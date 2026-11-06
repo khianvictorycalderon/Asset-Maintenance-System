@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "../../utils/http";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
@@ -65,7 +65,7 @@ export default function MaintenanceTasks() {
       setListError("");
 
       try {
-        const res = await axios.get<PersonnelTasksResponse>(BASE_URL, {
+        const res = await http.get<PersonnelTasksResponse>(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: applied.keyword.trim() || undefined,
@@ -158,7 +158,7 @@ export default function MaintenanceTasks() {
     setSaveError("");
 
     try {
-      await axios.patch(`${BASE_URL}/${target.id}/status`, { status }, { withCredentials: true });
+      await http.patch(`${BASE_URL}/${target.id}/status`, { status }, { withCredentials: true });
       setNotice({
         type: "success",
         message: `“${target.name}” was marked as ${status}.`,

@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../utils/http";
 import { useEffect, useState } from "react";
 import type { ChartData, ChartTypeRegistry } from "chart.js";
 import {
@@ -75,7 +76,7 @@ export default function Dashboard() {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<DashboardData>(
+        const response = await http.get<DashboardData>(
           `${import.meta.env.VITE_API_URL}/api/dashboard`,
           { withCredentials: true, signal: controller.signal },
         );

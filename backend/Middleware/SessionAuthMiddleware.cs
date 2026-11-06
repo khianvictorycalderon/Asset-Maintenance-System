@@ -1,4 +1,5 @@
 using backend.Data;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -8,7 +9,7 @@ public class SessionAuthMiddleware(RequestDelegate next)
 {
     private const string CookieName = "session_id";
 
-    public async Task InvokeAsync(HttpContext context, AppDbContext db)
+    public async Task InvokeAsync(HttpContext context, AppDbContext db, ICsrfTokenService csrfTokenService)
     {
         if (context.Request.Cookies.TryGetValue(CookieName, out var rawId)
             && Guid.TryParse(rawId, out var sessionId))
@@ -34,6 +35,7 @@ public class SessionAuthMiddleware(RequestDelegate next)
                 context.Items["Email"] = result.Email;
                 context.Items["Role"] = result.Role;
                 context.Items["SessionId"] = sessionId;
+                context.Items["CsrfToken"] = csrfTokenService.Compute(sessionId);
 
                 // SignalR / HttpContext.User authentication
                 var claims = new List<Claim>

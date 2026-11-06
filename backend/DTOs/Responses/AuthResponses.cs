@@ -4,6 +4,10 @@ public class LoginResponse
 {
     public string Message { get; set; } = string.Empty;
     public UserBasicResponse? User { get; set; }
+    // Anti-CSRF token for the session just created. The frontend stores
+    // this in memory and echoes it back via X-CSRF-TOKEN on every
+    // POST/PUT/PATCH/DELETE request (see frontend/src/utils/csrf.ts).
+    public string? CsrfToken { get; set; }
 }
 
 public class RegisterResponse
@@ -16,6 +20,10 @@ public class VerifyResponse
 {
     public bool Authenticated { get; set; }
     public UserVerifyResponse? User { get; set; }
+    // Re-handed out on every /api/verify call so a full page reload (or
+    // an app that lost its in-memory copy) can recover the current
+    // session's CSRF token without needing to log in again.
+    public string? CsrfToken { get; set; }
 }
 
 public class UserBasicResponse
