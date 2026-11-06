@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -215,9 +216,9 @@ export default function AssetsAssignment() {
     (async () => {
       try {
         const [sup, supAll, asg] = await Promise.all([
-          axios.get(SUPERVISORS_URL, cfg),
-          axios.get(SUPERVISORS_URL, { ...cfg, params: { includeRevoked: true } }),
-          axios.get(`${BASE_URL}/assigner-options`, cfg),
+          http.get(SUPERVISORS_URL, cfg),
+          http.get(SUPERVISORS_URL, { ...cfg, params: { includeRevoked: true } }),
+          http.get(`${BASE_URL}/assigner-options`, cfg),
         ]);
         if (cancelled) return;
         setSupervisors(sup.data.supervisors ?? []);
@@ -248,7 +249,7 @@ export default function AssetsAssignment() {
     const timer = setTimeout(
       async () => {
         try {
-          const res = await axios.get(`${BASE_URL}/asset-options`, {
+          const res = await http.get(`${BASE_URL}/asset-options`, {
             withCredentials: true,
             params: { keyword: assetKeyword.trim() || undefined, limit: 100 },
           });
@@ -296,7 +297,7 @@ export default function AssetsAssignment() {
       setLoading(true);
       setListError("");
       try {
-        const res = await axios.get(BASE_URL, {
+        const res = await http.get(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: filters.search.trim() || undefined,
@@ -365,7 +366,7 @@ export default function AssetsAssignment() {
 
     setSubmitting(true);
     try {
-      await axios.post(
+      await http.post(
         BASE_URL,
         {
           asset_ids: selectedAssets.map((asset) => asset.id),
@@ -441,7 +442,7 @@ export default function AssetsAssignment() {
     setEditSaving(true);
     setEditError("");
     try {
-      await axios.put(
+      await http.put(
         `${BASE_URL}/${editing.id}`,
         { supervisor_id: editSupervisor },
         { withCredentials: true }
@@ -480,7 +481,7 @@ export default function AssetsAssignment() {
     setDeleting(true);
     setDeleteError("");
     try {
-      await axios.delete(`${BASE_URL}/${deleteTarget.id}`, {
+      await http.delete(`${BASE_URL}/${deleteTarget.id}`, {
         withCredentials: true,
       });
       setDeleteTarget(null);

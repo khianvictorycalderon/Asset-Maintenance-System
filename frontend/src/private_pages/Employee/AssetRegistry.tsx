@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
@@ -371,7 +372,7 @@ export default function AssetRegistryPage() {
       setListError("");
 
       try {
-        const response = await axios.get<AssetsResponse>(
+        const response = await http.get<AssetsResponse>(
           `${API_URLS.Employee}/assets`,
           {
             withCredentials: true,
@@ -489,7 +490,7 @@ export default function AssetRegistryPage() {
     setMessage(null);
 
     try {
-      const response = await axios.post<AssetResponse>(
+      const response = await http.post<AssetResponse>(
         `${API_URLS.Employee}/assets`,
         toPayload(form),
         { withCredentials: true }
@@ -540,7 +541,7 @@ export default function AssetRegistryPage() {
     setEditError("");
 
     try {
-      const response = await axios.put<AssetResponse>(
+      const response = await http.put<AssetResponse>(
         `${API_URLS.Employee}/assets/${editingId}`,
         toPayload(editForm),
         { withCredentials: true }
@@ -595,7 +596,7 @@ export default function AssetRegistryPage() {
     setMessage(null);
 
     try {
-      const response = await axios.delete<{ message: string }>(
+      const response = await http.delete<{ message: string }>(
         `${API_URLS.Employee}/assets/${asset.id}`,
         { withCredentials: true }
       );

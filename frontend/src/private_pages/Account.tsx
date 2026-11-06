@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+import http from "../utils/http";
 import { BUILT_IN_API_URLS, REGISTER_FIELDS } from "../config";
 import Loading from "../components/Loading";
 import { useNavigate } from "react-router-dom";
@@ -255,7 +255,7 @@ export default function Account() {
 
   const fetchUser = useCallback(async () => {
     try {
-        const res = await axios.get(
+        const res = await http.get(
             BUILT_IN_API_URLS.getUserData,
             { withCredentials: true }
         );
@@ -285,7 +285,7 @@ export default function Account() {
   const fetchSessions = useCallback(async (page = 1) => {
     setSessionsLoading(true);
     try {
-      const res = await axios.get(`${BUILT_IN_API_URLS.sessions}?page=${page}`, { withCredentials: true });
+      const res = await http.get(`${BUILT_IN_API_URLS.sessions}?page=${page}`, { withCredentials: true });
       setSessions(res.data.sessions);
       setSessionPagination(res.data.pagination);
     } catch {
@@ -335,7 +335,7 @@ export default function Account() {
   const handleUpdateInfo = async () => {
     setIsSavingInfo(true);
     try {
-      await axios.patch(`${BUILT_IN_API_URLS.updateUserData}/${user.id}`, form, { withCredentials: true });
+      await http.patch(`${BUILT_IN_API_URLS.updateUserData}/${user.id}`, form, { withCredentials: true });
       showMsg(setInfoMessage, "success", "Profile updated successfully");
     } catch (err: any) {
       showMsg(setInfoMessage, "error", err?.response?.data?.message || "Failed to update profile");
@@ -350,7 +350,7 @@ export default function Account() {
     if (passwordForm.new_password !== passwordForm.confirm_password) { showMsg(setPasswordMessage, "error", "Passwords do not match"); return; }
     setIsSavingPassword(true);
     try {
-      await axios.patch(BUILT_IN_API_URLS.updatePassword, passwordForm, { withCredentials: true });
+      await http.patch(BUILT_IN_API_URLS.updatePassword, passwordForm, { withCredentials: true });
       setPasswordForm({ current_password: "", new_password: "", confirm_password: "" });
       showMsg(setPasswordMessage, "success", "Password updated successfully");
     } catch (err: any) {
@@ -364,7 +364,7 @@ export default function Account() {
     if (!deletePassword.trim()) { showMsg(setDeleteMessage, "error", "Please enter your password to confirm"); return; }
     setIsDeletingAccount(true);
     try {
-      await axios.delete(`${BUILT_IN_API_URLS.deleteUser}/${user.id}`, { data: { password: deletePassword }, withCredentials: true });
+      await http.delete(`${BUILT_IN_API_URLS.deleteUser}/${user.id}`, { data: { password: deletePassword }, withCredentials: true });
       navigate("/");
     } catch (err: any) {
       showMsg(setDeleteMessage, "error", err?.response?.data?.message || "Failed to delete account");
@@ -376,7 +376,7 @@ export default function Account() {
   const handleRevokeSession = async (sessionId: string) => {
     setRevokingId(sessionId);
     try {
-      await axios.delete(`${BUILT_IN_API_URLS.sessions}/${sessionId}`, { withCredentials: true });
+      await http.delete(`${BUILT_IN_API_URLS.sessions}/${sessionId}`, { withCredentials: true });
       showMsg(setSessionMessage, "success", "Session revoked");
       await fetchSessions(sessionPagination.page);
     } catch (err: any) {
@@ -389,7 +389,7 @@ export default function Account() {
   const handleRevokeAll = async () => {
     setIsRevokingAll(true);
     try {
-      await axios.delete(BUILT_IN_API_URLS.sessions, { withCredentials: true });
+      await http.delete(BUILT_IN_API_URLS.sessions, { withCredentials: true });
       showMsg(setSessionMessage, "success", "All other sessions revoked");
       await fetchSessions(1);
     } catch (err: any) {

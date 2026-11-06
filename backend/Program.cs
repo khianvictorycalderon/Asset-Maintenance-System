@@ -44,6 +44,7 @@ app.UseCorsPolicy();
 app.UseAudit();            // must wrap the exception handler to see the final status code
 app.UseExceptionHandler();
 app.UseSessionAuth();
+app.UseCsrfProtection();   // must run AFTER UseSessionAuth (needs the session's CSRF token)
 
 app.MapControllers();
 // For real-time features

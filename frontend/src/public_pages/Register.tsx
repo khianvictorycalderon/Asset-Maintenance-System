@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import http from "../utils/http";
 import { Link, useSearchParams } from "react-router-dom";
 import { BUILT_IN_API_URLS, REGISTER_FIELDS } from "../config";
 
@@ -103,7 +103,7 @@ export default function Register() {
           (item) => item.label === role
         )?.value;
 
-        await axios.post(BUILT_IN_API_URLS.register, {
+        await http.post(BUILT_IN_API_URLS.register, {
           ...form,
           role: backendRole,
         });        

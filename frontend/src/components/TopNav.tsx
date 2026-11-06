@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import http from "../utils/http";
+import { clearCsrfToken } from "../utils/csrf";
 import { useDispatch, useSelector } from "react-redux";
 import { BUILT_IN_API_URLS, NAVBAR_HEADER, type UserRole } from "../config";
 import { getTheme, setTheme } from "../utils/theme";
@@ -58,10 +59,11 @@ export default function TopNav({ onMenuClick }: Props) {
 
     const handleLogout = async () => {
         try {
-            await axios.delete(BUILT_IN_API_URLS.logout, {
+            await http.delete(BUILT_IN_API_URLS.logout, {
                 withCredentials: true,
             });
 
+            clearCsrfToken();
             navigate("/login");
             dispatch(clearUser()); // Clears existing user
         } catch (err) {

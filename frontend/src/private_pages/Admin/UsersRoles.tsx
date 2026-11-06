@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import Modal from "../../Modal";
 import Pagination from "../../Pagination";
@@ -120,7 +121,7 @@ const AdminUsersRoles = () => {
     setErrorMessage("");
 
     try {
-      const response = await axios.get<UsersResponse>(
+      const response = await http.get<UsersResponse>(
         `${API_URLS.Admin}/users?page=${page}&pageSize=${itemsPerPage}`,
         { withCredentials: true }
       );
@@ -228,7 +229,7 @@ const AdminUsersRoles = () => {
     setLoadingId(user.id);
 
     try {
-      const response = await axios.patch<{
+      const response = await http.patch<{
         is_user_banned: boolean;
         message: string;
       }>(
@@ -327,7 +328,7 @@ const AdminUsersRoles = () => {
 
     try {
       // Only new_password is sent. confirm_password never leaves the browser.
-      const response = await axios.patch<{ message: string }>(
+      const response = await http.patch<{ message: string }>(
         `${API_URLS.Admin}/users/${selectedUser.id}/password-change`,
         { new_password: newPassword },
         { withCredentials: true }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ROLE_BASED_API_URLS as API_URLS } from "../../config";
@@ -50,7 +50,7 @@ export default function AssetList() {
 
     (async () => {
       try {
-        const res = await axios.get<AssetFilterOptionsResponse>(
+        const res = await http.get<AssetFilterOptionsResponse>(
           `${BASE_URL}/filter-options`,
           { withCredentials: true }
         );
@@ -81,7 +81,7 @@ export default function AssetList() {
       setLoading(true);
       setListError("");
       try {
-        const res = await axios.get<PersonnelAssetsResponse>(BASE_URL, {
+        const res = await http.get<PersonnelAssetsResponse>(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: applied.keyword.trim() || undefined,

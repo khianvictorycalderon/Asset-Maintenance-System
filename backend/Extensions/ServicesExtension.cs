@@ -10,6 +10,7 @@ public static class ServicesExtension
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ISessionService, SessionService>();
+        services.AddSingleton<ICsrfTokenService, CsrfTokenService>();
 
         // Auditing
         services.AddScoped<AuditContext>();

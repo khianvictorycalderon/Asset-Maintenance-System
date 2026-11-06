@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Calendar, ChevronDown } from "lucide-react";
@@ -125,7 +126,7 @@ export default function AssignedAssets() {
     (async () => {
       setFilterOptionsError("");
       try {
-        const res = await axios.get(`${BASE_URL}/filter-options`, {
+        const res = await http.get(`${BASE_URL}/filter-options`, {
           withCredentials: true,
         });
         if (cancelled) return;
@@ -157,7 +158,7 @@ export default function AssignedAssets() {
       setLoading(true);
       setListError("");
       try {
-        const res = await axios.get(BASE_URL, {
+        const res = await http.get(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: applied.keyword.trim() || undefined,

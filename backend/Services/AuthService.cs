@@ -8,7 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
 
-public class AuthService(AppDbContext db, IConfiguration configuration, IHubContext<SyncHub> hub) : IAuthService
+public class AuthService(
+    AppDbContext db,
+    IConfiguration configuration,
+    IHubContext<SyncHub> hub,
+    ICsrfTokenService csrfTokenService
+) : IAuthService
 {
     private readonly int _sessionDurationHours =
         configuration.GetValue<int>("Session:DurationHours", 6);
@@ -58,7 +63,8 @@ public class AuthService(AppDbContext db, IConfiguration configuration, IHubCont
                 Email     = user.Email,
                 FirstName = user.FirstName,
                 LastName  = user.LastName
-            }
+            },
+            CsrfToken = csrfTokenService.Compute(session.Id)
         };
 
         await _hub.Clients.Group($"User_{user.Id}")
@@ -154,7 +160,8 @@ public class AuthService(AppDbContext db, IConfiguration configuration, IHubCont
                 Id    = user.Id,
                 Email = user.Email,
                 Role  = user.Role
-            }
+            },
+            CsrfToken = csrfTokenService.Compute(sessionId.Value)
         };
 
         return response;

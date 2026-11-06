@@ -1,4 +1,5 @@
 import axios from "axios";
+import http from "../../utils/http";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -178,10 +179,10 @@ export default function AssignPersonnel() {
     (async () => {
       try {
         const [sup, supAll, per, asg] = await Promise.all([
-          axios.get(SUPERVISORS_URL, cfg),
-          axios.get(SUPERVISORS_URL, { ...cfg, params: { includeRevoked: true } }),
-          axios.get(`${BASE_URL}/personnel-options`, { ...cfg, params: { limit: 100 } }),
-          axios.get(`${BASE_URL}/assigner-options`, cfg),
+          http.get(SUPERVISORS_URL, cfg),
+          http.get(SUPERVISORS_URL, { ...cfg, params: { includeRevoked: true } }),
+          http.get(`${BASE_URL}/personnel-options`, { ...cfg, params: { limit: 100 } }),
+          http.get(`${BASE_URL}/assigner-options`, cfg),
         ]);
         if (cancelled) return;
         setSupervisors(sup.data.supervisors ?? []);
@@ -214,7 +215,7 @@ export default function AssignPersonnel() {
       setLoading(true);
       setListError("");
       try {
-        const res = await axios.get(BASE_URL, {
+        const res = await http.get(BASE_URL, {
           withCredentials: true,
           params: {
             keyword: applied.keyword.trim() || undefined,
@@ -277,7 +278,7 @@ export default function AssignPersonnel() {
     setSubmitting(true);
     setMessage("");
     try {
-      await axios.post(
+      await http.post(
         BASE_URL,
         { personnel_ids: [selectedPersonnel], supervisor_id: selectedSupervisor },
         { withCredentials: true }
@@ -326,7 +327,7 @@ export default function AssignPersonnel() {
     setEditSaving(true);
     setEditError("");
     try {
-      await axios.put(
+      await http.put(
         `${BASE_URL}/${editTarget.id}`,
         { supervisor_id: editSupervisor },
         { withCredentials: true }
@@ -365,7 +366,7 @@ export default function AssignPersonnel() {
     setDeleting(true);
     setDeleteError("");
     try {
-      await axios.delete(`${BASE_URL}/${deleteTarget.id}`, {
+      await http.delete(`${BASE_URL}/${deleteTarget.id}`, {
         withCredentials: true,
       });
       setDeleteTarget(null);
